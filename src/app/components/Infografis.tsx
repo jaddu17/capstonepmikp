@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { Phone, MessageCircle, Activity, Shield, Flame, Wind, Heart, Home, Camera, Info } from "lucide-react";
-import logo from "../../assets/logo_pmi.png";
-
 export function Infografis() {
   const [infografisList, setInfografisList] = useState<any[]>([]);
   const [activeData, setActiveData] = useState<any>(null);
@@ -97,9 +95,6 @@ export function Infografis() {
                 </div>
                 <div className="w-48 h-48 flex-shrink-0 bg-red-50 rounded-[2.5rem] flex items-center justify-center border-4 border-dashed border-[#C21219]/20 overflow-hidden group-hover:border-[#C21219]/40 transition-colors">
                   <Shield className="w-24 h-24 text-[#C21219] opacity-10 group-hover:scale-110 transition-transform" />
-                  <div className="absolute inset-0 flex items-center justify-center p-8">
-                    <img src={logo} className="w-full h-full object-contain opacity-90" alt="Logo PMI" />
-                  </div>
                 </div>
               </div>
             </div>

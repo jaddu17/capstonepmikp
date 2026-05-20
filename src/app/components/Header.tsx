@@ -1,10 +1,11 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/logo_pmi.png";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   const navigation = [
     { name: "Beranda", href: "/" },
@@ -35,10 +36,10 @@ export function Header() {
               <Link
                 key={item.name}
                 to={item.href}
-                className={`text-sm font-medium transition-colors ${
-                  item.name === "Donasi" 
-                    ? "bg-primary text-white px-5 py-2 rounded-full hover:bg-[#C21219] shadow-md hover:shadow-primary/20"
-                    : "text-foreground hover:text-primary"
+                className={`text-sm font-medium transition-all px-4 py-2 rounded-full ${
+                  location.pathname === item.href
+                    ? "bg-primary text-white shadow-md hover:bg-[#C21219] hover:shadow-primary/20"
+                    : "text-foreground hover:bg-primary/5 hover:text-primary"
                 }`}
               >
                 {item.name}
@@ -65,8 +66,8 @@ export function Header() {
                 key={item.name}
                 to={item.href}
                 className={`block py-3 px-4 rounded-xl transition-all ${
-                  item.name === "Donasi"
-                    ? "bg-primary text-white text-center font-bold mt-4 shadow-lg"
+                  location.pathname === item.href
+                    ? "bg-primary text-white font-bold shadow-md"
                     : "text-foreground hover:bg-gray-50 hover:text-primary font-medium"
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
