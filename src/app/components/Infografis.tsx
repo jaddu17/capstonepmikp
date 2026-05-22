@@ -23,19 +23,19 @@ export function Infografis() {
   if (!activeData) return null;
 
   return (
-    <section id="infografis" className="py-20 bg-[#F8F9FA] overflow-hidden">
+    <section id="infografis" className="py-20 bg-gradient-to-br from-[#C41E3A] to-[#8B1529] overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16 space-y-4">
-          <div className="inline-block px-4 py-1.5 bg-[#C21219]/10 text-[#C21219] rounded-full text-xs font-black uppercase tracking-[0.2em]">
+          <div className="inline-block px-4 py-1.5 bg-white/20 text-white rounded-full text-xs font-black uppercase tracking-[0.2em]">
             Transparansi & Akuntabilitas
           </div>
-          <h2 className="text-4xl md:text-5xl font-black text-[#C21219] tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
             INFOGRAFIS PMI KABUPATEN KULON PROGO
           </h2>
           
           <div className="flex flex-col items-center gap-4 mt-6">
-            <div className="text-xl font-bold text-gray-500 uppercase tracking-widest">
+            <div className="text-xl font-bold text-white/80 uppercase tracking-widest">
               Laporan Kinerja Bulan:
             </div>
             <select 
@@ -44,7 +44,7 @@ export function Infografis() {
                 const selected = infografisList.find(d => d.id === e.target.value);
                 if (selected) setActiveData(selected);
               }}
-              className="px-8 py-3 bg-white border-2 border-[#C21219] rounded-2xl text-2xl font-black text-gray-900 shadow-xl focus:ring-4 focus:ring-[#C21219]/10 outline-none appearance-none cursor-pointer hover:bg-gray-50 transition-all text-center"
+              className="px-8 py-3 bg-white border-2 border-white rounded-2xl text-2xl font-black text-[#C41E3A] shadow-xl focus:ring-4 focus:ring-white/30 outline-none appearance-none cursor-pointer hover:bg-gray-50 transition-all text-center"
             >
               {infografisList.map(item => (
                 <option key={item.id} value={item.id}>
@@ -59,14 +59,14 @@ export function Infografis() {
           {/* Left Column: Contacts & Stats */}
           <div className="space-y-10">
             {/* Contacts Card */}
-            <div className="relative p-8 bg-white border-2 border-[#C21219] rounded-[2.5rem] shadow-2xl overflow-hidden group">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-[#C21219]/5 rounded-bl-full -mr-16 -mt-16 transition-all group-hover:scale-110"></div>
+            <div className="relative p-8 bg-white border-2 border-white rounded-[2.5rem] shadow-2xl overflow-hidden group">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-[#C41E3A]/5 rounded-bl-full -mr-16 -mt-16 transition-all group-hover:scale-110"></div>
               
               <div className="flex flex-col md:flex-row items-center gap-10 relative z-10">
                 <div className="flex-1 space-y-5 w-full">
-                  <h4 className="text-sm font-black text-[#C21219] uppercase tracking-widest mb-2">Layanan Darurat 24 Jam</h4>
+                  <h4 className="text-sm font-black text-[#C41E3A] uppercase tracking-widest mb-2">Layanan Darurat 24 Jam</h4>
                   <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 group/item hover:border-[#C21219]/30 transition-all">
-                    <div className="w-12 h-12 bg-[#C21219] text-white rounded-xl flex items-center justify-center shadow-lg group-hover/item:rotate-12 transition-transform">
+                    <div className="w-12 h-12 bg-[#C41E3A] text-white rounded-xl flex items-center justify-center shadow-lg group-hover/item:rotate-12 transition-transform">
                       <Phone className="w-6 h-6" />
                     </div>
                     <div>
@@ -93,8 +93,8 @@ export function Infografis() {
                     </div>
                   </div>
                 </div>
-                <div className="w-48 h-48 flex-shrink-0 bg-red-50 rounded-[2.5rem] flex items-center justify-center border-4 border-dashed border-[#C21219]/20 overflow-hidden group-hover:border-[#C21219]/40 transition-colors">
-                  <Shield className="w-24 h-24 text-[#C21219] opacity-10 group-hover:scale-110 transition-transform" />
+                <div className="w-48 h-48 flex-shrink-0 bg-red-50 rounded-[2.5rem] flex items-center justify-center border-4 border-dashed border-[#C41E3A]/20 overflow-hidden group-hover:border-[#C41E3A]/40 transition-colors">
+                  <Shield className="w-24 h-24 text-[#C41E3A] opacity-10 group-hover:scale-110 transition-transform" />
                 </div>
               </div>
             </div>
@@ -130,13 +130,13 @@ export function Infografis() {
           {/* Right Column: Documentation & Pelayanan */}
           <div className="bg-white border-2 border-gray-100 rounded-[3rem] p-10 relative shadow-2xl flex flex-col h-full">
             <div className="flex items-center gap-3 mb-8">
-              <Camera className="w-6 h-6 text-[#C21219]" />
+              <Camera className="w-6 h-6 text-[#C41E3A]" />
               <h3 className="text-2xl font-black tracking-widest text-gray-900 uppercase">DOKUMENTASI</h3>
             </div>
             
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
               {activeData.dokumentasi.map((img, idx) => (
-                <div key={idx} className="aspect-square bg-gray-50 rounded-3xl overflow-hidden group border-2 border-transparent hover:border-[#C21219] transition-all relative">
+                <div key={idx} className="aspect-square bg-gray-50 rounded-3xl overflow-hidden group border-2 border-transparent hover:border-[#C41E3A] transition-all relative">
                   {img ? (
                     <img 
                       src={img} 
@@ -155,13 +155,13 @@ export function Infografis() {
 
             <div className="mt-auto pt-10 border-t-2 border-gray-50">
               <div className="flex items-center gap-3 mb-6">
-                <Info className="w-6 h-6 text-[#C21219]" />
+                <Info className="w-6 h-6 text-[#C41E3A]" />
                 <h3 className="text-xl font-black text-gray-900 uppercase">PELAYANAN TERPADU</h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {activeData.pelayanan.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl font-bold text-gray-700 hover:bg-[#C21219] hover:text-white transition-all cursor-default group/pel">
-                    <div className="w-2 h-2 bg-[#C21219] rounded-full group-hover/pel:bg-white transition-colors"></div>
+                  <div key={idx} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl font-bold text-gray-700 hover:bg-[#C41E3A] hover:text-white transition-all cursor-default group/pel">
+                    <div className="w-2 h-2 bg-[#C41E3A] rounded-full group-hover/pel:bg-white transition-colors"></div>
                     {item}
                   </div>
                 ))}
@@ -172,7 +172,7 @@ export function Infografis() {
 
         {/* Bottom Section: Quote */}
         <div className="mt-16 text-center">
-          <div className="max-w-4xl mx-auto p-12 bg-[#C21219] rounded-[3rem] shadow-2xl shadow-[#C21219]/20 relative overflow-hidden group">
+          <div className="max-w-4xl mx-auto p-12 bg-[#C41E3A] rounded-[3rem] shadow-2xl shadow-[#C41E3A]/20 relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
             <div className="relative z-10">
               <div className="text-white/40 text-6xl font-serif absolute -top-4 -left-2">"</div>

@@ -1,0 +1,58 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Pengunjung (Public User)" as Visitor
+actor "Administrator (Admin)" as Admin
+
+package "PMI Kulon Progo Website" {
+  usecase "Melihat Halaman Home" as UC_Home
+  usecase "Melihat Daftar Berita" as UC_NewsList
+  usecase "Membaca Detail Berita" as UC_NewsDetail
+  usecase "Melihat Stok Darah" as UC_Stock
+  usecase "Melihat Jadwal Donor" as UC_Schedule
+  usecase "Melihat Informasi Donor / Prosedur" as UC_InfoDonor
+  usecase "Submit Donation Info" as UC_SubmitDonation
+  usecase "Send Message / Contact" as UC_Contact
+
+  usecase "Login" as UC_Login
+  usecase "Melihat Dashboard" as UC_Dashboard
+  usecase "Mengelola Berita (Add/Edit/Delete/Publish)" as UC_ManageNews
+  usecase "Mengelola Donasi (View/Update/Delete)" as UC_ManageDonasi
+  usecase "Mengelola Stok Darah" as UC_ManageStock
+  usecase "Mengelola Jadwal (Add/Edit/Delete)" as UC_ManageJadwal
+  usecase "Mengelola Pesan (View/Reply/Delete)" as UC_ManagePesan
+  usecase "Mengelola Infografis / Kontak" as UC_ManageInfo
+}
+
+' Public user interactions
+Visitor --> UC_Home
+Visitor --> UC_NewsList
+Visitor --> UC_NewsDetail
+Visitor --> UC_Stock
+Visitor --> UC_Schedule
+Visitor --> UC_InfoDonor
+Visitor --> UC_SubmitDonation
+Visitor --> UC_Contact
+
+' Admin interactions
+Admin --> UC_Login
+Admin --> UC_Dashboard
+Admin --> UC_ManageNews
+Admin --> UC_ManageDonasi
+Admin --> UC_ManageStock
+Admin --> UC_ManageJadwal
+Admin --> UC_ManagePesan
+Admin --> UC_ManageInfo
+
+' include relationships
+UC_Login .> UC_Dashboard : <<include>>
+UC_ManageNews .> UC_NewsList : <<extend>>
+UC_ManageDonasi .> UC_SubmitDonation : <<extend>>
+
+note right of UC_SubmitDonation
+  Donasi dari publik disimpan (localStorage)
+  dan dilihat oleh Admin di "Manage Donasi".
+end note
+
+@enduml

@@ -124,13 +124,13 @@ export function InfoDonorDarah() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {syarat.map((item) => (
-              <div
-                key={item.no}
-                className="bg-gradient-to-br from-white to-gray-50 border border-border rounded-xl p-6 hover:shadow-lg transition-shadow"
-              >
-                <div className="flex items-start gap-4">
+          <div className="bg-gradient-to-br from-white to-gray-50 border border-border rounded-2xl p-8 shadow-lg">
+            <div className="space-y-6">
+              {syarat.map((item, idx) => (
+                <div
+                  key={item.no}
+                  className={`flex items-start gap-4 ${idx !== syarat.length - 1 ? 'pb-6 border-b border-gray-200' : ''}`}
+                >
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
                       {item.no}
@@ -146,8 +146,8 @@ export function InfoDonorDarah() {
                     </p>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
