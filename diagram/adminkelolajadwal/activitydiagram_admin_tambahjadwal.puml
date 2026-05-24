@@ -1,0 +1,47 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_TAMBAHJADWAL
+title Activity Diagram - Admin Tambah Jadwal Donor Darah
+
+|Admin|
+start
+:Login sebagai admin;
+:Masuk ke halaman Kelola Jadwal Donor;
+
+|Sistem|
+:Tampilkan daftar jadwal donor saat ini;
+:Tampilkan tombol Tambah Jadwal;
+
+|Admin|
+:Klik tombol Tambah Jadwal;
+
+|Sistem|
+:Tampilkan form tambah jadwal;
+
+|Admin|
+:Isi form dengan tanggal, hari, waktu, lokasi, dan kuota;
+:Submit form jadwal;
+
+|Sistem|
+:Terima data jadwal;
+:Validasi input (tanggal, hari, waktu, lokasi, kuota);
+
+|Database|
+if (Validasi sukses?) then (Ya)
+  if (Jadwal bentrok?) then (Tidak)
+    :Simpan jadwal donor baru;
+  else (Ya)
+    :Tampilkan pesan error bentrok;
+    stop
+  endif
+else (Tidak)
+  :Tampilkan pesan error validasi;
+  stop
+endif
+
+|Sistem|
+:Tampilkan notifikasi jadwal berhasil ditambahkan;
+:Tampilkan jadwal terbaru;
+
+|Admin|
+stop
+
+@enduml

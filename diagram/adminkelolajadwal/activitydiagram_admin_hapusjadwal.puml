@@ -1,0 +1,42 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_HAPUS_JADWAL
+title Activity Diagram - Admin Hapus Jadwal Donor Darah
+
+|Admin|
+start
+:Login sebagai admin;
+:Masuk ke halaman Kelola Jadwal Donor;
+
+|Sistem|
+:Tampilkan daftar jadwal donor saat ini;
+:Tampilkan opsi Hapus untuk setiap jadwal;
+
+|Admin|
+:Pilih jadwal yang akan dihapus;
+:Klik tombol Hapus jadwal;
+
+|Sistem|
+:Tampilkan konfirmasi penghapusan;
+
+|Admin|
+:Pilih Ya untuk konfirmasi;
+
+|Sistem|
+:Terima permintaan hapus;
+:Validasi aksi penghapusan;
+
+|Database|
+if (Jadwal ditemukan?) then (Ya)
+  :Hapus jadwal donor dari database;
+else (Tidak)
+  :Tampilkan pesan error jadwal tidak ditemukan;
+  stop
+endif
+
+|Sistem|
+:Tampilkan notifikasi jadwal berhasil dihapus;
+:Tampilkan daftar jadwal terbaru;
+
+|Admin|
+stop
+
+@enduml
