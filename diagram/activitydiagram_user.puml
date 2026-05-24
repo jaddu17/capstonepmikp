@@ -1,0 +1,68 @@
+@startuml ACTIVITY_DIAGRAM_USER
+title Activity Diagram - User
+
+|User|
+start
+:Open Website;
+|Sistem|
+:Tampilkan Home Page;
+|User|
+if (Pilih menu?) then (Ya)
+  :Klik menu pilihan;
+else (Tidak)
+  :Tetap di Home;
+  stop
+endif
+|Sistem|
+:Navigasi ke halaman;
+:Ambil data stok/jadwal/berita/info;
+|Database|
+:Query data stok darah;
+:Query jadwal donor;
+:Query berita;
+:Query informasi;
+|Sistem|
+:Tampilkan halaman;
+|User|
+if (Ingin donasi?) then (Ya)
+  :Buka halaman donasi;
+  :Isi form donasi;
+else (Tidak)
+endif
+|Sistem|
+:Terima form donasi;
+:Validasi form;
+|Database|
+if (Validasi sukses?) then (Ya)
+  :Simpan data donasi;
+else (Tidak)
+endif
+|Sistem|
+if (Simpan sukses?) then (Ya)
+  :Tampilkan notifikasi sukses;
+else (Tidak)
+  :Tampilkan error message;
+endif
+|User|
+if (Ingin kontak?) then (Ya)
+  :Buka halaman kontak;
+  :Isi form pesan;
+else (Tidak)
+endif
+|Sistem|
+:Terima form pesan;
+:Validasi pesan;
+|Database|
+if (Validasi sukses?) then (Ya)
+  :Simpan pesan;
+else (Tidak)
+endif
+|Sistem|
+if (Simpan sukses?) then (Ya)
+  :Tampilkan alert "Pesan terkirim";
+else (Tidak)
+  :Tampilkan error message;
+endif
+|User|
+stop
+@enduml

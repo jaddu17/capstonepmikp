@@ -1,0 +1,32 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Pengunjung (Public User)" as Visitor
+
+package "PMI Kulon Progo Website - User" {
+  usecase "Melihat Halaman Home" as UC_Home
+  usecase "Melihat Daftar Berita" as UC_NewsList
+  usecase "Membaca Detail Berita" as UC_NewsDetail
+  usecase "Melihat Stok Darah" as UC_Stock
+  usecase "Melihat Jadwal Donor" as UC_Schedule
+  usecase "Melihat Informasi Donor / Prosedur" as UC_InfoDonor
+  usecase "Submit Donation Info" as UC_SubmitDonation
+  usecase "Send Message / Contact" as UC_Contact
+}
+
+Visitor --> UC_Home
+Visitor --> UC_NewsList
+Visitor --> UC_NewsDetail
+Visitor --> UC_Stock
+Visitor --> UC_Schedule
+Visitor --> UC_InfoDonor
+Visitor --> UC_SubmitDonation
+Visitor --> UC_Contact
+
+note right of UC_SubmitDonation
+  Donasi dari publik disimpan (localStorage)
+  dan dilihat oleh Admin di "Manage Donasi".
+end note
+
+@enduml

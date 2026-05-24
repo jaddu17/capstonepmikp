@@ -1,0 +1,113 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN
+title Activity Diagram - Administrator
+
+|Admin|
+start
+:Buka /admin/login;
+:Masukkan username & password;
+|Sistem|
+:Form login diterima;
+:Validasi kredensial;
+|Database|
+:Query user admin;
+:Verifikasi password;
+|Sistem|
+if (Login berhasil?) then (Ya)
+  :Buat session;
+else (Tidak)
+  :Tampilkan error;
+  stop
+endif
+|Admin|
+:Masuk dashboard;
+repeat
+  if (Kelola stok darah?) then (Ya)
+    :Input data stok darah;
+  else (Tidak)
+  endif
+repeat while (Menu lain?)
+|Sistem|
+if (Data stok disubmit?) then (Ya)
+  :Validasi data stok;
+else (Tidak)
+endif
+|Database|
+if (Validasi sukses?) then (Ya)
+  :Update stok darah;
+else (Tidak)
+endif
+|Admin|
+repeat
+  if (Kelola jadwal?) then (Ya)
+    :Tambah/Edit/Hapus jadwal;
+  else (Tidak)
+  endif
+repeat while (Menu lain?)
+|Sistem|
+if (Data jadwal disubmit?) then (Ya)
+  :Validasi jadwal;
+else (Tidak)
+endif
+|Database|
+if (Validasi sukses?) then (Ya)
+  :Update jadwal donor;
+else (Tidak)
+endif
+|Admin|
+repeat
+  if (Kelola berita?) then (Ya)
+    :Tambah/Edit/Publish berita;
+  else (Tidak)
+  endif
+repeat while (Menu lain?)
+|Sistem|
+if (Data berita disubmit?) then (Ya)
+  :Validasi berita;
+else (Tidak)
+endif
+|Database|
+if (Validasi sukses?) then (Ya)
+  :Update berita;
+else (Tidak)
+endif
+|Admin|
+repeat
+  if (Kelola donasi?) then (Ya)
+    :Lihat/Update/Hapus donasi;
+  else (Tidak)
+  endif
+repeat while (Menu lain?)
+|Sistem|
+if (Update donasi?) then (Ya)
+  :Validasi data;
+else (Tidak)
+endif
+|Database|
+if (Validasi sukses?) then (Ya)
+  :Update donasi;
+else (Tidak)
+endif
+|Admin|
+repeat
+  if (Kelola pesan?) then (Ya)
+    :Lihat/Balas/Hapus pesan;
+  else (Tidak)
+  endif
+repeat while (Menu lain?)
+|Sistem|
+if (Update pesan?) then (Ya)
+  :Validasi aksi;
+else (Tidak)
+endif
+|Database|
+if (Validasi sukses?) then (Ya)
+  :Update pesan;
+else (Tidak)
+endif
+|Admin|
+:Logout;
+|Sistem|
+:Hapus session;
+|Admin|
+stop
+@enduml
