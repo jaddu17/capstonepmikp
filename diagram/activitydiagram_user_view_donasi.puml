@@ -1,0 +1,45 @@
+@startuml ACTIVITY_DIAGRAM_USER_VIEW_DONASI
+title Activity Diagram - User View Donasi
+
+|User|
+start
+:Klik menu "Donasi" di header atau footer;
+
+|Sistem|
+:Navigasi ke halaman /donasi;
+:Render halaman Donasi;
+:Render form donasi;
+
+|User|
+:Isi form donasi (nama, WA, keterangan);
+:Klik tombol "Lanjut ke Pembayaran QRIS";
+
+|Sistem|
+:Generate ID donasi sementara;
+:Simpan data donasi ke localStorage dengan status "Menunggu Pembayaran";
+:Tampilkan step QRIS dan unggah bukti transfer;
+
+|User|
+:Scan QRIS dan transfer dana;
+:Unggah bukti transfer;
+:Klik tombol "Konfirmasi Pembayaran";
+
+|Sistem|
+if (Bukti transfer terunggah?) then (Ya)
+  :Update localStorage dengan bukti dan status "Sudah Bayar";
+  :Tampilkan konfirmasi donasi selesai;
+
+  |User|
+  :Baca pesan sukses;
+  :Klik tombol "Kembali ke Beranda";
+  stop
+else (Tidak)
+  :Tampilkan error "Silakan unggah bukti transfer terlebih dahulu";
+  :Tetap di step upload bukti;
+
+  |User|
+  :Unggah bukti transfer;
+  :Klik "Konfirmasi Pembayaran" lagi;
+endif
+
+@enduml

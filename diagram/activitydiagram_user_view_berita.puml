@@ -17,18 +17,17 @@ start
 
 |User|
 :Melihat daftar berita;
-:Pilih berita;
+:Pilih berita dengan tombol "Baca Selengkapnya";
 
-if (Klik berita?) then (Ya)
+if (Klik "Baca Selengkapnya"?) then (Ya)
   |Sistem|
-  :Navigasi ke detail berita;
+  :Tampilkan modal detail berita;
 
   |Database|
   :Query detail berita by ID;
 
   |Sistem|
-  :Render halaman detail;
-  :Tampilkan judul, konten, gambar, tanggal;
+  :Render modal dengan judul, konten, gambar, kategori, tanggal;
 
   |User|
   :Baca detail berita;
@@ -39,9 +38,9 @@ endif
 
 |User|
 :Selesai membaca;
-if (Kembali ke list?) then (Ya)
+if (Klik tombol "Tutup"?) then (Ya)
   |Sistem|
-  :Kembali ke halaman list;
+  :Tutup modal dan kembali ke daftar berita;
 else (Tidak)
   stop
 endif

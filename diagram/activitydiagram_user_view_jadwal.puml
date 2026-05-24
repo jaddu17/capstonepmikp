@@ -3,42 +3,41 @@ title Activity Diagram - User View Jadwal Donor
 
 |User|
 start
-:Klik menu Jadwal Donor;
+:Klik menu "Jadwal Donor" di header atau tombol "Jadwal Donor";
 
 |Sistem|
-:Navigasi ke halaman jadwal;
+:Navigasi ke route /jadwal;
 
 |Database|
 :Query jadwal donor;
 
 |Sistem|
-:Format jadwal;
-:Tampilkan kalender/list jadwal;
+:Render halaman Jadwal Donor;
+:Tampilkan daftar jadwal mobile unit;
 :Menampilkan:
 - Tanggal acara;
-- Waktu;
+- Hari;
 - Lokasi;
-- Quota donor;
+- Jam;
+- Kuota;
+- Tombol Daftar;
 
 |User|
 :Melihat jadwal donor;
-:Pilih jadwal;
+:Pilih jadwal yang diinginkan;
 
-if (Cek detail jadwal?) then (Ya)
+if (Klik tombol "Daftar"?) then (Ya)
   |Sistem|
-  :Tampilkan detail acara;
-  :Tunjukkan peta lokasi;
-  :Tunjukkan petunjuk arah;
+  :Buka link WhatsApp dengan pesan prafilled;
+  :Arahkan user ke WhatsApp;
 
   |User|
-  :Lihat detail lengkap;
-  :Dapat informasi lokasi;
+  :Kirim pesan pendaftaran donor;
+  stop
 else (Tidak)
+  |User|
+  :Lihat detail jadwal lain atau kembali;
   stop
 endif
-
-|User|
-:Catat/Siapkan diri untuk donor;
-stop
 
 @enduml

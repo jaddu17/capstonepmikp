@@ -91,7 +91,9 @@ export function JadwalDonor() {
 
                 <div className="flex-shrink-0">
                   <a
-                    href="#kontak"
+                    href="https://wa.me/6281328861118?text=Halo%20Admin%20PMI%20Kulon%20Progo,%20saya%20ingin%20mendaftar%20donor%20darah%20untuk%20jadwal%20ini."
+                    target="_blank"
+                    rel="noreferrer"
                     className="inline-block bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#C21219] transition-colors"
                   >
                     Daftar

@@ -1,61 +1,32 @@
 @startuml FLOWCHART
-title Flowchart - Alur Utama Website PMI Kulon Progo
+title Flowchart - Alur Navigasi Website PMI Kulon Progo
 
 start
 :Pengguna membuka website;
-if (Admin atau Publik?) then (Admin)
-  :Tampil halaman login admin;
-  :Admin memasukkan username/password;
-  if (Login valid?) then (Ya)
-    :Masuk dashboard admin;
-    if (Pilih kelola stok darah?) then (Ya)
-      :Admin mengelola stok darah;
-    else (Tidak)
-    endif
-    if (Pilih kelola jadwal?) then (Ya)
-      :Admin mengelola jadwal donor;
-    else (Tidak)
-    endif
-    if (Pilih kelola berita?) then (Ya)
-      :Admin mengelola berita;
-    else (Tidak)
-    endif
-    if (Pilih kelola donasi?) then (Ya)
-      :Admin memantau donasi publik;
-    else (Tidak)
-    endif
-    if (Pilih kelola pesan?) then (Ya)
-      :Admin membalas pesan;
-    else (Tidak)
-    endif
-    stop
-  else (Tidak)
-    :Tampilkan error login;
-    stop
-  endif
-else (Publik)
-  :Tampil halaman utama;
-  if (Lihat berita?) then (Ya)
-    :Pengguna membaca berita;
-  else (Tidak)
-  endif
-  if (Lihat stok darah?) then (Ya)
-    :Pengguna melihat stok darah;
-  else (Tidak)
-  endif
-  if (Lihat jadwal donor?) then (Ya)
-    :Pengguna melihat jadwal donor;
-  else (Tidak)
-  endif
-  if (Isi form donasi?) then (Ya)
-    :Pengguna mengirim donasi;
-  else (Tidak)
-  endif
-  if (Kirim pesan kontak?) then (Ya)
-    :Pengguna mengirim pesan ke PMI;
-  else (Tidak)
+:Render Home page;
+if (Klik "Cek Stok Darah"?) then (Ya)
+  :Navigasi ke halaman /stok-darah;
+  :Tampilkan Stok Darah Real-Time;
+  :Tampilkan kartu jenis darah dan status;
+  if (Klik "Lihat Syarat & Cara Donor"?) then (Ya)
+    :Scroll ke bagian Prosedur Permintaan Darah;
   endif
   stop
+else (Tidak)
+  if (Klik "Jadwal Donor"?) then (Ya)
+    :Navigasi ke halaman /jadwal;
+    :Tampilkan daftar jadwal donor;
+    :Tampilkan tombol Daftar;
+    stop
+  else (Tidak)
+    if (Klik menu lain?) then (Berita)
+      :Navigasi ke halaman /berita;
+      stop
+    else (Donasi)
+      :Navigasi ke halaman /donasi;
+      stop
+    endif
+  endif
 endif
 
 @enduml

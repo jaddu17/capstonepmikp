@@ -3,47 +3,43 @@ title Activity Diagram - User View Stok Darah
 
 |User|
 start
-:Klik menu Stok Darah;
+:Klik tombol "Cek Stok Darah" di Hero;
 
 |Sistem|
-:Navigasi ke halaman stok darah;
+:Navigate ke route /stok-darah;
+
+|Sistem|
+:Render halaman Stok Darah Page;
+
+|Sistem|
+:Render komponen StokDarah;
 
 |Database|
-:Query data stok darah;
+:Query data stok darah terkini;
 
 |Sistem|
-:Format data stok;
-:Tampilkan tabel/card stok;
-:Menampilkan:
-- Jenis darah (O, A, B, AB);
-- Kuantitas;
-- Status (tersedia/terbatas);
+:Render delapan kartu stok darah;
+:Menampilkan jenis darah, kuantitas, status;
 
 |User|
-:Melihat stok darah terkini;
-:Baca informasi stok;
+:Melihat stok darah real-time;
 
-if (Ingin tahu info donor?) then (Ya)
+if (Klik tombol "Lihat Syarat & Cara Donor"?) then (Ya)
   |Sistem|
-  :Tampilkan link/button informasi;
+  :Scroll/lihat bagian Prosedur Permintaan Darah di halaman;
+  :Render komponen ProsedurDarah;
   
   |User|
-  :Klik informasi donor;
+  :Baca prosedur donor darah;
 else (Tidak)
   stop
 endif
 
-|Sistem|
-:Navigasi ke halaman info donor;
-
-|Database|
-:Query informasi prosedur donor;
-
-|Sistem|
-:Tampilkan panduan & persyaratan donor;
-
 |User|
-:Baca informasi donor;
-stop
+:Jika perlu, klik WA untuk permintaan stok darah;
 
+|Sistem|
+:Open WhatsApp link dengan pesan template;
+
+stop
 @enduml
