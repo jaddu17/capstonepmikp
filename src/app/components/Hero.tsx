@@ -1,4 +1,5 @@
 import { Heart, Droplet, Users, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function Hero() {
   const stats = [
@@ -23,18 +24,18 @@ export function Hero() {
             dan layanan sosial untuk masyarakat Kulon Progo
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a
-              href="#stok-darah"
+            <Link
+              to="/stok-darah"
               className="bg-white text-primary px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors"
             >
               Cek Stok Darah
-            </a>
-            <a
-              href="#jadwal"
+            </Link>
+            <Link
+              to="/jadwal"
               className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-medium hover:bg-white/10 transition-colors"
             >
               Jadwal Donor
-            </a>
+            </Link>
           </div>
         </div>
 
