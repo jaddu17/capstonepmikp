@@ -1,0 +1,97 @@
+@startuml classdiagram
+skinparam classBackgroundColor #FEFEFE
+skinparam classBorderColor #000000
+skinparam arrowColor #000000
+
+class Users {
+  -id_user: int
+  -username: varchar
+  -password: varchar
+  -role: enum(admin, pendonor, donatur)
+  -created_at: datetime
+}
+
+class Berita {
+  -id_berita: int
+  -judul: varchar
+  -konten: text
+  -gambar: text
+  -tanggal_publish: datetime
+  -id_user: int
+}
+
+class StokDarah {
+  -id_stok: int
+  -jenis_darah: varchar(3)
+  -kuantitas: int
+  -satuan: varchar
+  -terakhir_update: datetime
+}
+
+class JadwalDonor {
+  -id_jadwal: int
+  -nama_jadwal: varchar
+  -tanggal: date
+  -jam_mulai: time
+  -jam_selesai: time
+  -lokasi: varchar
+  -quota: int
+  -id_user: int
+  -created_at: datetime
+}
+
+class Donasi {
+  -id_donasi: int
+  -nama_donatur: varchar
+  -email: varchar
+  -no_hp: varchar
+  -nominal_donasi: int
+  -pesan: text
+  -status: enum(pending, confirmed, used)
+  -tanggal_donasi: datetime
+}
+
+class Pesan {
+  -id_pesan: int
+  -nama_pengirim: varchar
+  -email: varchar
+  -subjek: varchar
+  -konten_pesan: text
+  -status: enum(unread, read, replied)
+  -balasan: text
+  -tanggal_pesan: datetime
+  -tanggal_balasan: datetime
+}
+
+class Infografis {
+  -id_infografis: int
+  -judul: varchar
+  -deskripsi: text
+  -file_link: text
+  -id_user: int
+  -created_at: datetime
+}
+
+class Kontak {
+  -id_kontak: int
+  -alamat: varchar
+  -no_telepon: varchar
+  -email: varchar
+  -jam_operasional: varchar
+}
+
+class InfoDonor {
+  -id_info: int
+  -judul: varchar
+  -konten: text
+  -syarat_donor: text
+  -id_user: int
+  -updated_at: datetime
+}
+
+Berita --> Users : ditulis oleh
+JadwalDonor --> Users : dibuat oleh
+Infografis --> Users : dibuat oleh
+InfoDonor --> Users : diupdate oleh
+
+@enduml

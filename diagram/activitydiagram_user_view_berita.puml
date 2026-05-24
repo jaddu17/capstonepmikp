@@ -1,0 +1,52 @@
+@startuml ACTIVITY_DIAGRAM_USER_VIEW_BERITA
+title Activity Diagram - User View Berita
+
+|User|
+start
+:Klik menu Berita;
+
+|Sistem|
+:Navigasi ke halaman berita;
+
+|Database|
+:Query daftar berita;
+
+|Sistem|
+:Tampilkan list berita;
+:Tampilkan thumbnail, judul, tanggal;
+
+|User|
+:Melihat daftar berita;
+:Pilih berita;
+
+if (Klik berita?) then (Ya)
+  |Sistem|
+  :Navigasi ke detail berita;
+
+  |Database|
+  :Query detail berita by ID;
+
+  |Sistem|
+  :Render halaman detail;
+  :Tampilkan judul, konten, gambar, tanggal;
+
+  |User|
+  :Baca detail berita;
+  :Scroll konten;
+else (Tidak)
+  stop
+endif
+
+|User|
+:Selesai membaca;
+if (Kembali ke list?) then (Ya)
+  |Sistem|
+  :Kembali ke halaman list;
+else (Tidak)
+  stop
+endif
+
+|User|
+stop
+
+@enduml

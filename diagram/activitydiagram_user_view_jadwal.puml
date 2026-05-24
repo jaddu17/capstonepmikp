@@ -1,0 +1,44 @@
+@startuml ACTIVITY_DIAGRAM_USER_VIEW_JADWAL
+title Activity Diagram - User View Jadwal Donor
+
+|User|
+start
+:Klik menu Jadwal Donor;
+
+|Sistem|
+:Navigasi ke halaman jadwal;
+
+|Database|
+:Query jadwal donor;
+
+|Sistem|
+:Format jadwal;
+:Tampilkan kalender/list jadwal;
+:Menampilkan:
+- Tanggal acara;
+- Waktu;
+- Lokasi;
+- Quota donor;
+
+|User|
+:Melihat jadwal donor;
+:Pilih jadwal;
+
+if (Cek detail jadwal?) then (Ya)
+  |Sistem|
+  :Tampilkan detail acara;
+  :Tunjukkan peta lokasi;
+  :Tunjukkan petunjuk arah;
+
+  |User|
+  :Lihat detail lengkap;
+  :Dapat informasi lokasi;
+else (Tidak)
+  stop
+endif
+
+|User|
+:Catat/Siapkan diri untuk donor;
+stop
+
+@enduml

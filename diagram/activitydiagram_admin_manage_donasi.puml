@@ -1,0 +1,53 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_MANAGE_DONASI
+title Activity Diagram - Admin Manage Donasi
+
+|Admin|
+start
+:Buka halaman Manage Donasi;
+
+|Sistem|
+:Ambil data donasi;
+
+|Database|
+:Query donasi dari user;
+
+|Sistem|
+:Tampilkan daftar donasi;
+
+|Admin|
+:Review donasi;
+:Pilih aksi;
+if (Update/Hapus donasi?) then (Ya)
+  :Klik opsi update atau hapus;
+else (Tidak)
+  stop
+endif
+
+if (Update status?) then (Ya)
+  |Admin|
+  :Tentukan status donasi;
+  :Isi keterangan;
+
+  |Sistem|
+  :Validasi status;
+
+  |Database|
+  :Update status donasi;
+else (Hapus?)
+  |Admin|
+  :Konfirmasi penghapusan;
+
+  |Sistem|
+  :Proses penghapusan;
+
+  |Database|
+  :Hapus data donasi;
+endif
+
+|Sistem|
+:Tampilkan notifikasi;
+
+|Admin|
+stop
+
+@enduml

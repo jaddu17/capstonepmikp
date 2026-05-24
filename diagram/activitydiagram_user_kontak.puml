@@ -1,0 +1,63 @@
+@startuml ACTIVITY_DIAGRAM_USER_KONTAK
+title Activity Diagram - User Send Message / Kontak
+
+|User|
+start
+:Klik menu Kontak;
+
+|Sistem|
+:Navigasi ke halaman kontak;
+:Tampilkan informasi PMI;
+:Menampilkan:
+- Alamat;
+- No. Telepon;
+- Email;
+- Map lokasi;
+
+|User|
+:Baca informasi kontak;
+if (Ingin kirim pesan?) then (Ya)
+  :Scroll ke form pesan;
+else (Tidak)
+  stop
+endif
+
+|Sistem|
+:Tampilkan form pesan;
+
+|User|
+:Isi form pesan;
+:Masukkan:
+- Nama;
+- Email;
+- Subjek;
+- Pesan;
+
+if (Validasi form?) then (Ya)
+  |User|
+  :Klik submit pesan;
+else (Tidak)
+  :Perbaiki form;
+endif
+
+|Sistem|
+:Terima form pesan;
+:Validasi input;
+
+if (Validasi sukses?) then (Ya)
+  :Simpan pesan;
+  :Tampilkan notifikasi "Pesan terkirim";
+else (Tidak)
+  :Tampilkan error message;
+  stop
+endif
+
+|Sistem|
+:Pesan tersimpan di database;
+:Admin dapat lihat di manage pesan;
+
+|User|
+:Selesai mengirim pesan;
+stop
+
+@enduml

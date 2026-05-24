@@ -1,0 +1,49 @@
+@startuml ACTIVITY_DIAGRAM_USER_VIEW_STOK
+title Activity Diagram - User View Stok Darah
+
+|User|
+start
+:Klik menu Stok Darah;
+
+|Sistem|
+:Navigasi ke halaman stok darah;
+
+|Database|
+:Query data stok darah;
+
+|Sistem|
+:Format data stok;
+:Tampilkan tabel/card stok;
+:Menampilkan:
+- Jenis darah (O, A, B, AB);
+- Kuantitas;
+- Status (tersedia/terbatas);
+
+|User|
+:Melihat stok darah terkini;
+:Baca informasi stok;
+
+if (Ingin tahu info donor?) then (Ya)
+  |Sistem|
+  :Tampilkan link/button informasi;
+  
+  |User|
+  :Klik informasi donor;
+else (Tidak)
+  stop
+endif
+
+|Sistem|
+:Navigasi ke halaman info donor;
+
+|Database|
+:Query informasi prosedur donor;
+
+|Sistem|
+:Tampilkan panduan & persyaratan donor;
+
+|User|
+:Baca informasi donor;
+stop
+
+@enduml

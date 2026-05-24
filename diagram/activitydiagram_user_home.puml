@@ -1,0 +1,46 @@
+@startuml ACTIVITY_DIAGRAM_USER_HOME
+title Activity Diagram - User Home & Navigation
+
+|User|
+start
+:Akses website;
+
+|Sistem|
+:Load halaman home;
+:Tampilkan hero section;
+:Tampilkan featured content;
+
+|Database|
+:Query berita terbaru;
+:Query informasi umum;
+
+|Sistem|
+:Render homepage;
+
+|User|
+:Melihat konten home;
+:Pilih navigasi;
+if (Klik menu?) then (Ya)
+  :Pilih menu (Berita/Stok/Jadwal/Kontak/Tentang);
+else (Tidak)
+  :Scroll halaman;
+endif
+
+repeat
+  |Sistem|
+  :Navigasi ke halaman;
+  
+  |Database|
+  :Query data sesuai menu;
+  
+  |Sistem|
+  :Tampilkan halaman;
+  
+  |User|
+  :View konten;
+repeat while (Lanjut browsing?)
+
+|User|
+stop
+
+@enduml

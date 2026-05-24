@@ -1,0 +1,30 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_LOGIN
+title Activity Diagram - Admin Login
+
+|Admin|
+start
+:Buka /admin/login;
+:Masukkan username & password;
+
+|Sistem|
+:Form login diterima;
+:Validasi kredensial;
+
+|Database|
+:Query user admin;
+:Verifikasi password;
+
+|Sistem|
+if (Login berhasil?) then (Ya)
+  :Buat session;
+  :Set authentication token;
+else (Tidak)
+  :Tampilkan error message;
+  stop
+endif
+
+|Admin|
+:Redirect ke dashboard;
+stop
+
+@enduml

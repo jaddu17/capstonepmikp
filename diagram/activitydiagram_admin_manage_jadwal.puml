@@ -1,0 +1,44 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_MANAGE_JADWAL
+title Activity Diagram - Admin Manage Jadwal Donor
+
+|Admin|
+start
+:Buka halaman Manage Jadwal;
+
+|Sistem|
+:Tampilkan data jadwal donor;
+
+|Database|
+:Query jadwal donor;
+
+|Sistem|
+:Tampilkan kalender/tabel jadwal;
+
+|Admin|
+:Pilih aksi;
+if (Tambah/Edit/Hapus jadwal?) then (Ya)
+  :Isi form jadwal;
+  :Tentukan tanggal, waktu & lokasi;
+else (Tidak)
+  stop
+endif
+
+|Sistem|
+:Terima data jadwal;
+:Validasi jadwal;
+
+|Database|
+if (Tanggal tidak bentrok?) then (Ya)
+  :Simpan/Update jadwal;
+else (Tidak)
+  :Tampilkan warning;
+  stop
+endif
+
+|Sistem|
+:Notifikasi jadwal berhasil disimpan;
+
+|Admin|
+stop
+
+@enduml

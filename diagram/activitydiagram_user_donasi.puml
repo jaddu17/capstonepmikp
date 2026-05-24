@@ -1,0 +1,57 @@
+@startuml ACTIVITY_DIAGRAM_USER_DONASI
+title Activity Diagram - User Submit Donasi
+
+|User|
+start
+:Klik menu Donasi;
+
+|Sistem|
+:Navigasi ke halaman donasi;
+:Tampilkan informasi donasi;
+
+|User|
+:Baca informasi;
+:Klik form donasi;
+
+|Sistem|
+:Tampilkan form donasi;
+
+|User|
+:Isi form donasi;
+:Masukkan:
+- Nama lengkap;
+- Email;
+- No. HP;
+- Nominal donasi;
+- Pesan (opsional);
+
+if (Validasi form?) then (Ya)
+  |User|
+  :Klik submit donasi;
+else (Tidak)
+  :Perbaiki form;
+endif
+
+|Sistem|
+:Terima data donasi;
+:Validasi input;
+
+if (Validasi sukses?) then (Ya)
+  :Simpan ke localStorage;
+  :Tampilkan notifikasi sukses;
+else (Tidak)
+  :Tampilkan pesan error;
+  |User|
+  :Perbaiki data;
+  stop
+endif
+
+|Sistem|
+:Data donasi tersimpan;
+:Akan dilihat admin di manage donasi;
+
+|User|
+:Selesai melakukan donasi;
+stop
+
+@enduml

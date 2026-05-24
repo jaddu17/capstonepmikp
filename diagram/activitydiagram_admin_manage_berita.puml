@@ -1,0 +1,53 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_MANAGE_BERITA
+title Activity Diagram - Admin Manage Berita
+
+|Admin|
+start
+:Buka halaman Manage Berita;
+
+|Sistem|
+:Tampilkan daftar berita;
+
+|Database|
+:Query berita dari database;
+
+|Sistem|
+:Tampilkan tabel berita;
+
+|Admin|
+:Pilih aksi;
+if (Tambah/Edit berita?) then (Ya)
+  :Buka form berita;
+  :Isi judul, konten, gambar;
+  
+  |Sistem|
+  :Terima form berita;
+  :Validasi konten;
+
+  |Database|
+  if (Validasi sukses?) then (Ya)
+    :Simpan/Update berita;
+  else (Tidak)
+    :Tampilkan error;
+  endif
+
+else (Hapus berita?)
+  |Admin|
+  :Klik tombol hapus;
+  :Konfirmasi penghapusan;
+
+  |Sistem|
+  :Terima konfirmasi;
+
+  |Database|
+  :Hapus berita dari database;
+
+endif
+
+|Sistem|
+:Tampilkan notifikasi sukses;
+
+|Admin|
+stop
+
+@enduml
