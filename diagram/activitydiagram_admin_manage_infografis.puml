@@ -1,0 +1,49 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_MANAGE_INFOGRAFIS
+title Activity Diagram - Admin Manage Infografis
+
+|Admin|
+start
+:Buka halaman Infografis;
+
+|Sistem|
+:Tampilkan data infografis saat ini
+(Informasi Umum, Kontak, Dokumentasi, Statistik, Daftar Pelayanan);
+
+|Admin|
+:Pilih bagian yang ingin diubah;
+fork
+  :Ubah Informasi Umum (Bulan, Tahun);
+fork again
+  :Ubah Kontak Markas (No Telp/WA);
+fork again
+  :Upload Dokumentasi (Foto 1 - 6);
+fork again
+  :Ubah nilai Statistik Layanan;
+fork again
+  :Kelola Daftar Pelayanan
+  (Tambah/Hapus/Edit layanan);
+end fork
+:Klik tombol Simpan;
+
+|Sistem|
+:Terima data pembaruan;
+:Validasi input data & file gambar;
+
+|Database|
+if (Validasi sukses?) then (Ya)
+  :Update data infografis;
+  :Simpan file gambar (jika ada);
+else (Tidak)
+  |Sistem|
+  :Tampilkan pesan error;
+  stop
+endif
+
+|Sistem|
+:Tampilkan notifikasi sukses;
+:Perbarui tampilan halaman infografis;
+
+|Admin|
+stop
+
+@enduml

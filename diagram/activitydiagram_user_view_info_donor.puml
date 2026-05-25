@@ -1,0 +1,36 @@
+@startuml ACTIVITY_DIAGRAM_USER_VIEW_INFO_DONOR
+title Activity Diagram - User View Info Donor
+
+|User|
+start
+:Klik menu Info Donor;
+
+|Sistem|
+:Navigasi ke halaman Info Donor;
+
+|Database|
+:Query data panduan & persyaratan donor;
+:Query informasi prosedur donor;
+
+|Sistem|
+:Render halaman Info Donor;
+:Tampilkan panduan & persyaratan;
+:Tampilkan prosedur donor;
+
+|User|
+:Membaca informasi donor;
+:Memahami syarat menjadi pendonor;
+
+if (Punya pertanyaan?) then (Ya)
+  |User|
+  :Klik tombol Kontak/Hubungi PMI;
+  |Sistem|
+  :Navigasi ke halaman Kontak;
+  stop
+else (Tidak)
+  |User|
+  :Selesai membaca;
+  stop
+endif
+
+@enduml

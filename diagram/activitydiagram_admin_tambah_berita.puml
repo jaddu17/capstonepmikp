@@ -1,0 +1,35 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_TAMBAH_BERITA
+title Activity Diagram - Admin Tambah Berita
+
+|Admin|
+start
+:Buka halaman Kelola Berita;
+:Klik tombol "Tambah Berita";
+
+|Sistem|
+:Tampilkan form Tambah Berita;
+
+|Admin|
+:Isi form (Judul, Tanggal, Kategori, Ringkasan, Isi, Gambar, Publikasi);
+:Klik tombol "Simpan";
+
+|Sistem|
+:Validasi input form;
+if (Validasi sukses?) then (Ya)
+  |Database|
+  :Simpan data berita baru;
+  |Sistem|
+  :Sembunyikan form;
+  :Tampilkan notifikasi "Berita berhasil ditambahkan!";
+  :Perbarui daftar kartu berita;
+else (Tidak)
+  |Sistem|
+  :Tampilkan pesan error;
+  |Admin|
+  :Perbaiki input form;
+  stop
+endif
+
+stop
+
+@enduml

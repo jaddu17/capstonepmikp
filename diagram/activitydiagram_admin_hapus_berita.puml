@@ -1,0 +1,28 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_HAPUS_BERITA
+title Activity Diagram - Admin Hapus Berita
+
+|Admin|
+start
+:Buka halaman Kelola Berita;
+:Melihat daftar kartu berita;
+:Klik icon "Hapus" pada salah satu berita;
+
+|Sistem|
+:Tampilkan pop-up konfirmasi dialog;
+
+|Admin|
+:Klik "OK/Ya" pada konfirmasi;
+
+|Sistem|
+:Terima instruksi hapus;
+
+|Database|
+:Hapus data berita;
+
+|Sistem|
+:Tampilkan notifikasi "Berita berhasil dihapus!";
+:Hapus kartu berita dari tampilan;
+
+stop
+
+@enduml

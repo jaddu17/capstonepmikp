@@ -1,44 +1,41 @@
 @startuml ACTIVITY_DIAGRAM_USER_HOME
-title Activity Diagram - User Home & Navigation
+title Activity Diagram - User Beranda / Home
 
 |User|
 start
-:Akses website;
+:Akses website (Halaman Beranda);
 
 |Sistem|
-:Load halaman home;
-:Tampilkan hero section;
-:Tampilkan featured content;
+:Permintaan data Beranda;
 
 |Database|
-:Query berita terbaru;
-:Query informasi umum;
+:Query data Tentang PMI (Visi, Misi, dsb);
+:Query data Infografis Kinerja 
+(Kontak Darurat, Statistik, Dokumentasi);
 
 |Sistem|
-:Render homepage;
+:Render Hero Section (Tombol Cek Stok & Jadwal);
+:Render bagian Tentang PMI Kulon Progo;
+:Render bagian Infografis Kinerja Bulanan;
+:Tampilkan keseluruhan halaman Beranda;
 
 |User|
-:Melihat konten home;
-:Pilih navigasi;
-if (Klik menu?) then (Ya)
-  :Pilih menu (Berita/Stok/Jadwal/Kontak/Tentang);
-else (Tidak)
-  :Scroll halaman;
-endif
+:Eksplorasi konten Beranda;
 
-repeat
+if (Pilih navigasi/aksi?) then (Klik Tombol Akses Cepat)
+  :Klik "Cek Stok Darah" atau "Jadwal Donor";
   |Sistem|
-  :Navigasi ke halaman;
-  
-  |Database|
-  :Query data sesuai menu;
-  
-  |Sistem|
-  :Tampilkan halaman;
-  
+  :Arahkan ke halaman terkait;
+else if (Klik Menu Navbar)
   |User|
-  :View konten;
-repeat while (Lanjut browsing?)
+  :Pilih menu (Berita/Stok/Jadwal/Donasi/dll);
+  |Sistem|
+  :Arahkan ke halaman yang dipilih;
+else (Scroll Halaman)
+  |User|
+  :Melihat visi misi, kontak darurat, 
+  dan dokumentasi infografis;
+endif
 
 |User|
 stop

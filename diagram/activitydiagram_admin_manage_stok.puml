@@ -3,40 +3,35 @@ title Activity Diagram - Admin Manage Stok Darah
 
 |Admin|
 start
-:Buka halaman Manage Stok;
+:Buka halaman Stok Darah;
 
 |Sistem|
-:Tampilkan data stok darah;
-
-|Database|
-:Query stok darah saat ini;
-
-|Sistem|
-:Tampilkan tabel stok;
+:Tampilkan form kartu golongan darah
+dengan jumlah kantong dan status saat ini;
 
 |Admin|
-:Pilih aksi;
-if (Tambah/Edit stok?) then (Ya)
-  :Isi form stok darah;
-  :Tentukan jenis darah & kuantitas;
-else (Tidak)
-  stop
-endif
+:Klik tambah/kurangi jumlah pada
+kartu golongan darah tertentu;
+:Klik tombol "Simpan Perubahan";
 
 |Sistem|
-:Terima data stok;
-:Validasi format data;
+:Terima data perubahan stok;
+:Tentukan status baru otomatis
+(>20: Aman, 10-19: Menipis, <10: Kritis);
+:Validasi data;
 
 |Database|
 if (Validasi sukses?) then (Ya)
-  :Update/Insert stok darah;
+  :Update stok darah dan status ke database;
 else (Tidak)
-  :Kembalikan error;
+  |Sistem|
+  :Tampilkan pesan error;
   stop
 endif
 
 |Sistem|
 :Tampilkan notifikasi sukses;
+:Perbarui tampilan kartu stok darah;
 
 |Admin|
 stop

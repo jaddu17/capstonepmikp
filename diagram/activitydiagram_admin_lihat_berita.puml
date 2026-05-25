@@ -1,0 +1,33 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_LIHAT_BERITA
+title Activity Diagram - Admin Lihat Berita
+
+|Admin|
+start
+:Buka menu Kelola Berita;
+
+|Sistem|
+:Navigasi ke halaman Kelola Berita;
+
+|Database|
+:Query daftar berita;
+
+|Sistem|
+:Tampilkan daftar berita dalam bentuk kartu (card);
+:Tampilkan thumbnail, kategori, tanggal, judul, dan ringkasan;
+
+|Admin|
+:Melihat daftar berita;
+if (Ubah status publikasi?) then (Ya)
+  :Klik icon Publish/Unpublish (Eye);
+  |Sistem|
+  :Update status publikasi berita;
+  |Database|
+  :Simpan perubahan status;
+  |Sistem|
+  :Tampilkan notifikasi "Status publikasi berhasil diubah!";
+else (Tidak)
+endif
+
+stop
+
+@enduml
