@@ -3,7 +3,7 @@ title Activity Diagram - Admin Edit Berita
 
 |Admin|
 start
-:Buka halaman Kelola Berita;
+:Buka menu Berita;
 :Melihat daftar kartu berita;
 :Klik icon "Edit" pada salah satu berita;
 

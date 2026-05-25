@@ -3,7 +3,7 @@ title Activity Diagram - Admin Manage Infografis
 
 |Admin|
 start
-:Buka halaman Infografis;
+:Buka Menu Infografis;
 
 |Sistem|
 :Tampilkan data infografis saat ini

@@ -3,7 +3,7 @@ title Activity Diagram - Admin Manage Donasi
 
 |Admin|
 start
-:Buka halaman Manage Donasi;
+:Buka Menu Donasi Masuk;
 
 |Sistem|
 :Ambil data donasi;

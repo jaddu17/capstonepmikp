@@ -3,7 +3,7 @@ title Activity Diagram - Admin Tambah Berita
 
 |Admin|
 start
-:Buka halaman Kelola Berita;
+:Buka menu Berita;
 :Klik tombol "Tambah Berita";
 
 |Sistem|

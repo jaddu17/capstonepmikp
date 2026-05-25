@@ -1,0 +1,28 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_HAPUS_DONASI
+title Activity Diagram - Admin Hapus Donasi
+
+|Admin|
+start
+:Buka Menu Donasi masuk;
+:Pilih data donasi yang ingin dihapus pada tabel;
+:Klik icon "Hapus" (Trash) pada kolom Aksi;
+
+|Sistem|
+:Tampilkan pop-up dialog konfirmasi (browser alert);
+
+|Admin|
+:Klik "OK/Ya" pada konfirmasi;
+
+|Sistem|
+:Terima instruksi persetujuan hapus;
+
+|Database|
+:Hapus data donasi dari database;
+
+|Sistem|
+:Hapus baris data tersebut dari tabel secara realtime;
+:Tampilkan notifikasi "Data berhasil dihapus!";
+
+|Admin|
+stop
+@enduml

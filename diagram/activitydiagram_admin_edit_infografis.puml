@@ -1,0 +1,36 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_EDIT_INFOGRAFIS
+title Activity Diagram - Admin Edit Infografis
+
+|Admin|
+start
+:Buka menu Infografis;
+:Pilih data bulan yang ingin diubah melalui dropdown;
+
+|Sistem|
+:Tampilkan data pada setiap field (Umum, Kontak, Statistik, Dokumentasi);
+
+|Admin|
+:Ubah nilai teks/angka pada field yang diinginkan;
+:Upload/Hapus gambar pada kotak dokumentasi (opsional);
+:Tambah/Hapus list pada "Daftar Pelayanan" (opsional);
+:Klik tombol "Simpan Semua";
+
+|Sistem|
+:Proses seluruh perubahan pada data bulan aktif;
+
+|Database|
+:Simpan seluruh data infografis ke database;
+
+|Sistem|
+if (Ukuran foto/data terlalu besar?) then (Ya)
+  :Tampilkan notifikasi error ukuran file;
+  |Admin|
+  :Kurangi ukuran foto/resolusi;
+  stop
+else (Tidak)
+  :Tampilkan notifikasi sukses "Semua data infografis berhasil disimpan!";
+endif
+
+|Admin|
+stop
+@enduml

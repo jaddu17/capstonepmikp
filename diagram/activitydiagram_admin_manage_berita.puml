@@ -3,7 +3,7 @@ title Activity Diagram - Admin Manage Berita
 
 |Admin|
 start
-:Buka halaman Manage Berita;
+:Buka menu Berita;
 
 |Sistem|
 :Tampilkan daftar berita;

@@ -3,7 +3,7 @@ title Activity Diagram - Admin Manage Pesan
 
 |Admin|
 start
-:Buka halaman Manage Pesan;
+:Buka Menu Pesan Masuk;
 
 |Sistem|
 :Ambil daftar pesan;

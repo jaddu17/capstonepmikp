@@ -1,0 +1,24 @@
+@startwbs INFORMATION_ARCHITECTURE
+title Information Architecture (Sitemap) - Website PMI Kulon Progo
+
+* Website PMI Kulon Progo
+** Halaman Publik (User)
+*** Beranda (Home)
+*** Stok Darah
+*** Info Donor
+*** Jadwal Mobile Unit
+*** Berita & Kegiatan
+*** Donasi Kemanusiaan
+*** Hubungi Kami (Kontak)
+
+** Panel Admin (CMS)
+*** Login Admin
+*** Dashboard (Overview)
+*** Manajemen Konten
+**** Kelola Stok Darah
+**** Kelola Jadwal Mobile Unit
+**** Kelola Berita & Kegiatan
+**** Kelola Pesan Masuk
+**** Kelola Infografis
+**** Kelola Donasi Masuk
+@endwbs

@@ -3,7 +3,7 @@ title Activity Diagram - Admin Hapus Berita
 
 |Admin|
 start
-:Buka halaman Kelola Berita;
+:Buka Menu Berita;
 :Melihat daftar kartu berita;
 :Klik icon "Hapus" pada salah satu berita;
 

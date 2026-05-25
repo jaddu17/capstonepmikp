@@ -1,0 +1,30 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_TAMBAH_INFOGRAFIS
+title Activity Diagram - Admin Tambah Infografis (Bulan Baru)
+
+|Admin|
+start
+:Buka Menu Infografis;
+:Klik tombol "Bulan Baru";
+
+|Sistem|
+:Buat kerangka data baru dengan nilai default;
+:Set status nama bulan menjadi "BARU";
+:Tambahkan data baru ke dalam daftar dropdown;
+:Ubah pilihan dropdown ke data yang baru dibuat;
+:Tampilkan form dengan data default (kosong/0);
+:Tampilkan notifikasi "Data bulan baru ditambahkan!";
+
+|Admin|
+:Mulai mengubah dan mengisi isi form (Bulan, Tahun, Statistik, dll);
+:Klik "Simpan Semua";
+
+|Sistem|
+:Proses pembaruan array data secara keseluruhan;
+
+|Database|
+:Simpan daftar infografis terbaru ke database;
+
+|Sistem|
+:Tampilkan notifikasi sukses "Semua data infografis berhasil disimpan!";
+stop
+@enduml

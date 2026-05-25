@@ -1,0 +1,37 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_HAPUS_PESAN
+title Activity Diagram - Admin Hapus Pesan
+
+|Admin|
+start
+:Buka menu Pesan Masuk;
+:Melihat daftar pesan di panel kiri;
+
+|Admin|
+:Arahkan kursor ke salah satu pesan;
+:Klik icon "Hapus" (Trash) yang muncul pada pesan tersebut;
+
+|Sistem|
+:Tampilkan pop-up konfirmasi (browser alert);
+
+|Admin|
+:Klik "OK/Ya" pada dialog konfirmasi;
+
+|Sistem|
+:Terima persetujuan hapus;
+
+|Database|
+:Hapus data pesan dari database;
+
+|Sistem|
+:Tampilkan notifikasi "Pesan berhasil dihapus!";
+:Hapus pesan dari tampilan daftar;
+
+if (Pesan yang dihapus sedang dibuka?) then (Ya)
+  :Kosongkan panel kanan detail pesan;
+else (Tidak)
+endif
+
+|Admin|
+stop
+
+@enduml

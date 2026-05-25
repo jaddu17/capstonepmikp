@@ -3,7 +3,7 @@ title Activity Diagram - Admin Manage Jadwal Donor
 
 |Admin|
 start
-:Buka halaman Manage Jadwal;
+:Buka Menu Jadwal Donor;
 
 |Sistem|
 :Tampilkan data jadwal donor;
@@ -12,13 +12,13 @@ start
 :Query jadwal donor;
 
 |Sistem|
-:Tampilkan kalender/tabel jadwal;
+:Tampilkan tabel jadwal;
 
 |Admin|
 :Pilih aksi;
 if (Tambah/Edit/Hapus jadwal?) then (Ya)
   :Isi form jadwal;
-  :Tentukan tanggal, waktu & lokasi;
+  :Tentukan tanggal, waktu, lokasi &kuota;
 else (Tidak)
   stop
 endif

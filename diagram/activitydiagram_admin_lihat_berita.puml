@@ -3,7 +3,7 @@ title Activity Diagram - Admin Lihat Berita
 
 |Admin|
 start
-:Buka menu Kelola Berita;
+:Buka menu Berita;
 
 |Sistem|
 :Navigasi ke halaman Kelola Berita;
