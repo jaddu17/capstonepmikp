@@ -3,46 +3,34 @@ title Activity Diagram - User View Berita
 
 |User|
 start
-:Klik menu Berita;
+:Akses halaman Berita\n(Melalui menu Navbar);
 
 |Sistem|
-:Navigasi ke halaman berita;
+:Menerima permintaan rute /berita;
 
 |Database|
-:Query daftar berita;
+:Query data seluruh berita terkini\n(Beserta konten isi lengkapnya);
 
 |Sistem|
-:Tampilkan list berita;
-:Tampilkan thumbnail, judul, tanggal;
+:Render daftar kartu berita\n(Menampilkan Thumbnail, Kategori, Judul, Tanggal);
+:Tampilkan keseluruhan halaman Berita ke layar;
 
 |User|
-:Melihat daftar berita;
-:Pilih berita dengan tombol "Baca Selengkapnya";
+:Melihat dan mengeksplorasi daftar berita;
 
-if (Klik "Baca Selengkapnya"?) then (Ya)
+if (Pilih Aksi Selanjutnya?) then (Klik "Baca Selengkapnya")
   |Sistem|
-  :Tampilkan modal detail berita;
-
-  |Database|
-  :Query detail berita by ID;
-
-  |Sistem|
-  :Render modal dengan judul, konten, gambar, kategori, tanggal;
-
+  :Render dan tampilkan modal pop-up detail berita\n(Menggunakan data di memori tanpa query ulang);
+  
   |User|
-  :Baca detail berita;
-  :Scroll konten;
-else (Tidak)
-  stop
-endif
-
-|User|
-:Selesai membaca;
-if (Klik tombol "Tutup"?) then (Ya)
+  :Membaca isi detail berita;
+  :Selesai membaca, klik tombol "Tutup" (X);
+  
   |Sistem|
-  :Tutup modal dan kembali ke daftar berita;
-else (Tidak)
-  stop
+  :Tutup modal pop-up dan\nkembali menampilkan daftar berita;
+else (Hanya Scroll / Keluar)
+  |User|
+  :Meninggalkan halaman;
 endif
 
 |User|

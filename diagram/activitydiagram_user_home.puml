@@ -1,5 +1,5 @@
 @startuml ACTIVITY_DIAGRAM_USER_HOME
-title Activity Diagram - User Beranda / Home
+title Activity Diagram - User Beranda
 
 |User|
 start
@@ -9,13 +9,12 @@ start
 :Permintaan data Beranda;
 
 |Database|
-:Query data Tentang PMI (Visi, Misi, dsb);
 :Query data Infografis Kinerja 
 (Kontak Darurat, Statistik, Dokumentasi);
 
 |Sistem|
-:Render Hero Section (Tombol Cek Stok & Jadwal);
-:Render bagian Tentang PMI Kulon Progo;
+:Render Hero Section (Tombol Cek Stok Darah & Jadwal Donor);
+:Render bagian Tentang PMI (Visi, Misi, dll);
 :Render bagian Infografis Kinerja Bulanan;
 :Tampilkan keseluruhan halaman Beranda;
 
@@ -31,6 +30,12 @@ else if (Klik Menu Navbar)
   :Pilih menu (Berita/Stok/Jadwal/Donasi/dll);
   |Sistem|
   :Arahkan ke halaman yang dipilih;
+else if (Pilih Bulan Infografis)
+  |User|
+  :Pilih bulan pada dropdown "Laporan Kinerja";
+  |Sistem|
+  :Filter dan perbarui tampilan data infografis 
+  sesuai bulan yang dipilih;
 else (Scroll Halaman)
   |User|
   :Melihat visi misi, kontak darurat, 

@@ -1,63 +1,52 @@
-@startuml ACTIVITY_DIAGRAM_USER_KONTAK
-title Activity Diagram - User Send Message / Kontak
+@startuml ACTIVITY_DIAGRAM_USER_KONTAK_REVISI
+title Activity Diagram - User View Kontak & Interaksi
 
 |User|
 start
-:Klik menu Kontak;
+:Akses halaman Kontak;
 
 |Sistem|
-:Navigasi ke halaman kontak;
-:Tampilkan informasi PMI;
-:Menampilkan:
-- Alamat;
-- No. Telepon;
-- Email;
-- Map lokasi;
+:Menerima permintaan rute /kontak;
+:Render halaman Kontak secara utuh\n(Informasi Kontak & Formulir Pesan);
 
 |User|
-:Baca informasi kontak;
-if (Ingin kirim pesan?) then (Ya)
-  :Scroll ke form pesan;
-else (Tidak)
-  stop
-endif
-
-|Sistem|
-:Tampilkan form pesan;
-
-|User|
-:Isi form pesan;
-:Masukkan:
-- Nama;
-- Email;
-- Subjek;
-- Pesan;
-
-if (Validasi form?) then (Ya)
+if (Pilih Tindakan / Interaksi?) then (Klik Hubungi via WhatsApp)
+  |Sistem|
+  :Buka aplikasi / tautan WhatsApp PMI;
   |User|
-  :Klik submit pesan;
-else (Tidak)
-  :Perbaiki form;
-endif
+  :Melanjutkan komunikasi langsung via WhatsApp;
+  stop
 
-|Sistem|
-:Terima form pesan;
-:Validasi input;
+else if (Klik Alamat Email)
+  |Sistem|
+  :Buka aplikasi klien email (mailto:);
+  |User|
+  :Melanjutkan penulisan email manual;
+  stop
 
-if (Validasi sukses?) then (Ya)
-  :Simpan pesan;
-  :Tampilkan notifikasi "Pesan terkirim";
-else (Tidak)
-  :Tampilkan error message;
+else if (Kirim Pesan via Formulir)
+  repeat
+    |User|
+    :Mengisi form pesan\n(Nama, Email, Subjek, Pesan);
+    :Klik tombol "Kirim Pesan";
+    
+    |Sistem|
+  repeat while (Validasi Input Form?) is (Tidak Valid / Kosong)
+  ->Valid;
+  
+  |Database|
+  :Simpan data pesan baru ke dalam sistem;
+  
+  |Sistem|
+  :Tampilkan notifikasi sukses "Pesan terkirim";
+  |User|
+  :Membaca notifikasi sukses;
+  stop
+
+else (Hanya Melihat Info / Keluar)
+  |User|
+  :Meninggalkan halaman Kontak;
   stop
 endif
-
-|Sistem|
-:Pesan tersimpan di database;
-:Admin dapat lihat di manage pesan;
-
-|User|
-:Selesai mengirim pesan;
-stop
 
 @enduml

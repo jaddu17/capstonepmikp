@@ -3,41 +3,32 @@ title Activity Diagram - User View Jadwal Donor
 
 |User|
 start
-:Klik menu "Jadwal Donor" di header atau tombol "Jadwal Donor";
+:Akses halaman Jadwal Donor\n(Melalui menu Navbar atau tombol di Beranda);
 
 |Sistem|
-:Navigasi ke route /jadwal;
+:Menerima permintaan rute /jadwal;
 
 |Database|
-:Query jadwal donor;
+:Query data jadwal donor (Mobile Unit) terkini;
 
 |Sistem|
-:Render halaman Jadwal Donor;
-:Tampilkan daftar jadwal mobile unit;
-:Menampilkan:
-- Tanggal acara;
-- Hari;
-- Lokasi;
-- Jam;
-- Kuota;
-- Tombol Daftar;
+:Render daftar kartu jadwal donor\n(Menampilkan Tanggal, Hari, Lokasi, Jam, dan Kuota);
+:Tampilkan keseluruhan halaman Jadwal Donor ke layar;
 
 |User|
-:Melihat jadwal donor;
-:Pilih jadwal yang diinginkan;
+:Melihat informasi dan mengeksplorasi\njadwal donor yang tersedia;
 
-if (Klik tombol "Daftar"?) then (Ya)
+if (Pilih Aksi Selanjutnya?) then (Klik Tombol "Daftar")
   |Sistem|
-  :Buka link WhatsApp dengan pesan prafilled;
-  :Arahkan user ke WhatsApp;
-
+  :Buka tautan WhatsApp Admin PMI\ndengan pesan templat otomatis;
   |User|
-  :Kirim pesan pendaftaran donor;
-  stop
-else (Tidak)
+  :Meneruskan pesan pendaftaran\ndonor darah via WhatsApp;
+else (Hanya Scroll / Keluar)
   |User|
-  :Lihat detail jadwal lain atau kembali;
-  stop
+  :Melihat detail jadwal lain\natau meninggalkan halaman;
 endif
+
+|User|
+stop
 
 @enduml

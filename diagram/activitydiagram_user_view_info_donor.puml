@@ -3,34 +3,27 @@ title Activity Diagram - User View Info Donor
 
 |User|
 start
-:Klik menu Info Donor;
+:Akses halaman Info Donor\n(Melalui menu Navbar);
 
 |Sistem|
-:Navigasi ke halaman Info Donor;
-
-|Database|
-:Query data panduan & persyaratan donor;
-:Query informasi prosedur donor;
-
-|Sistem|
-:Render halaman Info Donor;
-:Tampilkan panduan & persyaratan;
-:Tampilkan prosedur donor;
+:Menerima permintaan rute /info-donor;
+:Render komponen InfoDonorDarah\n(Berisi data statis Panduan, Syarat, & Prosedur);
+:Tampilkan keseluruhan halaman Info Donor ke layar;
 
 |User|
-:Membaca informasi donor;
-:Memahami syarat menjadi pendonor;
+:Membaca informasi panduan, syarat,\ndan prosedur donor darah;
 
-if (Punya pertanyaan?) then (Ya)
-  |User|
-  :Klik tombol Kontak/Hubungi PMI;
+if (Pilih Aksi Selanjutnya?) then (Klik Tombol Kontak / Hubungi PMI)
   |Sistem|
-  :Navigasi ke halaman Kontak;
-  stop
-else (Tidak)
+  :Arahkan rute ke halaman Kontak (/kontak);
   |User|
-  :Selesai membaca;
-  stop
+  :Melihat halaman Kontak;
+else (Tidak ada aksi / Keluar)
+  |User|
+  :Selesai membaca dan meninggalkan halaman;
 endif
+
+|User|
+stop
 
 @enduml
