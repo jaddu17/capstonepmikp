@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-
+import laravel from 'laravel-vite-plugin'
 
 function figmaAssetResolver() {
   return {
@@ -18,6 +18,10 @@ function figmaAssetResolver() {
 
 export default defineConfig({
   plugins: [
+    laravel({
+      input: ['src/main.tsx', 'src/styles/index.css'], // Adjust based on your entry point
+      refresh: true,
+    }),
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them

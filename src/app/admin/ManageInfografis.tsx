@@ -52,41 +52,72 @@ export function ManageInfografis() {
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem("pmi_infografis_list");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setInfografisList(parsed);
-      if (parsed.length > 0) setActiveId(parsed[0].id);
-    } else {
-      // Migrate old data if exists
-      const oldData = localStorage.getItem("pmi_infografis_data");
-      const initial = oldData ? [{ ...JSON.parse(oldData), id: Date.now().toString() }] : [{ ...defaultData, id: Date.now().toString() }];
-      setInfografisList(initial);
-      setActiveId(initial[0].id);
-      localStorage.setItem("pmi_infografis_list", JSON.stringify(initial));
-    }
+    fetch('/api/infografis')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          const formatted = data.map((d: any) => ({
+            ...d,
+            id: d.id.toString(),
+            kontak: typeof d.kontak === 'string' ? JSON.parse(d.kontak) : d.kontak,
+            stats: typeof d.stats === 'string' ? JSON.parse(d.stats) : d.stats,
+            dokumentasi: typeof d.dokumentasi === 'string' ? JSON.parse(d.dokumentasi) : d.dokumentasi,
+            pelayanan: typeof d.pelayanan === 'string' ? JSON.parse(d.pelayanan) : d.pelayanan
+          }));
+          setInfografisList(formatted);
+          setActiveId(formatted[0].id);
+        } else {
+          // If completely empty, use default data
+          const initial = [{ ...defaultData, id: Date.now().toString() }];
+          setInfografisList(initial);
+          setActiveId(initial[0].id);
+        }
+      })
+      .catch(err => console.error("Error fetching infografis:", err));
   }, []);
 
   const activeData = infografisList.find(d => d.id === activeId) || defaultData;
 
   const handleSave = () => {
-    try {
-      localStorage.setItem("pmi_infografis_list", JSON.stringify(infografisList));
-      // Also update the single key for backward compatibility or public view default
-      localStorage.setItem("pmi_infografis_data", JSON.stringify(activeData));
-      toast.success("Semua data infografis berhasil disimpan!");
-    } catch (error) {
-      console.error("Save error:", error);
-      toast.error("Gagal menyimpan: Ukuran data terlalu besar (mungkin karena foto terlalu banyak/besar). Coba gunakan foto dengan ukuran lebih kecil.");
-    }
+    const url = activeId.startsWith("new-") ? '/api/infografis' : `/api/infografis/${activeId}`;
+    const method = activeId.startsWith("new-") ? 'POST' : 'PUT';
+
+    fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(activeData)
+    })
+    .then(res => res.json())
+    .then(data => {
+      const formatted = {
+        ...data,
+        id: data.id.toString(),
+        kontak: typeof data.kontak === 'string' ? JSON.parse(data.kontak) : data.kontak,
+        stats: typeof data.stats === 'string' ? JSON.parse(data.stats) : data.stats,
+        dokumentasi: typeof data.dokumentasi === 'string' ? JSON.parse(data.dokumentasi) : data.dokumentasi,
+        pelayanan: typeof data.pelayanan === 'string' ? JSON.parse(data.pelayanan) : data.pelayanan
+      };
+      setInfografisList(infografisList.map(d => d.id === activeId ? formatted : d));
+      if (activeId.startsWith("new-")) {
+        setActiveId(formatted.id);
+      }
+      toast.success("Data infografis berhasil disimpan!");
+    })
+    .catch(err => {
+      console.error(err);
+      toast.error("Gagal menyimpan data.");
+    });
   };
 
   const handleAddNew = () => {
-    const newId = Date.now().toString();
+    const newId = `new-${Date.now()}`;
     const newData = { ...defaultData, id: newId, bulan: "BARU", tahun: new Date().getFullYear().toString() };
     setInfografisList([newData, ...infografisList]);
     setActiveId(newId);
-    toast.success("Data bulan baru ditambahkan!");
+    toast.success("Data bulan baru ditambahkan, jangan lupa Simpan Semua!");
   };
 
   const handleDelete = (id: string) => {
@@ -95,10 +126,21 @@ export function ManageInfografis() {
       return;
     }
     if (confirm("Apakah Anda yakin ingin menghapus data bulan ini?")) {
-      const updated = infografisList.filter(d => d.id !== id);
-      setInfografisList(updated);
-      setActiveId(updated[0].id);
-      toast.success("Data berhasil dihapus!");
+      if (id.startsWith("new-")) {
+        const updated = infografisList.filter(d => d.id !== id);
+        setInfografisList(updated);
+        setActiveId(updated[0].id);
+        toast.success("Data berhasil dihapus!");
+      } else {
+        fetch(`/api/infografis/${id}`, { method: 'DELETE' })
+        .then(() => {
+          const updated = infografisList.filter(d => d.id !== id);
+          setInfografisList(updated);
+          setActiveId(updated[0].id);
+          toast.success("Data berhasil dihapus dari database!");
+        })
+        .catch(err => console.error(err));
+      }
     }
   };
 

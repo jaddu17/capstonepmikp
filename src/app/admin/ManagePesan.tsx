@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
-import { Mail, Trash2, Eye, EyeOff, MessageCircle, Send } from "lucide-react";
+import { Mail, Trash2, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 
 interface Message {
@@ -14,107 +14,105 @@ interface Message {
   date: string;
   read: boolean;
   replied?: boolean;
-  replyText?: string;
+  reply_text?: string;
 }
 
 export function ManagePesan() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      name: "Budi Santoso",
-      email: "budi@example.com",
-      phone: "08123456789",
-      type: "donor",
-      subject: "Pertanyaan tentang syarat donor darah",
-      message: "Selamat pagi, saya ingin menanyakan apakah penderita hipertensi terkontrol bisa donor darah? Terima kasih.",
-      date: "10 Mei 2026, 09:30",
-      read: false,
-    },
-    {
-      id: "2",
-      name: "Siti Aminah",
-      email: "siti@example.com",
-      phone: "08987654321",
-      type: "relawan",
-      subject: "Pendaftaran menjadi relawan PMI",
-      message: "Halo, saya tertarik untuk menjadi relawan PMI Kulon Progo. Bagaimana prosedur pendaftarannya? Apakah ada persyaratan khusus?",
-      date: "9 Mei 2026, 14:15",
-      read: true,
-      replied: true,
-      replyText: "Halo Siti, pendaftaran relawan bisa dilakukan dengan mengisi formulir di markas kami."
-    },
-    {
-      id: "3",
-      name: "Ahmad Rifai",
-      email: "ahmad@example.com",
-      phone: "08567891234",
-      type: "saran",
-      subject: "Saran untuk website PMI",
-      message: "Website sudah bagus, tapi mungkin bisa ditambahkan fitur notifikasi WA ketika stok darah menipis. Terima kasih.",
-      date: "8 Mei 2026, 16:45",
-      read: false,
-    }
-  ]);
-
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
   const [replyContent, setReplyContent] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("pmi_messages");
-    if (saved) {
-      setMessages(JSON.parse(saved));
-    }
+    fetch('/api/pesans')
+      .then(res => res.json())
+      .then(data => {
+        setMessages(data.map((item: any) => ({
+          ...item,
+          id: item.id.toString(),
+          read: Boolean(item.read),
+          replied: Boolean(item.replied),
+        })));
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching pesans:", err);
+        setLoading(false);
+      });
   }, []);
-
-  const saveMessages = (updated: Message[]) => {
-    setMessages(updated);
-    localStorage.setItem("pmi_messages", JSON.stringify(updated));
-  };
 
   const handleDelete = (id: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus pesan ini?")) {
-      const updated = messages.filter((m) => m.id !== id);
-      saveMessages(updated);
-      if (selectedMessage?.id === id) setSelectedMessage(null);
-      toast.success("Pesan berhasil dihapus!");
+      fetch(`/api/pesans/${id}`, { method: 'DELETE' })
+      .then(() => {
+        const updated = messages.filter(m => m.id !== id);
+        setMessages(updated);
+        if (selectedMessage?.id === id) setSelectedMessage(null);
+        toast.success("Pesan berhasil dihapus!");
+      })
+      .catch(err => console.error(err));
     }
   };
 
   const handleRead = (message: Message) => {
     setSelectedMessage(message);
-    setReplyContent(message.replyText || "");
+    setReplyContent(message.reply_text || "");
     if (!message.read) {
-      const updated = messages.map((m) => (m.id === message.id ? { ...m, read: true } : m));
-      saveMessages(updated);
+      fetch(`/api/pesans/${message.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ read: true }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        const updated = messages.map(m => m.id === message.id ? { ...m, read: true } : m);
+        setMessages(updated);
+        setSelectedMessage({ ...message, read: true });
+      })
+      .catch(err => console.error(err));
     }
   };
 
   const handleSendReply = (method: "email" | "whatsapp") => {
     if (!selectedMessage) return;
-    
+
     if (method === "email") {
       window.open(`mailto:${selectedMessage.email}?subject=Re: ${selectedMessage.subject}&body=${encodeURIComponent(replyContent)}`);
     } else if (method === "whatsapp" && selectedMessage.phone) {
       window.open(`https://wa.me/${selectedMessage.phone.replace(/^0/, "62")}?text=${encodeURIComponent(replyContent)}`);
     }
 
-    const updated = messages.map((m) => 
-      m.id === selectedMessage.id ? { ...m, replied: true, replyText: replyContent } : m
-    );
-    saveMessages(updated);
-    setSelectedMessage({ ...selectedMessage, replied: true, replyText: replyContent });
-    toast.success("Balasan berhasil disimpan!");
+    fetch(`/api/pesans/${selectedMessage.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ replied: true, reply_text: replyContent }),
+    })
+    .then(res => res.json())
+    .then(() => {
+      const updated = messages.map(m =>
+        m.id === selectedMessage.id ? { ...m, replied: true, reply_text: replyContent } : m
+      );
+      setMessages(updated);
+      setSelectedMessage({ ...selectedMessage, replied: true, reply_text: replyContent });
+      toast.success("Balasan berhasil disimpan!");
+    })
+    .catch(err => console.error(err));
   };
 
-  const filteredMessages = messages.filter((m) => {
+  const filteredMessages = messages.filter(m => {
     if (filter === "unread") return !m.read;
     if (filter === "read") return m.read;
     return true;
   });
 
   const getTypeColor = (type: string) => {
-    const colors: any = { umum: "bg-blue-100 text-blue-800", donor: "bg-red-100 text-red-800", relawan: "bg-green-100 text-green-800", saran: "bg-purple-100 text-purple-800" };
+    const colors: any = {
+      umum: "bg-blue-100 text-blue-800",
+      donor: "bg-red-100 text-red-800",
+      relawan: "bg-green-100 text-green-800",
+      saran: "bg-purple-100 text-purple-800",
+    };
     return colors[type] || "bg-gray-100 text-gray-800";
   };
 
@@ -132,7 +130,7 @@ export function ManagePesan() {
       </div>
 
       <div className="flex gap-3 mb-8">
-        {["all", "unread", "read"].map((f) => (
+        {["all", "unread", "read"].map(f => (
           <button
             key={f}
             onClick={() => setFilter(f as any)}
@@ -146,8 +144,12 @@ export function ManagePesan() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] pr-2 custom-scrollbar">
-          {filteredMessages.map((message) => (
+        <div className="lg:col-span-1 space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] pr-2">
+          {loading ? (
+            <div className="text-center py-12 text-muted-foreground">Memuat pesan...</div>
+          ) : filteredMessages.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">Tidak ada pesan.</div>
+          ) : filteredMessages.map(message => (
             <div
               key={message.id}
               onClick={() => handleRead(message)}
@@ -163,7 +165,9 @@ export function ManagePesan() {
                   </div>
                   <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tighter ${getTypeColor(message.type)}`}>{message.type}</span>
                 </div>
-                <button onClick={(e) => { e.stopPropagation(); handleDelete(message.id); }} className="p-2 hover:bg-red-50 text-red-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={e => { e.stopPropagation(); handleDelete(message.id); }} className="p-2 hover:bg-red-50 text-red-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
               <div className="text-sm font-bold text-gray-600 mb-2 line-clamp-1">{message.subject}</div>
               <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{message.date}</div>
@@ -205,7 +209,7 @@ export function ManagePesan() {
                   <label className="block text-xs font-black text-gray-400 mb-4 uppercase tracking-[0.2em]">Balas Pesan Ini</label>
                   <textarea
                     value={replyContent}
-                    onChange={(e) => setReplyContent(e.target.value)}
+                    onChange={e => setReplyContent(e.target.value)}
                     rows={6}
                     placeholder="Tulis balasan profesional Anda di sini..."
                     className="w-full p-8 bg-gray-50 border-2 border-transparent focus:border-primary/20 focus:bg-white rounded-[2rem] transition-all outline-none resize-none font-medium text-gray-800"

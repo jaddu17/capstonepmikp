@@ -18,36 +18,18 @@ export function ManageBerita() {
   const [newsList, setNewsList] = useState<News[]>([]);
 
   useEffect(() => {
-    const savedNews = localStorage.getItem("pmi_news_data");
-    if (savedNews) {
-      setNewsList(JSON.parse(savedNews));
-    } else {
-      // Default data if none in localStorage
-      const defaultNews = [
-        {
-          id: "1",
-          title: "PMI Kulon Progo Berhasil Kumpulkan 250 Kantong Darah",
-          date: "8 Mei 2026",
-          category: "Donor Darah",
-          excerpt: "Kegiatan donor darah masal di Alun-Alun Wates berhasil mengumpulkan 250 kantong darah dari masyarakat Kulon Progo.",
-          content: "PMI Kulon Progo melaksanakan kegiatan donor darah masal di Alun-Alun Wates pada hari Sabtu lalu. Antusiasme masyarakat sangat tinggi, terlihat dari banyaknya warga yang datang sejak pagi hari. Tim medis PMI bekerja keras melayani para pendonor dengan tetap menjaga protokol kesehatan. Total 250 kantong darah berhasil dikumpulkan untuk menambah stok darah di Kulon Progo.",
-          image: "https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=800&h=500&fit=crop",
-          published: true,
-        },
-        {
-          id: "2",
-          title: "Pelatihan Pertolongan Pertama untuk Relawan PMI",
-          date: "5 Mei 2026",
-          category: "Pelatihan",
-          excerpt: "50 relawan PMI mengikuti pelatihan pertolongan pertama pada kecelakaan (P3K) yang diselenggarakan di kantor PMI Kulon Progo.",
-          content: "Pusat Pendidikan dan Pelatihan PMI Kulon Progo menyelenggarakan pelatihan P3K intensif selama tiga hari. Relawan diajarkan teknik-teknik dasar penyelamatan nyawa, penanganan luka, hingga evakuasi korban. Pelatihan ini bertujuan untuk meningkatkan kesiapsiagaan relawan dalam menghadapi situasi darurat di lapangan.",
-          image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=500&fit=crop",
-          published: true,
-        },
-      ];
-      setNewsList(defaultNews);
-      localStorage.setItem("pmi_news_data", JSON.stringify(defaultNews));
-    }
+    fetch('/api/beritas')
+      .then(res => res.json())
+      .then(data => {
+        // Map data to match the frontend types (e.g. converting ID from number to string if needed)
+        const formattedData = data.map((item: any) => ({
+          ...item,
+          id: item.id.toString(),
+          published: Boolean(item.published)
+        }));
+        setNewsList(formattedData);
+      })
+      .catch(err => console.error("Error fetching beritas:", err));
   }, []);
 
   const [isAdding, setIsAdding] = useState(false);
@@ -95,49 +77,81 @@ export function ManageBerita() {
   };
 
   const handleSave = () => {
-    // Also save to localStorage to sync with public view
-    const updatedList = editingId
-      ? newsList.map((n) => (n.id === editingId ? { ...formData, id: editingId } : n))
-      : [{ ...formData, id: Date.now().toString() }, ...newsList];
+    const isEdit = !!editingId;
+    const url = isEdit ? `/api/beritas/${editingId}` : '/api/beritas';
+    const method = isEdit ? 'PUT' : 'POST';
 
-    setNewsList(updatedList);
-    localStorage.setItem("pmi_news_data", JSON.stringify(updatedList));
-    
-    if (editingId) {
-      toast.success("Berita berhasil diperbarui!");
+    fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(res => res.json())
+    .then(data => {
+      // Format data to match frontend requirements
+      const formattedData = {
+        ...data,
+        id: data.id.toString(),
+        published: Boolean(data.published)
+      };
+
+      if (isEdit) {
+        setNewsList(newsList.map((n) => (n.id === editingId ? formattedData : n)));
+        toast.success("Berita berhasil diperbarui!");
+      } else {
+        setNewsList([formattedData, ...newsList]);
+        toast.success("Berita berhasil ditambahkan!");
+      }
+      
       setEditingId(null);
-    } else {
-      toast.success("Berita berhasil ditambahkan!");
       setIsAdding(false);
-    }
-    
-    setFormData({
-      title: "",
-      date: "",
-      category: "",
-      excerpt: "",
-      content: "",
-      image: "",
-      published: false,
-    });
+      setFormData({
+        title: "",
+        date: "",
+        category: "",
+        excerpt: "",
+        content: "",
+        image: "",
+        published: false,
+      });
+    })
+    .catch(err => console.error(err));
   };
 
   const handleDelete = (id: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus berita ini?")) {
-      const updated = newsList.filter((n) => n.id !== id);
-      setNewsList(updated);
-      localStorage.setItem("pmi_news_data", JSON.stringify(updated));
-      toast.success("Berita berhasil dihapus!");
+      fetch(`/api/beritas/${id}`, { method: 'DELETE' })
+      .then(() => {
+        setNewsList(newsList.filter((n) => n.id !== id));
+        toast.success("Berita berhasil dihapus!");
+      })
+      .catch(err => console.error(err));
     }
   };
 
   const togglePublish = (id: string) => {
-    const updated = newsList.map((n) =>
-      n.id === id ? { ...n, published: !n.published } : n
-    );
-    setNewsList(updated);
-    localStorage.setItem("pmi_news_data", JSON.stringify(updated));
-    toast.success("Status publikasi berhasil diubah!");
+    const news = newsList.find(n => n.id === id);
+    if (!news) return;
+
+    fetch(`/api/beritas/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ ...news, published: !news.published })
+    })
+    .then(res => res.json())
+    .then(data => {
+      const formattedData = {
+        ...data,
+        id: data.id.toString(),
+        published: Boolean(data.published)
+      };
+      setNewsList(newsList.map((n) => (n.id === id ? formattedData : n)));
+      toast.success("Status publikasi berhasil diubah!");
+    })
+    .catch(err => console.error(err));
   };
 
   const handleCancel = () => {

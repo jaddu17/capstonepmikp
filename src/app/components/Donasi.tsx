@@ -12,26 +12,41 @@ export function Donasi() {
   });
   const [proofFile, setProofFile] = useState<string | null>(null);
 
-  const handleSubmitForm = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const donationId = Date.now().toString();
-    setCurrentDonationId(donationId);
-    
-    // Initial save
-    const donationData = {
-      id: donationId,
-      ...formData,
-      proof: null,
-      date: new Date().toLocaleString("id-ID"),
-      status: "Menunggu Pembayaran"
-    };
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const existingDonations = JSON.parse(localStorage.getItem("pmi_donations") || "[]");
-    localStorage.setItem("pmi_donations", JSON.stringify([donationData, ...existingDonations]));
+  const handleSubmitForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
     
-    setStep(2);
-    toast.success("Informasi donasi telah dicatat!");
+    try {
+      const response = await fetch('/api/donasis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          proof: null,
+          date: new Date().toLocaleString("id-ID"),
+          status: "Menunggu Pembayaran",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Gagal menyimpan data donasi');
+      }
+
+      const donasi = await response.json();
+      setCurrentDonationId(donasi.id.toString());
+      setStep(2);
+      toast.success("Informasi donasi telah dicatat!");
+    } catch (error) {
+      console.error("Error saving donasi:", error);
+      toast.error("Gagal menyimpan data donasi. Silakan coba lagi.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,23 +65,39 @@ export function Donasi() {
     }
   };
 
-  const handleConfirmPayment = () => {
+  const handleConfirmPayment = async () => {
     if (!proofFile) {
       toast.error("Silakan unggah bukti transfer terlebih dahulu");
       return;
     }
 
-    const existingDonations = JSON.parse(localStorage.getItem("pmi_donations") || "[]");
-    const updatedDonations = existingDonations.map((d: any) => {
-      if (d.id === currentDonationId) {
-        return { ...d, proof: proofFile, status: "Sudah Bayar" };
-      }
-      return d;
-    });
+    setIsSubmitting(true);
 
-    localStorage.setItem("pmi_donations", JSON.stringify(updatedDonations));
-    setStep(3);
-    toast.success("Terima kasih! Bukti transfer telah terkirim.");
+    try {
+      const response = await fetch(`/api/donasis/${currentDonationId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          proof: proofFile,
+          status: "Sudah Bayar",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Gagal mengupload bukti transfer');
+      }
+
+      setStep(3);
+      toast.success("Terima kasih! Bukti transfer telah terkirim.");
+    } catch (error) {
+      console.error("Error confirming payment:", error);
+      toast.error("Gagal mengirim bukti transfer. Silakan coba lagi.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -134,9 +165,10 @@ export function Donasi() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg hover:shadow-primary/20 hover:bg-[#C21219] transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3"
+                  disabled={isSubmitting}
+                  className="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg hover:shadow-primary/20 hover:bg-[#C21219] transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Lanjut ke Pembayaran QRIS <ArrowRight className="w-5 h-5" />
+                  {isSubmitting ? "Mengirim..." : <>Lanjut ke Pembayaran QRIS <ArrowRight className="w-5 h-5" /></>}
                 </button>
               </form>
             </div>
@@ -179,9 +211,10 @@ export function Donasi() {
               <div className="flex flex-col gap-4 max-w-sm mx-auto">
                 <button 
                   onClick={handleConfirmPayment}
-                  className="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg hover:bg-[#C21219] transition-all flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg hover:bg-[#C21219] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <CheckCircle2 className="w-5 h-5" /> Konfirmasi Pembayaran
+                  {isSubmitting ? "Mengirim..." : <><CheckCircle2 className="w-5 h-5" /> Konfirmasi Pembayaran</>}
                 </button>
                 <button 
                   onClick={() => setStep(1)}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Plus, Edit, Trash2, Save, X } from "lucide-react";
 import { toast } from "sonner";
@@ -13,32 +13,21 @@ interface Schedule {
 }
 
 export function ManageJadwal() {
-  const [schedules, setSchedules] = useState<Schedule[]>([
-    {
-      id: "1",
-      date: "12 Mei 2026",
-      day: "Selasa",
-      location: "Alun-Alun Wates",
-      time: "08:00 - 13:00 WIB",
-      quota: "100 orang",
-    },
-    {
-      id: "2",
-      date: "15 Mei 2026",
-      day: "Jumat",
-      location: "Kantor PMI Kulon Progo",
-      time: "09:00 - 14:00 WIB",
-      quota: "75 orang",
-    },
-    {
-      id: "3",
-      date: "19 Mei 2026",
-      day: "Selasa",
-      location: "Pasar Sentolo",
-      time: "08:00 - 12:00 WIB",
-      quota: "80 orang",
-    },
-  ]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/jadwal-donors')
+      .then(res => res.json())
+      .then(data => {
+        setSchedules(data.map((item: any) => ({ ...item, id: item.id.toString() })));
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching jadwal:", err);
+        setLoading(false);
+      });
+  }, []);
 
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -67,30 +56,43 @@ export function ManageJadwal() {
   };
 
   const handleSave = () => {
-    if (editingId) {
-      setSchedules(
-        schedules.map((s) =>
-          s.id === editingId ? { ...formData, id: editingId } : s
-        )
-      );
-      toast.success("Jadwal berhasil diperbarui!");
-      setEditingId(null);
-    } else {
-      const newSchedule = {
-        ...formData,
-        id: Date.now().toString(),
-      };
-      setSchedules([...schedules, newSchedule]);
-      toast.success("Jadwal berhasil ditambahkan!");
-      setIsAdding(false);
-    }
-    setFormData({ date: "", day: "", location: "", time: "", quota: "" });
+    const isEdit = !!editingId;
+    const url = isEdit ? `/api/jadwal-donors/${editingId}` : '/api/jadwal-donors';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(formData),
+    })
+    .then(res => res.json())
+    .then(data => {
+      const formatted = { ...data, id: data.id.toString() };
+      if (isEdit) {
+        setSchedules(schedules.map(s => s.id === editingId ? formatted : s));
+        toast.success("Jadwal berhasil diperbarui!");
+        setEditingId(null);
+      } else {
+        setSchedules([...schedules, formatted]);
+        toast.success("Jadwal berhasil ditambahkan!");
+        setIsAdding(false);
+      }
+      setFormData({ date: "", day: "", location: "", time: "", quota: "" });
+    })
+    .catch(err => {
+      console.error(err);
+      toast.error("Gagal menyimpan jadwal.");
+    });
   };
 
   const handleDelete = (id: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
-      setSchedules(schedules.filter((s) => s.id !== id));
-      toast.success("Jadwal berhasil dihapus!");
+      fetch(`/api/jadwal-donors/${id}`, { method: 'DELETE' })
+      .then(() => {
+        setSchedules(schedules.filter(s => s.id !== id));
+        toast.success("Jadwal berhasil dihapus!");
+      })
+      .catch(err => console.error(err));
     }
   };
 
@@ -201,52 +203,46 @@ export function ManageJadwal() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-border">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                  Tanggal
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                  Hari
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                  Lokasi
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                  Waktu
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                  Kuota
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                  Aksi
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Tanggal</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Hari</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Lokasi</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Waktu</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Kuota</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {schedules.map((schedule) => (
-                <tr key={schedule.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">{schedule.date}</td>
-                  <td className="px-6 py-4">{schedule.day}</td>
-                  <td className="px-6 py-4">{schedule.location}</td>
-                  <td className="px-6 py-4">{schedule.time}</td>
-                  <td className="px-6 py-4">{schedule.quota}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(schedule)}
-                        className="text-blue-600 hover:text-blue-800 p-1"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(schedule.id)}
-                        className="text-red-600 hover:text-red-800 p-1"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {loading ? (
+                <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Memuat data jadwal...</td></tr>
+              ) : schedules.length === 0 ? (
+                <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Belum ada jadwal donor.</td></tr>
+              ) : (
+                schedules.map((schedule) => (
+                  <tr key={schedule.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">{schedule.date}</td>
+                    <td className="px-6 py-4">{schedule.day}</td>
+                    <td className="px-6 py-4">{schedule.location}</td>
+                    <td className="px-6 py-4">{schedule.time}</td>
+                    <td className="px-6 py-4">{schedule.quota}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(schedule)}
+                          className="text-blue-600 hover:text-blue-800 p-1"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(schedule.id)}
+                          className="text-red-600 hover:text-red-800 p-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

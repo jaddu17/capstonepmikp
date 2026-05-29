@@ -6,15 +6,39 @@ export function Login() {
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
-    if (credentials.username === "admin" && credentials.password === "pmi2026") {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          username: credentials.username,
+          password: credentials.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Username atau password salah!");
+        return;
+      }
+
       localStorage.setItem("pmi_admin_logged_in", "true");
       navigate("/admin/dashboard");
-    } else {
-      setError("Username atau password salah!");
+    } catch (err) {
+      setError("Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -68,17 +92,12 @@ export function Login() {
 
           <button
             type="submit"
-            className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-[#C21219] transition-colors"
+            disabled={isLoading}
+            className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-[#C21219] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Masuk Dashboard
+            {isLoading ? "Memproses..." : "Masuk Dashboard"}
           </button>
         </form>
-
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs text-blue-800 text-center">
-            <strong>Demo:</strong> Username: <code className="bg-blue-100 px-1 rounded">admin</code> | Password: <code className="bg-blue-100 px-1 rounded">pmi2026</code>
-          </p>
-        </div>
 
         <div className="mt-6 text-center">
           <a href="/" className="text-sm text-primary hover:underline">
@@ -89,3 +108,4 @@ export function Login() {
     </div>
   );
 }
+

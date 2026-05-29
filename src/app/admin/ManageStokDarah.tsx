@@ -1,19 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Save, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
+interface BloodStock {
+  id: string;
+  type: string;
+  stock: number;
+  status: string;
+}
+
 export function ManageStokDarah() {
-  const [bloodStock, setBloodStock] = useState([
-    { type: "A+", stock: 45, status: "aman" },
-    { type: "A-", stock: 8, status: "menipis" },
-    { type: "B+", stock: 38, status: "aman" },
-    { type: "B-", stock: 5, status: "menipis" },
-    { type: "AB+", stock: 22, status: "aman" },
-    { type: "AB-", stock: 3, status: "kritis" },
-    { type: "O+", stock: 52, status: "aman" },
-    { type: "O-", stock: 7, status: "menipis" },
-  ]);
+  const [bloodStock, setBloodStock] = useState<BloodStock[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/stok-darahs')
+      .then(res => res.json())
+      .then(data => {
+        setBloodStock(data.map((item: any) => ({
+          ...item,
+          id: item.id.toString(),
+        })));
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching stok darah:", err);
+        setLoading(false);
+      });
+  }, []);
 
   const updateStock = (index: number, value: number) => {
     const newStock = [...bloodStock];
@@ -31,8 +46,26 @@ export function ManageStokDarah() {
   };
 
   const handleSave = () => {
-    localStorage.setItem("pmi_blood_stock", JSON.stringify(bloodStock));
-    toast.success("Stok darah berhasil diperbarui!");
+    const updates = bloodStock.map(item => ({
+      id: parseInt(item.id),
+      stock: item.stock,
+      status: item.status,
+    }));
+
+    fetch('/api/stok-darahs/bulk-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(updates),
+    })
+    .then(res => res.json())
+    .then(data => {
+      setBloodStock(data.map((item: any) => ({ ...item, id: item.id.toString() })));
+      toast.success("Stok darah berhasil diperbarui!");
+    })
+    .catch(err => {
+      console.error(err);
+      toast.error("Gagal menyimpan stok darah.");
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -60,40 +93,42 @@ export function ManageStokDarah() {
 
       <div className="bg-white rounded-xl border border-border shadow-sm">
         <div className="p-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {bloodStock.map((item, index) => (
-              <div
-                key={item.type}
-                className="border border-border rounded-xl p-6 hover:shadow-md transition-shadow"
-              >
-                <div className="text-center mb-4">
-                  <div className="text-3xl font-bold text-primary mb-2">
-                    {item.type}
+          {loading ? (
+            <div className="text-center py-12 text-muted-foreground">Memuat data stok darah...</div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {bloodStock.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="border border-border rounded-xl p-6 hover:shadow-md transition-shadow"
+                >
+                  <div className="text-center mb-4">
+                    <div className="text-3xl font-bold text-primary mb-2">
+                      {item.type}
+                    </div>
+                    <div
+                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(item.status)}`}
+                    >
+                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                    </div>
                   </div>
-                  <div
-                    className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                      item.status
-                    )}`}
-                  >
-                    {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                  </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Jumlah Kantong
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={item.stock}
-                    onChange={(e) => updateStock(index, parseInt(e.target.value) || 0)}
-                    className="w-full px-4 py-2 border border-border rounded-lg text-center text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  />
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Jumlah Kantong
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={item.stock}
+                      onChange={(e) => updateStock(index, parseInt(e.target.value) || 0)}
+                      className="w-full px-4 py-2 border border-border rounded-lg text-center text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="border-t border-border p-6 bg-gray-50 rounded-b-xl">

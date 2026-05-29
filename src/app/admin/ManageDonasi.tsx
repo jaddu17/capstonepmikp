@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
-import { Trash2, Calendar, User, Phone, MessageSquare, CheckCircle, Clock, Upload, X } from "lucide-react";
+import { Trash2, Calendar, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 interface Donation {
@@ -15,34 +15,49 @@ interface Donation {
 
 export function ManageDonasi() {
   const [donations, setDonations] = useState<Donation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedProof, setSelectedProof] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedDonations = localStorage.getItem("pmi_donations");
-    if (savedDonations) {
-      setDonations(JSON.parse(savedDonations));
-    }
+    fetch('/api/donasis')
+      .then(res => res.json())
+      .then(data => {
+        setDonations(data.map((item: any) => ({ ...item, id: item.id.toString() })));
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching donasi:", err);
+        setLoading(false);
+      });
   }, []);
 
   const handleDelete = (id: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus data donasi ini?")) {
-      const updated = donations.filter((d) => d.id !== id);
-      setDonations(updated);
-      localStorage.setItem("pmi_donations", JSON.stringify(updated));
-      toast.success("Data berhasil dihapus!");
+      fetch(`/api/donasis/${id}`, { method: 'DELETE' })
+      .then(() => {
+        setDonations(donations.filter(d => d.id !== id));
+        toast.success("Data berhasil dihapus!");
+      })
+      .catch(err => console.error(err));
     }
   };
 
   const toggleStatus = (id: string) => {
-    const updated = donations.map((d) => {
-      if (d.id === id) {
-        return { ...d, status: d.status === "Selesai" ? "Sudah Bayar" : "Selesai" };
-      }
-      return d;
-    });
-    setDonations(updated);
-    localStorage.setItem("pmi_donations", JSON.stringify(updated));
-    toast.success("Status donasi diperbarui!");
+    const don = donations.find(d => d.id === id);
+    if (!don) return;
+    const newStatus = don.status === "Selesai" ? "Sudah Bayar" : "Selesai";
+
+    fetch(`/api/donasis/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    })
+    .then(res => res.json())
+    .then(data => {
+      setDonations(donations.map(d => d.id === id ? { ...d, status: data.status } : d));
+      toast.success("Status donasi diperbarui!");
+    })
+    .catch(err => console.error(err));
   };
 
   return (
@@ -71,7 +86,9 @@ export function ManageDonasi() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {donations.length === 0 ? (
+              {loading ? (
+                <tr><td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">Memuat data donasi...</td></tr>
+              ) : donations.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
                     Belum ada data donasi masuk.
@@ -112,8 +129,8 @@ export function ManageDonasi() {
                       <button
                         onClick={() => toggleStatus(don.id)}
                         className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold ${
-                          don.status === "Selesai" 
-                            ? "bg-green-100 text-green-700" 
+                          don.status === "Selesai"
+                            ? "bg-green-100 text-green-700"
                             : "bg-yellow-100 text-yellow-700"
                         }`}
                       >
@@ -142,7 +159,7 @@ export function ManageDonasi() {
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
             <div className="p-4 border-b border-border flex justify-between items-center">
               <h3 className="font-bold">Bukti Transfer</h3>
-              <button 
+              <button
                 onClick={() => setSelectedProof(null)}
                 className="p-1 hover:bg-gray-100 rounded-full transition-colors"
               >
@@ -150,14 +167,14 @@ export function ManageDonasi() {
               </button>
             </div>
             <div className="p-4 bg-gray-50 flex justify-center">
-              <img 
-                src={selectedProof} 
-                alt="Bukti Transfer" 
+              <img
+                src={selectedProof}
+                alt="Bukti Transfer"
                 className="max-h-[70vh] rounded-lg shadow-md"
               />
             </div>
             <div className="p-4 border-t border-border text-right">
-              <button 
+              <button
                 onClick={() => setSelectedProof(null)}
                 className="px-6 py-2 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition-all"
               >
