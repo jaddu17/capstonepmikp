@@ -65,7 +65,7 @@ export function Berita() {
           <div className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold mb-4 uppercase tracking-widest">
             Update Terbaru
           </div>
-          <h2 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Berita & Kegiatan Terkini</h2>
+          <h2 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Berita</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
             Ikuti perkembangan terbaru mengenai program kemanusiaan dan aksi relawan PMI Kulon Progo.
           </p>

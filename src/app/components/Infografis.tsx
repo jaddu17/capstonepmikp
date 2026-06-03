@@ -3,23 +3,28 @@ import { Phone, MessageCircle, Activity, Shield, Flame, Wind, Heart, Home, Camer
 export function Infografis() {
   const [infografisList, setInfografisList] = useState<any[]>([]);
   const [activeData, setActiveData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedList = localStorage.getItem("pmi_infografis_list");
-    const savedSingle = localStorage.getItem("pmi_infografis_data");
-    
-    if (savedList) {
-      const parsed = JSON.parse(savedList);
-      setInfografisList(parsed);
-      // Automatically show the first one (usually the latest)
-      if (parsed.length > 0) setActiveData(parsed[0]);
-    } else if (savedSingle) {
-      const parsed = JSON.parse(savedSingle);
-      setActiveData(parsed);
-      setInfografisList([parsed]);
-    }
+    fetch('/api/infografis')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setInfografisList(data);
+          setActiveData(data[0]);
+        } else if (data && !Array.isArray(data)) {
+          setInfografisList([data]);
+          setActiveData(data);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching infografis:", err);
+        setLoading(false);
+      });
   }, []);
 
+  if (loading) return <div className="text-center py-12 text-white">Memuat Infografis...</div>;
   if (!activeData) return null;
 
   return (
@@ -55,117 +60,91 @@ export function Infografis() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-10 items-stretch">
-          {/* Left Column: Contacts & Stats */}
-          <div className="space-y-10">
-            {/* Contacts Card */}
-            <div className="relative p-8 bg-white border-2 border-white rounded-[2.5rem] shadow-2xl overflow-hidden group">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-[#C41E3A]/5 rounded-bl-full -mr-16 -mt-16 transition-all group-hover:scale-110"></div>
-              
-              <div className="flex flex-col md:flex-row items-center gap-10 relative z-10">
-                <div className="flex-1 space-y-5 w-full">
-                  <h4 className="text-sm font-black text-[#C41E3A] uppercase tracking-widest mb-2">Layanan Darurat 24 Jam</h4>
-                  <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 group/item hover:border-[#C21219]/30 transition-all">
-                    <div className="w-12 h-12 bg-[#C41E3A] text-white rounded-xl flex items-center justify-center shadow-lg group-hover/item:rotate-12 transition-transform">
-                      <Phone className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-gray-400 uppercase">Markas</div>
-                      <div className="text-xl font-black text-gray-900">{activeData.kontak.markas}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 group/item hover:border-[#C21219]/30 transition-all">
-                    <div className="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg group-hover/item:rotate-12 transition-transform">
-                      <Activity className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-gray-400 uppercase">Ambulance</div>
-                      <div className="text-xl font-black text-gray-900">{activeData.kontak.ambulance}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 group/item hover:border-[#C21219]/30 transition-all">
-                    <div className="w-12 h-12 bg-green-500 text-white rounded-xl flex items-center justify-center shadow-lg group-hover/item:rotate-12 transition-transform">
-                      <MessageCircle className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-gray-400 uppercase">WhatsApp</div>
-                      <div className="text-xl font-black text-gray-900">{activeData.kontak.whatsapp}</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-48 h-48 flex-shrink-0 bg-red-50 rounded-[2.5rem] flex items-center justify-center border-4 border-dashed border-[#C41E3A]/20 overflow-hidden group-hover:border-[#C41E3A]/40 transition-colors">
-                  <Shield className="w-24 h-24 text-[#C41E3A] opacity-10 group-hover:scale-110 transition-transform" />
+        <div className="bg-white border-2 border-gray-100 rounded-[3rem] p-8 md:p-12 shadow-2xl flex flex-col h-full relative z-10">
+          
+          {/* Stats Section */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-12">
+            {[
+              { label: "PERTOLONGAN PERTAMA", value: activeData.stats?.pertolongan_pertama || 0, icon: Heart, color: "text-red-600" },
+              { label: "KECELAKAAN", value: activeData.stats?.kecelakaan || 0, icon: Activity, color: "text-orange-600" },
+              { label: "KEBAKARAN", value: activeData.stats?.kebakaran || 0, icon: Flame, color: "text-amber-600" },
+              { label: "BENCANA ALAM", value: activeData.stats?.bencana_alam || 0, icon: Wind, color: "text-blue-600" },
+              { label: "EVAKUASI JENAZAH", value: activeData.stats?.evakuasi_jenazah || 0, icon: Shield, color: "text-slate-700" },
+              { label: "HOME EMERGENCY", value: activeData.stats?.home_emergency || 0, icon: Home, color: "text-emerald-600" },
+            ].map((stat, idx) => (
+              <div key={idx} className="text-center group p-4 bg-gray-50 rounded-2xl hover:bg-red-50 transition-colors border border-gray-100">
+                <div className="text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest">{stat.label}</div>
+                <div className={`text-4xl font-black ${stat.color} mb-2`}>{stat.value}</div>
+                <div className="flex justify-center">
+                  <stat.icon className={`w-5 h-5 ${stat.color} opacity-30`} />
                 </div>
               </div>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="bg-[#FFEBEC] border-4 border-white rounded-[3rem] p-10 relative shadow-2xl overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-2 bg-[#C21219]"></div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-y-12 gap-x-6">
-                {[
-                  { label: "PERTOLONGAN PERTAMA", value: activeData.stats.pertolongan_pertama, icon: Heart, color: "text-red-600" },
-                  { label: "KECELAKAAN", value: activeData.stats.kecelakaan, icon: Activity, color: "text-orange-600" },
-                  { label: "KEBAKARAN", value: activeData.stats.kebakaran, icon: Flame, color: "text-amber-600" },
-                  { label: "BENCANA ALAM", value: activeData.stats.bencana_alam, icon: Wind, color: "text-blue-600" },
-                  { label: "EVAKUASI JENAZAH", value: activeData.stats.evakuasi_jenazah, icon: Shield, color: "text-slate-700" },
-                  { label: "HOME EMERGENCY", value: activeData.stats.home_emergency, icon: Home, color: "text-emerald-600" },
-                ].map((stat, idx) => (
-                  <div key={idx} className="text-center group">
-                    <div className="text-[10px] font-black text-gray-500 leading-tight mb-3 h-8 flex items-center justify-center uppercase tracking-widest px-2">
-                      {stat.label}
-                    </div>
-                    <div className={`text-5xl font-black ${stat.color} mb-2 group-hover:scale-110 transition-transform duration-300 drop-shadow-sm`}>
-                      {stat.value}
-                    </div>
-                    <div className="flex justify-center">
-                      <stat.icon className={`w-5 h-5 ${stat.color} opacity-20`} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Right Column: Documentation & Pelayanan */}
-          <div className="bg-white border-2 border-gray-100 rounded-[3rem] p-10 relative shadow-2xl flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-8">
-              <Camera className="w-6 h-6 text-[#C41E3A]" />
-              <h3 className="text-2xl font-black tracking-widest text-gray-900 uppercase">DOKUMENTASI</h3>
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Left: Pelayanan & Kontak */}
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <Info className="w-6 h-6 text-[#C41E3A]" />
+                  <h3 className="text-xl font-black text-gray-900 uppercase">PELAYANAN TERPADU</h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {activeData.pelayanan?.map((item: string, idx: number) => (
+                    <div key={idx} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl font-bold text-gray-700 hover:bg-[#C41E3A] hover:text-white transition-all">
+                      <div className="w-2 h-2 bg-[#C41E3A] rounded-full"></div>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-black text-[#C41E3A] uppercase tracking-widest mb-4">Layanan Darurat 24 Jam</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                    <div className="w-10 h-10 bg-[#C41E3A] text-white rounded-xl flex items-center justify-center shadow-lg"><Phone className="w-5 h-5" /></div>
+                    <div className="text-xs font-bold text-gray-400 uppercase">Markas</div>
+                    <div className="text-lg font-black text-gray-900">{activeData.kontak?.markas || '-'}</div>
+                  </div>
+                  <div className="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                    <div className="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg"><Activity className="w-5 h-5" /></div>
+                    <div className="text-xs font-bold text-gray-400 uppercase">Ambulance</div>
+                    <div className="text-lg font-black text-gray-900">{activeData.kontak?.ambulance || '-'}</div>
+                  </div>
+                  <div className="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                    <div className="w-10 h-10 bg-green-500 text-white rounded-xl flex items-center justify-center shadow-lg"><MessageCircle className="w-5 h-5" /></div>
+                    <div className="text-xs font-bold text-gray-400 uppercase">WhatsApp</div>
+                    <div className="text-lg font-black text-gray-900">{activeData.kontak?.whatsapp || '-'}</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
-              {activeData.dokumentasi.map((img, idx) => (
-                <div key={idx} className="aspect-square bg-gray-50 rounded-3xl overflow-hidden group border-2 border-transparent hover:border-[#C41E3A] transition-all relative">
-                  {img ? (
+
+            {/* Right: Dokumentasi */}
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <Camera className="w-6 h-6 text-[#C41E3A]" />
+                <h3 className="text-xl font-black text-gray-900 uppercase">DOKUMENTASI</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {activeData.dokumentasi?.filter((img: string | null) => img).map((img: string, idx: number) => (
+                  <div key={idx} className="aspect-[4/3] bg-gray-50 rounded-2xl overflow-hidden group relative shadow-md border border-gray-200">
                     <img 
                       src={img} 
                       alt={`Dokumentasi ${idx + 1}`} 
-                      className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-200">
-                      <Camera className="w-10 h-10" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-auto pt-10 border-t-2 border-gray-50">
-              <div className="flex items-center gap-3 mb-6">
-                <Info className="w-6 h-6 text-[#C41E3A]" />
-                <h3 className="text-xl font-black text-gray-900 uppercase">PELAYANAN TERPADU</h3>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {activeData.pelayanan.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl font-bold text-gray-700 hover:bg-[#C41E3A] hover:text-white transition-all cursor-default group/pel">
-                    <div className="w-2 h-2 bg-[#C41E3A] rounded-full group-hover/pel:bg-white transition-colors"></div>
-                    {item}
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
                 ))}
               </div>
+              {(!activeData.dokumentasi || activeData.dokumentasi.filter((img: string | null) => img).length === 0) && (
+                <div className="text-center py-12 text-gray-400 border-2 border-dashed border-gray-200 rounded-2xl">
+                  Belum ada dokumentasi
+                </div>
+              )}
             </div>
           </div>
         </div>

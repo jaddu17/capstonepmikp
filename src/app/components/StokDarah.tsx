@@ -1,16 +1,29 @@
+import { useState, useEffect } from "react";
 import { Droplet, AlertCircle, CheckCircle } from "lucide-react";
 
+interface BloodStockItem {
+  id: string;
+  type: string;
+  stock: number;
+  status: string;
+}
+
 export function StokDarah() {
-  const bloodStock = [
-    { type: "A+", stock: 45, status: "aman" },
-    { type: "A-", stock: 8, status: "menipis" },
-    { type: "B+", stock: 38, status: "aman" },
-    { type: "B-", stock: 5, status: "menipis" },
-    { type: "AB+", stock: 22, status: "aman" },
-    { type: "AB-", stock: 3, status: "kritis" },
-    { type: "O+", stock: 52, status: "aman" },
-    { type: "O-", stock: 7, status: "menipis" },
-  ];
+  const [bloodStock, setBloodStock] = useState<BloodStockItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/stok-darahs')
+      .then(res => res.json())
+      .then(data => {
+        setBloodStock(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching stok darah:", err);
+        setLoading(false);
+      });
+  }, []);
 
   const getStatusColor = (status: string) => {
     if (status === "aman") return "bg-green-100 text-green-800 border-green-200";
@@ -37,30 +50,34 @@ export function StokDarah() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          {bloodStock.map((item) => (
-            <div
-              key={item.type}
-              className="bg-white rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow"
-            >
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">
-                  {item.type}
-                </div>
-                <div className="text-4xl font-bold mb-3">{item.stock}</div>
-                <div className="text-sm text-muted-foreground mb-3">kantong</div>
-                <div
-                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                    item.status
-                  )}`}
-                >
-                  {getStatusIcon(item.status)}
-                  <span className="capitalize">{item.status}</span>
+        {loading ? (
+          <div className="text-center py-12 text-muted-foreground">Memuat data stok darah...</div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+            {bloodStock.map((item) => (
+              <div
+                key={item.type}
+                className="bg-white rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow"
+              >
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">
+                    {item.type}
+                  </div>
+                  <div className="text-4xl font-bold mb-3">{item.stock}</div>
+                  <div className="text-sm text-muted-foreground mb-3">kantong</div>
+                  <div
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                      item.status
+                    )}`}
+                  >
+                    {getStatusIcon(item.status)}
+                    <span className="capitalize">{item.status}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <div className="bg-red-50 border border-red-200 rounded-xl p-6">
           <div className="flex items-start gap-3">

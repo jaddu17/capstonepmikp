@@ -1,4 +1,4 @@
-import { Target, Eye, Award, Users } from "lucide-react";
+import { Target, Eye } from "lucide-react";
 
 export function TentangPMI() {
   const values = [
@@ -6,25 +6,13 @@ export function TentangPMI() {
       icon: Eye,
       title: "Visi",
       description:
-        "Terwujudnya masyarakat Kulon Progo yang peduli dan tanggap terhadap sesama melalui gerakan kemanusiaan",
+        "PMI berkarakter, profesional, mandiri dan dicintai masyarakat.",
     },
     {
       icon: Target,
       title: "Misi",
       description:
-        "Memberikan pelayanan donor darah, tanggap darurat bencana, dan pelayanan sosial kemanusiaan untuk masyarakat",
-    },
-    {
-      icon: Award,
-      title: "Nilai",
-      description:
-        "Kemanusiaan, Kesukarelaan, Kenetralan, Kemandirian, Kesatuan, dan Kesemestaan",
-    },
-    {
-      icon: Users,
-      title: "Komitmen",
-      description:
-        "Melayani dengan sepenuh hati tanpa memandang suku, agama, ras, dan golongan",
+        "1. Menjadi organisasi kemanusiaan terdepan yang memberikan layanan berkualitas kepada masyarakat sesuai dengan prinsip-prinsip dasar Gerakan Palang Merah dan Bulan Sabit Merah;\n2. Meningkatkan kemandirian organisasi PMI melalui kemitraan strategis yang berkesinambungan dengan pemerintah, swasta, mitra gerakan, masyarakat, dan pemangku kepentingan lainnya di semua tingkatan;",
     },
   ];
 
@@ -52,7 +40,7 @@ export function TentangPMI() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
+                  <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">
                     {item.description}
                   </p>
                 </div>

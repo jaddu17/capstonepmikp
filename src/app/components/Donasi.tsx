@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Wallet, CreditCard, Landmark, ArrowRight, Heart, QrCode, User, Phone, MessageSquare, CheckCircle2, Upload, FileText } from "lucide-react";
+import { Wallet, CreditCard, Landmark, ArrowRight, Heart, User, Phone, MessageSquare, CheckCircle2, Upload, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 export function Donasi() {
@@ -182,9 +182,8 @@ export function Donasi() {
               </div>
 
               <div className="max-w-sm mx-auto p-6 bg-gray-50 border-2 border-dashed border-gray-200 rounded-[2rem] mb-8 group transition-all hover:border-primary/30">
-                <div className="aspect-square bg-white rounded-2xl flex flex-col items-center justify-center border-4 border-white shadow-lg overflow-hidden mb-4">
-                  <QrCode className="w-40 h-40 text-gray-800" />
-                  <div className="mt-2 text-[10px] font-black text-gray-400 uppercase">QRIS - PMI KULON PROGO</div>
+                <div className="bg-white rounded-2xl flex flex-col items-center justify-center border-4 border-white shadow-lg overflow-hidden mb-4">
+                  <img src="/images/qris-pmi-kulonprogo.jpg" alt="QRIS PMI Kulon Progo" className="w-full h-auto rounded-xl" />
                 </div>
 
                 <div className="text-left">
