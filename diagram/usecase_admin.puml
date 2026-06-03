@@ -7,28 +7,24 @@ actor "Administrator (Admin)" as Admin
 package "PMI Kulon Progo Website - Admin" {
   usecase "Login" as UC_Login
   usecase "Melihat Dashboard" as UC_Dashboard
-  usecase "Mengelola Berita (Add/Edit/Delete/Publish)" as UC_ManageNews
-  usecase "Mengelola Donasi (View/Update/Delete)" as UC_ManageDonasi
-  usecase "Mengelola Stok Darah (Add/Edit/Delete/Update)" as UC_ManageStock
-  usecase "Mengelola Jadwal (Add/Edit/Delete)" as UC_ManageJadwal
-  usecase "Mengelola Pesan (View/Reply/Delete)" as UC_ManagePesan
-  usecase "Mengelola Infografis & Kontak" as UC_ManageInfo
+  usecase "Mengelola Stok Darah (Update)" as UC_ManageStock
+  usecase "Mengelola Jadwal Donor (CRUD)" as UC_ManageJadwal
+  usecase "Mengelola Berita (CRUD)" as UC_ManageNews
+  usecase "Mengelola Pesan Masuk (View/Reply/Delete)" as UC_ManagePesan
+  usecase "Mengelola Infografis (CRUD)" as UC_ManageInfo
+  usecase "Mengelola Donasi Masuk (View/Delete)" as UC_ManageDonasi
+  usecase "Logout" as UC_Logout
 }
 
 Admin --> UC_Login
-Admin --> UC_Dashboard
-Admin --> UC_ManageNews
-Admin --> UC_ManageDonasi
-Admin --> UC_ManageStock
-Admin --> UC_ManageJadwal
-Admin --> UC_ManagePesan
-Admin --> UC_ManageInfo
 
-UC_Login ..> UC_Dashboard : <<include>>
-
-note right of UC_ManageDonasi
-  Admin dapat melihat dan mengelola
-  donasi yang dikirim dari publik.
-end note
+UC_Login --> UC_Dashboard
+UC_Login --> UC_ManageStock
+UC_Login --> UC_ManageJadwal
+UC_Login --> UC_ManageNews
+UC_Login --> UC_ManagePesan
+UC_Login --> UC_ManageInfo
+UC_Login --> UC_ManageDonasi
+UC_Login --> UC_Logout
 
 @enduml

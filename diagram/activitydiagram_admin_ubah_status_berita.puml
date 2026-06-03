@@ -1,0 +1,26 @@
+@startuml ACTIVITY_DIAGRAM_ADMIN_UBAH_STATUS_BERITA
+title Activity Diagram - Admin Ubah Status Publikasi Berita
+
+|Admin|
+start
+:Buka menu Berita;
+
+if (Status berita Draft?) then (Ya)
+    :Klik ikon Publish (✓);
+else (Tidak)
+    :Klik ikon Unpublish (🔒);
+endif
+
+|Sistem|
+:Perbarui status publikasi berita;
+
+if (Berhasil?) then (Ya)
+    :Tampilkan notifikasi
+    "Status publikasi berhasil diubah";
+    :Perbarui tampilan status berita;
+else (Tidak)
+    :Tampilkan pesan error;
+endif
+
+stop
+@enduml

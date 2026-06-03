@@ -11,8 +11,8 @@ package "PMI Kulon Progo Website - User" {
   usecase "Melihat Stok Darah" as UC_Stock
   usecase "Melihat Jadwal Donor" as UC_Schedule
   usecase "Melihat Informasi Donor / Prosedur" as UC_InfoDonor
-  usecase "Submit Donation Info" as UC_SubmitDonation
-  usecase "Send Message / Contact" as UC_Contact
+  usecase "Kirim Donasi" as UC_SubmitDonation
+  usecase "Kirim Pesan" as UC_Contact
 }
 
 Visitor --> UC_Home
@@ -26,7 +26,7 @@ Visitor --> UC_Contact
 
 note right of UC_SubmitDonation
   Donasi dari publik disimpan (localStorage)
-  dan dilihat oleh Admin di "Manage Donasi".
+  dan dilihat oleh Admin di menu "Donasi Masuk".
 end note
 
 @enduml

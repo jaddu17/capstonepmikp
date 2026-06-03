@@ -8,13 +8,8 @@ start
 
 |Sistem|
 :Form login diterima;
-:Validasi kredensial;
+:Validasi kredensial (Cek DB & Verifikasi Password);
 
-|Database|
-:Query user admin;
-:Verifikasi password;
-
-|Sistem|
 if (Login berhasil?) then (Ya)
   :Buat session;
   :Set authentication token;

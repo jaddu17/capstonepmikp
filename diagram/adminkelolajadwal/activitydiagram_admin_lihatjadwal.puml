@@ -1,39 +1,18 @@
-@startuml
+@startuml ACTIVITY_DIAGRAM_ADMIN_LIHATJADWAL
 title Activity Diagram - Admin Lihat Jadwal Donor Darah
 
 |Admin|
 start
-:Login sebagai admin;
-:Masuk ke halaman Kelola Jadwal Donor;
+:Login dan masuk ke Dashboard;
+:Klik menu "Jadwal Donor";
 
 |Sistem|
-:Tampilkan daftar jadwal donor saat ini;
-:Tampilkan kalender atau tabel jadwal;
+:Kirim request untuk mengambil data jadwal;
+:Terima balasan data jadwal terbaru;
+:Tampilkan data dalam bentuk tabel interaktif;
 
 |Admin|
-:Lihat detail jadwal yang tersedia;
-
-|Sistem|
-:Minta data jadwal;
-
-|Database|
-:Query daftar jadwal donor;
-
-|Sistem|
-:Terima data jadwal;
-:Perbarui tampilan jadwal jika diperlukan;
-
-|Admin|
-if (Ingin melakukan aksi lain?) then (Ya)
-  :Pilih aksi yang diinginkan;
-  |Sistem|
-  :Tampilkan form atau konfirmasi sesuai aksi;
-  -> |Admin|
-else (Tidak)
-  stop
-endif
-
-|Admin|
+:Melihat daftar jadwal donor;
 stop
 
 @enduml

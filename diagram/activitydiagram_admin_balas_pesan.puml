@@ -4,35 +4,34 @@ title Activity Diagram - Admin Balas Pesan
 |Admin|
 start
 :Buka menu Pesan Masuk;
-:Klik pesan yang ingin dibalas di panel kiri;
-:Membaca detail pesan di panel kanan;
+:Pilih salah satu pesan;
+
+|Sistem|
+:Tampilkan detail pesan;
 
 |Admin|
-:Ketik teks balasan pada kolom "Balas Pesan Ini";
-:Pilih metode pengiriman;
+:Ketik isi balasan;
 
-if (Metode balasan?) then (Email)
-  :Klik tombol "Balas via Email";
-  |Sistem|
-  :Buka aplikasi/tab Email default (mailto:) dengan subject & isi;
+if (Pilih metode balasan?) then (Email)
+
+    :Klik "Balas via Email";
+
+    |Sistem|
+    :Kirim balasan melalui Email;
+    :Tampilkan notifikasi
+    "Balasan berhasil dikirim";
+
 else (WhatsApp)
-  :Klik tombol "Balas via WhatsApp";
-  |Sistem|
-  :Buka tab baru WhatsApp Web (wa.me/) dengan nomor tujuan;
+
+    :Klik "Balas via WhatsApp";
+
+    |Sistem|
+    :Kirim balasan melalui WhatsApp;
+    :Tampilkan notifikasi
+    "Balasan berhasil dikirim";
+
 endif
 
-|Sistem|
-:Tandai status pesan menjadi "Terbalas" (replied: true);
-:Simpan teks balasan;
 
-|Database|
-:Update data pesan di database;
-
-|Sistem|
-:Tampilkan notifikasi "Balasan berhasil disimpan!";
-:Tampilkan status "Terbalas" di panel kanan;
-
-|Admin|
 stop
-
 @enduml

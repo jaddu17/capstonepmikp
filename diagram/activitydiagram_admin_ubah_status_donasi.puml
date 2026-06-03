@@ -1,22 +1,27 @@
 @startuml ACTIVITY_DIAGRAM_ADMIN_UBAH_STATUS_DONASI
-title Activity Diagram - Admin Ubah Status Donasi
+title Activity Diagram - Admin Ubah Status Donasi (Verifikasi)
 
 |Admin|
 start
 :Buka menu Donasi Masuk;
-:Pilih salah satu data donasi pada tabel;
-:Klik tombol badge Status (contoh: "Sudah Bayar" / "Selesai");
+:Klik tombol aksi/status (misal: "Verifikasi" atau "Tolak")\npada donasi tertentu;
 
 |Sistem|
-:Toggle (ubah) status donasi ke state sebaliknya;
+:Tampilkan dialog konfirmasi perubahan status;
 
-|Database|
-:Update status donasi di database;
+|Admin|
+:Klik "Ya, Konfirmasi";
 
 |Sistem|
-:Perbarui warna dan teks badge status pada tabel;
-:Tampilkan notifikasi "Status donasi diperbarui!";
+:Perbarui status donasi di sistem;
+if (Update sukses?) then (Ya)
+  :Tampilkan notifikasi "Status donasi berhasil diubah";
+  :Ubah warna/label status pada tabel;
+else (Tidak)
+  :Tampilkan pesan error;
+endif
 
 |Admin|
 stop
+
 @enduml

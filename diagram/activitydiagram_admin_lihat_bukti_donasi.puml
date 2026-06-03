@@ -1,27 +1,23 @@
 @startuml ACTIVITY_DIAGRAM_ADMIN_LIHAT_BUKTI_DONASI
-title Activity Diagram - Admin Lihat Bukti Transfer
+title Activity Diagram - Admin Lihat Bukti Transfer Donasi
 
 |Admin|
 start
 :Buka menu Donasi Masuk;
-:Cari data donasi pada tabel;
+:Klik tombol "Lihat Bukti" pada salah satu donasi;
 
 |Sistem|
-if (Apakah bukti transfer tersedia?) then (Ya)
-  |Admin|
-  :Klik tombol "Lihat Bukti";
-  |Sistem|
-  :Tampilkan modal/pop-up berisi gambar bukti transfer;
-  |Admin|
-  :Melihat gambar bukti;
-  :Klik tombol "Tutup" atau icon (X);
-  |Sistem|
-  :Sembunyikan modal/pop-up;
-else (Tidak)
-  |Sistem|
-  :Tampilkan label teks "Belum Upload";
-endif
+:Ambil URL/file gambar bukti transfer;
+:Tampilkan gambar bukti transfer\ndi dalam Modal (Pop-up);
+
+|Admin|
+:Melihat gambar bukti transfer;
+:Klik tombol "Tutup" ;
+
+|Sistem|
+:Tutup;
 
 |Admin|
 stop
+
 @enduml

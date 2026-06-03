@@ -4,33 +4,26 @@ title Activity Diagram - Admin Edit Berita
 |Admin|
 start
 :Buka menu Berita;
-:Melihat daftar kartu berita;
-:Klik icon "Edit" pada salah satu berita;
+:Klik ikon "Lihat" (Mata);
 
 |Sistem|
-:Tampilkan form Edit Berita dengan data terisi;
+:Tampilkan form edit berita;
 
 |Admin|
-:Ubah data form (Judul, Kategori, Isi, dll);
-:Klik tombol "Simpan";
+:Ubah data berita;
+:Klik "Simpan Perubahan";
 
 |Sistem|
-:Validasi form;
-if (Validasi sukses?) then (Ya)
-  |Database|
-  :Update data berita;
-  |Sistem|
-  :Sembunyikan form;
-  :Tampilkan notifikasi "Berita berhasil diperbarui!";
-  :Perbarui daftar kartu berita;
+:Validasi data;
+
+if (Data valid?) then (Ya)
+    :Simpan perubahan data berita;
+    :Tampilkan notifikasi
+    "Berita berhasil diperbarui";
+    :Tampilkan data terbaru;
 else (Tidak)
-  |Sistem|
-  :Tampilkan pesan error;
-  |Admin|
-  :Perbaiki input form;
-  stop
+    :Tampilkan pesan error validasi;
 endif
 
 stop
-
 @enduml

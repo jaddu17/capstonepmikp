@@ -1,22 +1,14 @@
-@startuml ACTIVITY_DIAGRAM_ADMIN_LOGOUT_COMPLETE
-title Activity Diagram - Admin Logout (Full System)
+@startuml ACTIVITY_DIAGRAM_ADMIN_LOGOUT
+title Activity Diagram - Admin Logout
 
 |Admin|
 start
 :Klik tombol "Keluar" di Sidebar;
 
 |Sistem|
-:Kirim permintaan logout ke Backend API\n(HTTP POST /api/v1/auth/logout);
-:Form permintaan logout diterima;
-
-|Database|
-:Hapus data session aktif / masukkan token ke blacklist;
-:Konfirmasi penghapusan data berhasil;
-
-|Sistem|
-:Hapus local authentication tokens\n(localStorage / cookies);
-:Redirect browser ke halaman login\n("/admin/login");
-:Tampilkan pesan "Logout Berhasil";
+:Terima permintaan logout;
+:Hapus session dan token autentikasi;
+:Redirect ke halaman login;
 
 |Admin|
 :Melihat halaman login;

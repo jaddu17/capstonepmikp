@@ -1,46 +1,21 @@
 @startuml ACTIVITY_DIAGRAM_ADMIN_LIHAT_PESAN
-title Activity Diagram - Admin Lihat Pesan
+title Activity Diagram - Admin Lihat Pesan Masuk
 
 |Admin|
 start
-:Buka menu Pesan Masuk;
+:Login dan masuk ke Dashboard;
+:Klik menu "Pesan Masuk";
 
 |Sistem|
-:Navigasi ke halaman Kelola Pesan;
-
-|Database|
-:Query daftar pesan masuk;
-
-|Sistem|
-:Tampilkan daftar pesan di panel kiri;
-:Tampilkan indikator jumlah pesan baru;
+:Tampilkan daftar pesan masuk dalam tabel;
 
 |Admin|
-if (Pilih filter pesan?) then (Ya)
-  :Klik tombol filter (Semua / Belum Dibaca / Sudah Dibaca);
-  |Sistem|
-  :Saring daftar pesan sesuai pilihan;
-else (Tidak)
-endif
-
-|Admin|
-:Klik salah satu pesan pada daftar;
+:Klik salah satu pesan untuk melihat detail;
 
 |Sistem|
-if (Pesan belum dibaca?) then (Ya)
-  :Ubah status pesan menjadi "Sudah Dibaca" (read: true);
-  |Database|
-  :Update status baca pesan;
-else (Tidak)
-endif
-
-|Sistem|
-:Tampilkan detail pesan di panel kanan;
-:Tampilkan informasi pengirim, tipe, tanggal, dan isi pesan;
+:Tampilkan popup/halaman detail pesan;
 
 |Admin|
-:Membaca isi detail pesan;
-
 stop
 
 @enduml

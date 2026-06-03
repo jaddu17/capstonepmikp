@@ -3,35 +3,34 @@ title Activity Diagram - Admin Manage Stok Darah
 
 |Admin|
 start
-:Buka halaman Stok Darah;
+:Buka halaman Kelola Stok Darah;
 
 |Sistem|
-:Tampilkan form kartu golongan darah
-dengan jumlah kantong dan status saat ini;
+:Ambil data stok (WB, PRC, TC) terbaru;
+:Tampilkan form stok darah;
 
 |Admin|
-:Klik tambah/kurangi jumlah pada
-kartu golongan darah tertentu;
+:Ubah jumlah WB, PRC, atau TC;
+
+|Sistem|
+:Hitung total (WB + PRC);
+if (Golongan Darah?) then (AB)
+  :Status otomatis: <= 10 (STOK KURANG),\n> 10 (STOK CUKUP);
+else (A, B, O)
+  :Status otomatis: <= 30 (STOK KURANG),\n> 30 (STOK CUKUP);
+endif
+:Tampilkan perubahan status secara realtime;
+
+|Admin|
 :Klik tombol "Simpan Perubahan";
 
 |Sistem|
-:Terima data perubahan stok;
-:Tentukan status baru otomatis
-(>20: Aman, 10-19: Menipis, <10: Kritis);
-:Validasi data;
-
-|Database|
-if (Validasi sukses?) then (Ya)
-  :Update stok darah dan status ke database;
+:Kirim data update (Bulk Update);
+if (Simpan Berhasil?) then (Ya)
+  :Tampilkan notifikasi sukses;
 else (Tidak)
-  |Sistem|
-  :Tampilkan pesan error;
-  stop
+  :Tampilkan notifikasi error;
 endif
-
-|Sistem|
-:Tampilkan notifikasi sukses;
-:Perbarui tampilan kartu stok darah;
 
 |Admin|
 stop

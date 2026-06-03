@@ -4,31 +4,26 @@ title Activity Diagram - Admin Hapus Infografis
 |Admin|
 start
 :Buka menu Infografis;
-:Pilih data bulan yang ingin dihapus melalui dropdown;
-:Klik tombol "Hapus" (Trash);
+:Klik tombol "Hapus" pada salah satu infografis;
 
 |Sistem|
-if (Hanya tersisa 1 data di list?) then (Ya)
-  :Tampilkan pesan error "Minimal harus ada satu data infografis";
-  stop
-else (Tidak)
-  :Tampilkan pop-up konfirmasi (browser alert);
+:Tampilkan dialog konfirmasi penghapusan;
+
+|Admin|
+if (Yakin hapus?) then (Ya)
+  :Klik "Konfirmasi / Hapus";
+
+  |Sistem|
+  :Kirim instruksi hapus via API;
+  :Hapus file gambar & data dari sistem;
+  :Tampilkan notifikasi berhasil dihapus;
+  :Hilangkan infografis dari tampilan tabel;
+else (Batal)
+  |Admin|
+  :Klik "Batal";
 endif
 
 |Admin|
-:Klik "OK/Ya" pada dialog konfirmasi;
-
-|Sistem|
-:Terima instruksi hapus;
-
-|Database|
-:Hapus data bulan tersebut dari database array;
-
-|Sistem|
-:Perbarui daftar dropdown ke data bulan lain yang tersedia;
-:Muat form dengan data bulan tersebut;
-:Tampilkan notifikasi "Data berhasil dihapus!";
-
-|Admin|
 stop
+
 @enduml

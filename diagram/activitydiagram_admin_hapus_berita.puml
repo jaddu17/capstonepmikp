@@ -3,26 +3,25 @@ title Activity Diagram - Admin Hapus Berita
 
 |Admin|
 start
-:Buka Menu Berita;
-:Melihat daftar kartu berita;
-:Klik icon "Hapus" pada salah satu berita;
+:Buka menu Berita;
+:Klik ikon "Hapus";
 
 |Sistem|
-:Tampilkan pop-up konfirmasi dialog;
+:Tampilkan dialog konfirmasi penghapusan;
 
 |Admin|
-:Klik "OK/Ya" pada konfirmasi;
+if (Yakin hapus?) then (Ya)
+    :Klik "Hapus";
 
-|Sistem|
-:Terima instruksi hapus;
+    |Sistem|
+    :Hapus data berita;
+    :Tampilkan notifikasi
+    "Berita berhasil dihapus";
+    :Perbarui daftar berita;
 
-|Database|
-:Hapus data berita;
-
-|Sistem|
-:Tampilkan notifikasi "Berita berhasil dihapus!";
-:Hapus kartu berita dari tampilan;
+else (Tidak)
+    :Klik "Batal";
+endif
 
 stop
-
 @enduml

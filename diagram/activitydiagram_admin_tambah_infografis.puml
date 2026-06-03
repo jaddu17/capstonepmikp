@@ -1,30 +1,53 @@
-@startuml ACTIVITY_DIAGRAM_ADMIN_TAMBAH_INFOGRAFIS
-title Activity Diagram - Admin Tambah Infografis (Bulan Baru)
+@startuml ACTIVITY_DIAGRAM_ADMIN_KELOLA_INFOGRAFIS
+title Activity Diagram - Kelola Infografis PMI
 
 |Admin|
 start
-:Buka Menu Infografis;
-:Klik tombol "Bulan Baru";
+:Buka menu Infografis;
 
 |Sistem|
-:Buat kerangka data baru dengan nilai default;
-:Set status nama bulan menjadi "BARU";
-:Tambahkan data baru ke dalam daftar dropdown;
-:Ubah pilihan dropdown ke data yang baru dibuat;
-:Tampilkan form dengan data default (kosong/0);
-:Tampilkan notifikasi "Data bulan baru ditambahkan!";
+:Tampilkan halaman Kelola Infografis;
 
 |Admin|
-:Mulai mengubah dan mengisi isi form (Bulan, Tahun, Statistik, dll);
-:Klik "Simpan Semua";
+:Pilih bulan dan tahun;
+
+:Isi atau ubah data kontak
+(Markas, Ambulance, Whatsapp);
+
+:Upload dokumentasi foto
+(Foto 1 sampai Foto 6);
+
+:Isi statistik layanan
+(Kebakaran, Kecelakaan,
+Bencana Alam, Home Emergency,
+Evakuasi Jenazah,
+Pertolongan Pertama);
+
+:Kelola daftar pelayanan
+(Tambah atau Hapus Pelayanan);
+
+:Isi kata-kata hari ini (Quote);
+
+:Klik tombol Simpan Semua;
 
 |Sistem|
-:Proses pembaruan array data secara keseluruhan;
+:Validasi seluruh data;
 
-|Database|
-:Simpan daftar infografis terbaru ke database;
+if (Data valid?) then (Ya)
 
-|Sistem|
-:Tampilkan notifikasi sukses "Semua data infografis berhasil disimpan!";
+:Upload foto dokumentasi;
+:Simpan data kontak;
+:Simpan statistik layanan;
+:Simpan daftar pelayanan;
+:Simpan quote;
+:Update data infografis bulan terpilih;
+:Tampilkan notifikasi berhasil;
+
+else (Tidak)
+
+:Tampilkan pesan kesalahan;
+
+endif
+
 stop
 @enduml

@@ -7,29 +7,23 @@ start
 :Klik tombol "Tambah Berita";
 
 |Sistem|
-:Tampilkan form Tambah Berita;
+:Tampilkan form tambah berita;
 
 |Admin|
-:Isi form (Judul, Tanggal, Kategori, Ringkasan, Isi, Gambar, Publikasi);
-:Klik tombol "Simpan";
+:Isi form (Judul, Konten, Gambar, Kategori, dll);
+:Klik "Simpan";
 
 |Sistem|
-:Validasi input form;
+:Validasi input data berita;
 if (Validasi sukses?) then (Ya)
-  |Database|
-  :Simpan data berita baru;
-  |Sistem|
-  :Sembunyikan form;
-  :Tampilkan notifikasi "Berita berhasil ditambahkan!";
-  :Perbarui daftar kartu berita;
+  :Kirim data & Simpan ke sistem;
+  :Tampilkan notifikasi berhasil;
+  :Perbarui tampilan daftar berita;
 else (Tidak)
-  |Sistem|
-  :Tampilkan pesan error;
-  |Admin|
-  :Perbaiki input form;
-  stop
+  :Tampilkan pesan error validasi;
 endif
 
+|Admin|
 stop
 
 @enduml
