@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('stok_darahs', function (Blueprint $table) {
             $table->id();
             $table->string('type'); // e.g. 'A+', 'B-'
-            $table->integer('stock')->default(0);
-            $table->string('status')->default('aman');
+            $table->integer('wb')->default(0);
+            $table->integer('prc')->default(0);
+            $table->integer('tc')->default(0);
+            $table->string('status')->default('STOK CUKUP');
             $table->timestamps();
         });
     }

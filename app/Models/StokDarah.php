@@ -11,7 +11,9 @@ class StokDarah extends Model
 
     protected $fillable = [
         'type',
-        'stock',
+        'wb',
+        'prc',
+        'tc',
         'status',
     ];
 }

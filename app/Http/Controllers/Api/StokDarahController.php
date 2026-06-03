@@ -17,7 +17,9 @@ class StokDarahController extends Controller
     {
         $validated = $request->validate([
             'type' => 'required|string',
-            'stock' => 'required|integer|min:0',
+            'wb' => 'required|integer|min:0',
+            'prc' => 'required|integer|min:0',
+            'tc' => 'required|integer|min:0',
             'status' => 'nullable|string',
         ]);
 
@@ -34,7 +36,9 @@ class StokDarahController extends Controller
     {
         $validated = $request->validate([
             'type' => 'sometimes|string',
-            'stock' => 'sometimes|integer|min:0',
+            'wb' => 'sometimes|integer|min:0',
+            'prc' => 'sometimes|integer|min:0',
+            'tc' => 'sometimes|integer|min:0',
             'status' => 'nullable|string',
         ]);
 
@@ -53,14 +57,18 @@ class StokDarahController extends Controller
     {
         $items = $request->validate([
             '*.id' => 'required|integer',
-            '*.stock' => 'required|integer|min:0',
+            '*.wb' => 'required|integer|min:0',
+            '*.prc' => 'required|integer|min:0',
+            '*.tc' => 'required|integer|min:0',
             '*.status' => 'nullable|string',
         ]);
 
         foreach ($request->all() as $item) {
             StokDarah::where('id', $item['id'])->update([
-                'stock' => $item['stock'],
-                'status' => $item['status'],
+                'wb' => $item['wb'],
+                'prc' => $item['prc'],
+                'tc' => $item['tc'],
+                'status' => $item['status'] ?? 'STOK CUKUP',
             ]);
         }
 

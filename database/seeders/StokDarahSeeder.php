@@ -9,14 +9,10 @@ class StokDarahSeeder extends Seeder
     public function run(): void
     {
         $stocks = [
-            ['type' => 'A+',  'stock' => 45, 'status' => 'aman'],
-            ['type' => 'A-',  'stock' => 8,  'status' => 'menipis'],
-            ['type' => 'B+',  'stock' => 38, 'status' => 'aman'],
-            ['type' => 'B-',  'stock' => 5,  'status' => 'menipis'],
-            ['type' => 'AB+', 'stock' => 22, 'status' => 'aman'],
-            ['type' => 'AB-', 'stock' => 3,  'status' => 'kritis'],
-            ['type' => 'O+',  'stock' => 52, 'status' => 'aman'],
-            ['type' => 'O-',  'stock' => 7,  'status' => 'menipis'],
+            ['type' => 'A',  'wb' => 6,  'prc' => 49, 'tc' => 9, 'status' => 'STOK CUKUP'],
+            ['type' => 'B',  'wb' => 12, 'prc' => 7,  'tc' => 9, 'status' => 'STOK KURANG'],
+            ['type' => 'O',  'wb' => 12, 'prc' => 22, 'tc' => 7, 'status' => 'STOK CUKUP'],
+            ['type' => 'AB', 'wb' => 1,  'prc' => 3,  'tc' => 1, 'status' => 'STOK KURANG'],
         ];
 
         foreach ($stocks as $s) {

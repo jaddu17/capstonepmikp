@@ -45,8 +45,8 @@ export function DashboardOverview() {
   ];
 
   const alerts = [
-    { type: "warning", message: "Stok darah AB- menipis (3 kantong)" },
-    { type: "warning", message: "Stok darah B- menipis (5 kantong)" },
+    { type: "warning", message: "Stok darah AB menipis" },
+    { type: "warning", message: "Stok darah B menipis" },
     { type: "info", message: "5 pesan baru dari masyarakat" },
   ];
 
