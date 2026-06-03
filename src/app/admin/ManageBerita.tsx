@@ -132,28 +132,6 @@ export function ManageBerita() {
     }
   };
 
-  const togglePublish = (id: string) => {
-    const news = newsList.find(n => n.id === id);
-    if (!news) return;
-
-    fetch(`/api/beritas/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ ...news, published: !news.published })
-    })
-    .then(res => res.json())
-    .then(data => {
-      const formattedData = {
-        ...data,
-        id: data.id.toString(),
-        published: Boolean(data.published)
-      };
-      setNewsList(newsList.map((n) => (n.id === id ? formattedData : n)));
-      toast.success("Status publikasi berhasil diubah!");
-    })
-    .catch(err => console.error(err));
-  };
-
   const handleCancel = () => {
     setIsAdding(false);
     setEditingId(null);
@@ -172,9 +150,9 @@ export function ManageBerita() {
     <DashboardLayout>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold mb-2">Kelola Berita & Kegiatan</h1>
+          <h1 className="text-2xl font-bold mb-2">Kelola Berita </h1>
           <p className="text-muted-foreground">
-            Tambah, edit, atau hapus berita dan kegiatan PMI
+            Tambah, edit, atau hapus berita PMI
           </p>
         </div>
         {!isAdding && !editingId && (
@@ -324,65 +302,58 @@ export function ManageBerita() {
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {newsList.map((news) => (
+      <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+        {/* Header */}
+        <div className="grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-border font-semibold text-sm">
+          <div className="col-span-4">Judul Berita</div>
+          <div className="col-span-5">Deskripsi</div>
+          <div className="col-span-2">Status</div>
+          <div className="col-span-1 text-center">Aksi</div>
+        </div>
+        
+        {/* Rows */}
+        {newsList.map((news, index) => (
           <div
             key={news.id}
-            className="bg-white rounded-xl border border-border shadow-sm overflow-hidden"
+            className={`grid grid-cols-12 gap-4 p-4 items-start ${
+              index < newsList.length - 1 ? 'border-b border-border' : ''
+            } hover:bg-gray-50 transition-colors`}
           >
-            <div className="aspect-video bg-gray-200">
-              {news.image && (
-                <img
-                  src={news.image}
-                  alt={news.title}
-                  className="w-full h-full object-cover"
-                />
-              )}
+            <div className="col-span-4">
+              <h3 className="font-semibold text-sm">{news.title}</h3>
             </div>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-3">
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  {news.category}
-                </span>
-                <span className="text-sm text-muted-foreground">{news.date}</span>
-              </div>
-              <h3 className="font-semibold mb-2">{news.title}</h3>
-              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+            <div className="col-span-5">
+              <p className="text-sm text-muted-foreground line-clamp-2">
                 {news.excerpt}
               </p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div
-                    className={`w-2 h-2 rounded-full ${
-                      news.published ? "bg-green-500" : "bg-gray-400"
-                    }`}
-                  ></div>
-                  <span className="text-xs text-muted-foreground">
-                    {news.published ? "Published" : "Draft"}
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => togglePublish(news.id)}
-                    className="text-green-600 hover:text-green-800 p-1"
-                    title={news.published ? "Unpublish" : "Publish"}
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleEdit(news)}
-                    className="text-blue-600 hover:text-blue-800 p-1"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(news.id)}
-                    className="text-red-600 hover:text-red-800 p-1"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+            </div>
+            <div className="col-span-2">
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    news.published ? "bg-green-500" : "bg-gray-400"
+                  }`}
+                ></div>
+                <span className="text-xs font-medium">
+                  {news.published ? "Published" : "Draft"}
+                </span>
               </div>
+            </div>
+            <div className="col-span-1 flex justify-center gap-1">
+              <button
+                onClick={() => handleEdit(news)}
+                className="text-blue-600 hover:text-blue-800 p-1.5 rounded hover:bg-blue-50 transition-colors"
+                title="Review / Edit berita"
+              >
+                <Eye className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleDelete(news.id)}
+                className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 transition-colors"
+                title="Hapus berita"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
         ))}

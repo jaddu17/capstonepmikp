@@ -18,7 +18,9 @@ export function StokDarah() {
     fetch('/api/stok-darahs')
       .then(res => res.json())
       .then(data => {
-        setBloodStock(data);
+        // Filter hanya tipe darah A, B, O, AB
+        const filtered = data.filter((item: any) => ['A', 'B', 'O', 'AB'].includes(item.type));
+        setBloodStock(filtered);
         setLoading(false);
       })
       .catch(err => {

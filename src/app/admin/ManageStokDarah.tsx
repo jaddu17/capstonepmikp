@@ -20,7 +20,9 @@ export function ManageStokDarah() {
     fetch('/api/stok-darahs')
       .then(res => res.json())
       .then(data => {
-        setBloodStock(data.map((item: any) => ({
+        // Filter hanya tipe darah A, B, O, AB
+        const filtered = data.filter((item: any) => ['A', 'B', 'O', 'AB'].includes(item.type));
+        setBloodStock(filtered.map((item: any) => ({
           ...item,
           id: item.id.toString(),
         })));
