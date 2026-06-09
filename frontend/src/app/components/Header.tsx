@@ -1,7 +1,7 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../assets/logo_pmi.png";
+import logo from "../../assets/logo_pmi.svg";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -21,13 +21,12 @@ export function Header() {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="flex items-center justify-center w-12 h-12 transition-transform group-hover:scale-110">
-              <img src={logo} alt="Logo PMI" className="w-full h-full object-contain" />
+          <Link to="/" className="flex items-center gap-4 group">
+            <div className="flex items-center justify-center h-12 transition-transform group-hover:scale-105">
+              <img src={logo} alt="Logo PMI" className="h-full w-auto object-contain" />
             </div>
-            <div>
-              <div className="font-black text-xl text-primary tracking-tight leading-none">PMI</div>
-              <div className="text-[10px] uppercase font-black text-gray-400 tracking-widest mt-0.5">Kab. Kulon Progo</div>
+            <div className="hidden sm:block pl-4 border-l-2 border-gray-200">
+              <div className="text-sm font-black text-primary tracking-widest">KAB. KULON PROGO</div>
             </div>
           </Link>
 

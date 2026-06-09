@@ -16,10 +16,10 @@ class DonasiController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'wa' => 'required|string|max:20',
+            'nama' => 'nullable|string|max:255',
+            'wa' => 'nullable|string|max:20',
             'keterangan' => 'nullable|string',
-            'proof' => 'required|string',
+            'proof' => 'nullable|string',
             'date' => 'required|string',
             'status' => 'nullable|string',
         ]);
@@ -40,12 +40,12 @@ class DonasiController extends Controller
     public function update(Request $request, Donasi $donasi)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'wa' => 'required|string|max:20',
+            'nama' => 'sometimes|nullable|string|max:255',
+            'wa' => 'sometimes|nullable|string|max:20',
             'keterangan' => 'nullable|string',
             'proof' => 'nullable|string',
-            'date' => 'required|string',
-            'status' => 'required|string',
+            'date' => 'sometimes|required|string',
+            'status' => 'sometimes|required|string',
         ]);
 
         $donasi->update($validated);

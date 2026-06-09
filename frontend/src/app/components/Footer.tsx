@@ -1,6 +1,6 @@
 import { Facebook, Instagram, Twitter, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo_pmi.png";
+import logo from "../../assets/logo_pmi.svg";
 
 export function Footer() {
   const quickLinks = [
@@ -31,12 +31,11 @@ export function Footer() {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center justify-center w-12 h-12 bg-white rounded-2xl p-2">
-                <img src={logo} alt="Logo PMI" className="w-full h-full object-contain" />
+              <div className="flex items-center justify-center h-14 bg-white rounded-xl py-2 px-3">
+                <img src={logo} alt="Logo PMI" className="h-full w-auto object-contain" />
               </div>
-              <div>
-                <div className="font-black text-xl tracking-tight leading-none">PMI</div>
-                <div className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mt-1">Kab. Kulon Progo</div>
+              <div className="pl-4 border-l-2 border-gray-700">
+                <div className="text-sm font-black tracking-widest text-white">KAB. KULON PROGO</div>
               </div>
             </div>
             <p className="text-sm text-gray-400 mb-4">

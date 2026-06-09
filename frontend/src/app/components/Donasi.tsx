@@ -16,37 +16,7 @@ export function Donasi() {
 
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    
-    try {
-      const response = await fetch('/api/donasis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          proof: null,
-          date: new Date().toLocaleString("id-ID"),
-          status: "Menunggu Pembayaran",
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Gagal menyimpan data donasi');
-      }
-
-      const donasi = await response.json();
-      setCurrentDonationId(donasi.id.toString());
-      setStep(2);
-      toast.success("Informasi donasi telah dicatat!");
-    } catch (error) {
-      console.error("Error saving donasi:", error);
-      toast.error("Gagal menyimpan data donasi. Silakan coba lagi.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    setStep(2);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,14 +44,16 @@ export function Donasi() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/donasis/${currentDonationId}`, {
-        method: 'PUT',
+      const response = await fetch('/api/donasis', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: JSON.stringify({
+          ...formData,
           proof: proofFile,
+          date: new Date().toLocaleString("id-ID"),
           status: "Sudah Bayar",
         }),
       });

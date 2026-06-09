@@ -34,6 +34,7 @@ export function Login() {
       }
 
       localStorage.setItem("pmi_admin_logged_in", "true");
+      localStorage.setItem("admin_token", data.access_token);
       navigate("/admin/dashboard");
     } catch (err) {
       setError("Terjadi kesalahan. Silakan coba lagi.");

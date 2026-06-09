@@ -21,8 +21,8 @@ Route::apiResource('jadwal-donors', JadwalDonorController::class)->only(['index'
 Route::apiResource('stok-darahs', StokDarahController::class)->only(['index', 'show']);
 Route::apiResource('infografis', InfografisController::class)->only(['index', 'show']);
 
-// Masyarakat hanya boleh mengirim data/form (store)
-Route::apiResource('donasis', DonasiController::class)->only(['store']);
+// Masyarakat hanya boleh mengirim data/form (store) dan mengupload bukti bayar (update)
+Route::apiResource('donasis', DonasiController::class)->only(['store', 'update']);
 Route::apiResource('pesans', PesanController::class)->only(['store']);
 
 
@@ -42,8 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('stok-darahs', StokDarahController::class)->except(['index', 'show']);
     Route::apiResource('infografis', InfografisController::class)->except(['index', 'show']);
 
-    // Admin bisa melihat daftar donasi/pesan masuk dan edit statusnya
-    Route::apiResource('donasis', DonasiController::class)->except(['store']);
+    // Admin bisa melihat daftar donasi/pesan masuk dan hapus
+    Route::apiResource('donasis', DonasiController::class)->only(['index', 'show', 'destroy']);
     Route::apiResource('pesans', PesanController::class)->except(['store']);
     
     Route::post('stok-darahs/bulk-update', [StokDarahController::class, 'bulkUpdate']);

@@ -19,10 +19,20 @@ export function ManageDonasi() {
   const [selectedProof, setSelectedProof] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/donasis')
+    const token = localStorage.getItem("admin_token");
+    fetch('/api/donasis', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    })
       .then(res => res.json())
       .then(data => {
-        setDonations(data.map((item: any) => ({ ...item, id: item.id.toString() })));
+        if (Array.isArray(data)) {
+          setDonations(data.map((item: any) => ({ ...item, id: item.id.toString() })));
+        } else {
+          console.error("Invalid data format:", data);
+        }
         setLoading(false);
       })
       .catch(err => {
@@ -33,7 +43,14 @@ export function ManageDonasi() {
 
   const handleDelete = (id: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus data donasi ini?")) {
-      fetch(`/api/donasis/${id}`, { method: 'DELETE' })
+      const token = localStorage.getItem("admin_token");
+      fetch(`/api/donasis/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      })
       .then(() => {
         setDonations(donations.filter(d => d.id !== id));
         toast.success("Data berhasil dihapus!");
@@ -47,9 +64,14 @@ export function ManageDonasi() {
     if (!don) return;
     const newStatus = don.status === "Selesai" ? "Sudah Bayar" : "Selesai";
 
+    const token = localStorage.getItem("admin_token");
     fetch(`/api/donasis/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({ status: newStatus }),
     })
     .then(res => res.json())
