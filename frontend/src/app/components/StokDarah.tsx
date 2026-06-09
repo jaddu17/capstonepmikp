@@ -129,7 +129,7 @@ export function StokDarah() {
                 Beberapa stok darah sedang menipis (Stok Kurang). Kami sangat membutuhkan partisipasi donor Anda untuk membantu sesama.
               </p>
               <a
-                href="#info-donor"
+                href="/info-donor"
                 className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors"
               >
                 Lihat Syarat & Cara Donor
