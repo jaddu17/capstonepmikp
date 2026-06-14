@@ -62,7 +62,7 @@ export function ProsedurDarah() {
           ))}
         </div>
 
-        <div className="bg-[#C21219] rounded-[3rem] p-12 text-white overflow-hidden relative shadow-2xl shadow-red-900/20">
+        <div className="bg-gradient-to-br from-[#C21219] to-[#8B1529] rounded-[3rem] p-12 text-white overflow-hidden relative shadow-2xl shadow-red-900/20">
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-black/10 rounded-full blur-2xl"></div>
           

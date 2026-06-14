@@ -49,7 +49,7 @@ export function TentangPMI() {
           ))}
         </div>
 
-        <div className="bg-gradient-to-br from-primary to-[#C21219] text-white rounded-2xl p-8 md:p-12">
+        <div className="bg-gradient-to-br from-[#C21219] to-[#8B1529] text-white rounded-2xl p-8 md:p-12">
           <div className="max-w-3xl mx-auto text-center">
             <h3 className="text-2xl font-bold mb-4">
               Lebih dari Sekadar Donor Darah
