@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Heart, Lock, User } from "lucide-react";
+import { Lock, User } from "lucide-react";
 
 export function Login() {
   const navigate = useNavigate();
@@ -47,9 +47,7 @@ export function Login() {
     <div className="min-h-screen bg-gradient-to-br from-primary to-[#C21219] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4">
-            <Heart className="w-8 h-8 text-white fill-white" />
-          </div>
+
           <h1 className="text-2xl font-bold mb-2">Admin PMI Kulon Progo</h1>
           <p className="text-muted-foreground text-sm">Masuk ke dashboard admin</p>
         </div>

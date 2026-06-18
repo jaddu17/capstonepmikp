@@ -1,7 +1,6 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  Heart,
   LayoutDashboard,
   Droplet,
   Calendar,
@@ -22,10 +21,19 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const confirmLogout = () => {
     localStorage.removeItem("pmi_admin_logged_in");
     navigate("/admin/login");
+  };
+
+  const cancelLogout = () => {
+    setIsLogoutModalOpen(false);
   };
 
   const menuItems = [
@@ -43,7 +51,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Mobile Header */}
       <div className="lg:hidden bg-white border-b border-border px-4 py-3 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-2">
-          <Heart className="w-6 h-6 text-primary fill-primary" />
+          <img src="/favicon_pmi.svg" alt="Logo PMI" className="w-6 h-6 object-contain" />
           <span className="font-semibold">Admin PMI</span>
         </div>
         <button onClick={() => setSidebarOpen(!sidebarOpen)}>
@@ -59,8 +67,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       >
         <div className="p-6 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <Heart className="w-6 h-6 text-white fill-white" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <img src="/favicon_pmi.svg" alt="Logo PMI" className="w-10 h-10 object-contain" />
             </div>
             <div>
               <div className="font-semibold">Admin PMI</div>
@@ -111,6 +119,32 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <main className="lg:ml-64 p-4 lg:p-8">{children}</main>
+
+      {/* Logout Modal */}
+      {isLogoutModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 transform transition-all">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Konfirmasi Keluar</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Apakah Anda yakin ingin keluar dari dashboard admin?
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={cancelLogout}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
+              >
+                Ya, Keluar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
