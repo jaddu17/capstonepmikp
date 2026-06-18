@@ -28,6 +28,8 @@ interface InfografisData {
 export function ManageInfografis() {
   const [infografisList, setInfografisList] = useState<InfografisData[]>([]);
   const [activeId, setActiveId] = useState<string>("");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   const defaultData: InfografisData = {
     id: "default",
@@ -125,23 +127,39 @@ export function ManageInfografis() {
       toast.error("Minimal harus ada satu data infografis.");
       return;
     }
-    if (confirm("Apakah Anda yakin ingin menghapus data bulan ini?")) {
-      if (id.startsWith("new-")) {
-        const updated = infografisList.filter(d => d.id !== id);
+    setItemToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      if (itemToDelete.startsWith("new-")) {
+        const updated = infografisList.filter(d => d.id !== itemToDelete);
         setInfografisList(updated);
         setActiveId(updated[0].id);
         toast.success("Data berhasil dihapus!");
+        setDeleteModalOpen(false);
+        setItemToDelete(null);
       } else {
-        fetch(`/api/infografis/${id}`, { method: 'DELETE' })
+        fetch(`/api/infografis/${itemToDelete}`, { method: 'DELETE' })
         .then(() => {
-          const updated = infografisList.filter(d => d.id !== id);
+          const updated = infografisList.filter(d => d.id !== itemToDelete);
           setInfografisList(updated);
           setActiveId(updated[0].id);
           toast.success("Data berhasil dihapus dari database!");
         })
-        .catch(err => console.error(err));
+        .catch(err => console.error(err))
+        .finally(() => {
+          setDeleteModalOpen(false);
+          setItemToDelete(null);
+        });
       }
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteModalOpen(false);
+    setItemToDelete(null);
   };
 
   const updateActiveData = (newData: Partial<InfografisData>) => {
@@ -401,6 +419,32 @@ export function ManageInfografis() {
           </div>
         </div>
       </div>
+
+      {/* Delete Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 transform transition-all">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Konfirmasi Hapus</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Apakah Anda yakin ingin menghapus data bulan ini? Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
+              >
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
