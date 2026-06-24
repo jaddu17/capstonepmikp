@@ -373,7 +373,6 @@ export function ManageBerita() {
             </div>
           </div>
         ))}
-        ))}
       </div>
 
       {/* Delete Modal */}
