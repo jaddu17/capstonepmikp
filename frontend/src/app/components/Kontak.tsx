@@ -69,7 +69,7 @@ export function Kontak() {
     {
       icon: MapPin,
       title: "Alamat",
-      value: "Jl. KH. Ahmad Dahlan No. 12, Wates, Kulon Progo, DIY 55611",
+      value: "Jl. Bhayangkara, Serut, Pengasih, Kec. Pengasih, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55652",
       link: "#",
     },
   ];
