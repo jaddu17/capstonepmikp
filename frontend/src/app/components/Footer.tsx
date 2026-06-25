@@ -105,9 +105,9 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Kontak</h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>Jl. KH. Ahmad Dahlan No. 12</li>
-              <li>Wates, Kulon Progo</li>
-              <li>DIY 55611</li>
+              <li>Jl. Bhayangkara, Serut, Pengasih</li>
+              <li>Kec. Pengasih, Kabupaten Kulon Progo</li>
+              <li>Daerah Istimewa Yogyakarta 55652</li>
               <li className="mt-3">
                 <a
                   href="tel:0274773456"
