@@ -34,10 +34,8 @@ else if (Kirim Pesan via Formulir)
   repeat while (Validasi Input Form?) is (Tidak Valid / Kosong)
   ->Valid;
   
-  |Database|
-  :Simpan data pesan baru ke dalam sistem;
-  
   |Sistem|
+  :Simpan data pesan baru ke dalam sistem;
   :Tampilkan notifikasi sukses "Pesan terkirim";
   |User|
   :Membaca notifikasi sukses;

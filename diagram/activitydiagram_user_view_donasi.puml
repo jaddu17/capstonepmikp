@@ -1,5 +1,5 @@
 @startuml ACTIVITY_DIAGRAM_USER_VIEW_DONASI_FINAL
-title Activity Diagram - User View Donasi
+title Activity Diagram - User Melakukan Donasi
 
 |User|
 start
@@ -28,11 +28,7 @@ else (Donasi Uang)
   
   |Sistem|
   :Generate ID Donasi sementara;
-  
-  |Database|
   :Simpan data donasi\n(Status: "Menunggu Pembayaran");
-  
-  |Sistem|
   :Tampilkan kode QRIS dan form unggah bukti;
   
   |User|
@@ -46,10 +42,8 @@ else (Donasi Uang)
   repeat while (Validasi: Bukti terunggah?) is (Belum / Kosong)
   ->Sudah (Valid);
 
-  |Database|
-  :Perbarui data donasi\n(Simpan bukti, Status: "Sudah Bayar");
-  
   |Sistem|
+  :Perbarui data donasi\n(Simpan bukti, Status: "Sudah Bayar");
   :Tampilkan notifikasi sukses;
   
   |User|

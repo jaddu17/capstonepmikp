@@ -7,11 +7,7 @@ start
 
 |Sistem|
 :Menerima permintaan route /stok-darah;
-
-|Database|
-:Query data stok darah terkini;
-
-|Sistem|
+:Ambil data stok darah terkini;
 :Render 8 kartu stok darah\n(Menampilkan Golongan, Kuantitas, Status);
 :Render bagian Syarat & Prosedur Permintaan Darah;
 :Tampilkan keseluruhan halaman Stok Darah ke layar;

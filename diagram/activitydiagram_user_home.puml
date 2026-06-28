@@ -7,12 +7,8 @@ start
 
 |Sistem|
 :Permintaan data Beranda;
-
-|Database|
-:Query data Infografis Kinerja 
+:Ambil data Infografis Kinerja 
 (Kontak Darurat, Statistik, Dokumentasi);
-
-|Sistem|
 :Render Hero Section (Tombol Cek Stok Darah & Jadwal Donor);
 :Render bagian Tentang PMI (Visi, Misi, dll);
 :Render bagian Infografis Kinerja Bulanan;

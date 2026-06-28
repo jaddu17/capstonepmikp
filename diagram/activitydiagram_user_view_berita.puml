@@ -7,11 +7,7 @@ start
 
 |Sistem|
 :Menerima permintaan rute /berita;
-
-|Database|
-:Query data seluruh berita terkini\n(Beserta konten isi lengkapnya);
-
-|Sistem|
+:Ambil data seluruh berita terkini\n(Beserta konten isi lengkapnya);
 :Render daftar kartu berita\n(Menampilkan Thumbnail, Kategori, Judul, Tanggal);
 :Tampilkan keseluruhan halaman Berita ke layar;
 

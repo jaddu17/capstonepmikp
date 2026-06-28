@@ -7,11 +7,7 @@ start
 
 |Sistem|
 :Menerima permintaan rute /jadwal;
-
-|Database|
-:Query data jadwal donor (Mobile Unit) terkini;
-
-|Sistem|
+:Ambil data jadwal donor (Mobile Unit) terkini;
 :Render daftar kartu jadwal donor\n(Menampilkan Tanggal, Hari, Lokasi, Jam, dan Kuota);
 :Tampilkan keseluruhan halaman Jadwal Donor ke layar;
 
