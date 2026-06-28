@@ -3,27 +3,20 @@ title Activity Diagram - Admin Hapus Infografis
 
 |Admin|
 start
-:Buka menu Infografis;
-:Klik tombol "Hapus" pada salah satu infografis;
+:Akses menu Infografis;
+:Pilih Hapus;
 
 |Sistem|
-:Tampilkan dialog konfirmasi penghapusan;
+:Minta konfirmasi;
 
 |Admin|
-if (Yakin hapus?) then (Ya)
-  :Klik "Konfirmasi / Hapus";
-
+if (Konfirmasi?) then (Ya)
   |Sistem|
-  :Kirim instruksi hapus via API;
-  :Hapus file gambar & data dari sistem;
-  :Tampilkan notifikasi berhasil dihapus;
-  :Hilangkan infografis dari tampilan tabel;
-else (Batal)
-  |Admin|
-  :Klik "Batal";
+  :Hapus data;
+  :Tampilkan notifikasi sukses;
+else (Tidak)
 endif
 
 |Admin|
 stop
-
 @enduml

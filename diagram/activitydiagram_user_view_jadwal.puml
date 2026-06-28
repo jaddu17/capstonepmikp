@@ -1,30 +1,31 @@
 @startuml ACTIVITY_DIAGRAM_USER_VIEW_JADWAL
-title Activity Diagram - User View Jadwal Donor
+title Activity Diagram - Lihat Jadwal Donor
 
 |User|
 start
-:Akses halaman Jadwal Donor\n(Melalui menu Navbar atau tombol di Beranda);
+:Akses halaman Jadwal Donor;
 
 |Sistem|
-:Menerima permintaan rute /jadwal;
-:Ambil data jadwal donor (Mobile Unit) terkini;
-:Render daftar kartu jadwal donor\n(Menampilkan Tanggal, Hari, Lokasi, Jam, dan Kuota);
-:Tampilkan keseluruhan halaman Jadwal Donor ke layar;
+:Ambil data jadwal donor;
+:Tampilkan halaman Jadwal Donor;
 
 |User|
-:Melihat informasi dan mengeksplorasi\njadwal donor yang tersedia;
+:Lihat informasi jadwal donor;
 
-if (Pilih Aksi Selanjutnya?) then (Klik Tombol "Daftar")
-  |Sistem|
-  :Buka tautan WhatsApp Admin PMI\ndengan pesan templat otomatis;
-  |User|
-  :Meneruskan pesan pendaftaran\ndonor darah via WhatsApp;
-else (Hanya Scroll / Keluar)
-  |User|
-  :Melihat detail jadwal lain\natau meninggalkan halaman;
+if (Pilih jadwal?) then (Daftar)
+
+    :Klik tombol Daftar;
+
+    |Sistem|
+    :Buka aplikasi WhatsApp;
+
+    |User|
+    :Kirim pesan pendaftaran;
+
+else (Hanya Lihat)
+
 endif
 
 |User|
 stop
-
 @enduml

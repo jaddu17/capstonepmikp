@@ -3,28 +3,28 @@ title Activity Diagram - Admin Edit Infografis
 
 |Admin|
 start
-:Buka menu Infografis;
-:Klik tombol "Edit" pada salah satu infografis;
+:Akses menu Infografis;
+:Pilih Edit;
 
 |Sistem|
-:Ambil data infografis yang dipilih;
-:Tampilkan form edit dengan data awal;
+:Ambil data;
+:Tampilkan form edit;
 
 |Admin|
-:Ubah data (Judul, Gambar, dll);
-:Klik "Simpan Perubahan";
+:Ubah data;
+:Simpan Perubahan;
 
 |Sistem|
-:Validasi input data & file gambar (jika ada yang baru);
-if (Validasi sukses?) then (Ya)
-  :Kirim data via API & Update sistem;
-  :Tampilkan notifikasi berhasil diperbarui;
-  :Perbarui tampilan daftar infografis;
+:Validasi input;
+if (Valid?) then (Ya)
+  |Sistem|
+  :Update data;
+  :Tampilkan notifikasi sukses;
 else (Tidak)
-  :Tampilkan pesan error validasi;
+  |Sistem|
+  :Tampilkan galat;
 endif
 
 |Admin|
 stop
-
 @enduml

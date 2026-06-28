@@ -1,58 +1,42 @@
 @startuml ACTIVITY_DIAGRAM_ADMIN_MANAGE_PESAN
-title Activity Diagram - Admin Manage Pesan
+title Activity Diagram - Kelola Pesan
 
 |Admin|
 start
-:Buka Menu Pesan Masuk;
+:Akses Pesan Masuk;
 
 |Sistem|
-:Ambil daftar pesan;
+:Ambil data;
 
 |Database|
-:Query pesan masuk;
+:Ambil pesan;
 
 |Sistem|
-:Tampilkan inbox pesan;
+:Tampilkan pesan;
 
 |Admin|
 :Pilih pesan;
-:Baca detail pesan;
-
-|Admin|
-:Pilih aksi;
-if (Balas pesan?) then (Ya)
-  :Ketik balasan;
-  :Submit reply;
-  
+if (Aksi?) then (Balas)
+  :Tulis balasan;
   |Sistem|
-  :Terima balasan;
-  :Validasi konten;
-
+  :Validasi;
   |Database|
-  if (Validasi sukses?) then (Ya)
+  if (Valid?) then (Ya)
     :Simpan balasan;
-    :Update status pesan;
   else (Tidak)
-    :Tampilkan error;
+    |Sistem|
+    :Tampilkan galat;
+    stop
   endif
-
-else (Hapus pesan?)
+else (Hapus)
   |Admin|
-  :Klik hapus;
-  :Konfirmasi penghapusan;
-
-  |Sistem|
-  :Proses penghapusan;
-
+  :Konfirmasi Hapus;
   |Database|
-  :Hapus pesan dari database;
-
+  :Hapus pesan;
 endif
 
 |Sistem|
 :Tampilkan notifikasi sukses;
 
-|Admin|
 stop
-
 @enduml

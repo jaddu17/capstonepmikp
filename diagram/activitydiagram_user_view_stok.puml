@@ -1,36 +1,33 @@
 @startuml ACTIVITY_DIAGRAM_USER_VIEW_STOK
-title Activity Diagram - User View Stok Darah
+title Activity Diagram - Lihat Stok Darah
 
 |User|
 start
-:Akses halaman Stok Darah\n(Melalui tombol Hero atau Menu Navbar);
+:Akses halaman Stok Darah;
 
 |Sistem|
-:Menerima permintaan route /stok-darah;
-:Ambil data stok darah terkini;
-:Render 8 kartu stok darah\n(Menampilkan Golongan, Kuantitas, Status);
-:Render bagian Syarat & Prosedur Permintaan Darah;
-:Tampilkan keseluruhan halaman Stok Darah ke layar;
+:Ambil data stok darah;
+:Tampilkan halaman Stok Darah;
 
 |User|
-:Melihat informasi stok darah real-time;
+:Lihat informasi stok darah;
 
-if (Pilih Aksi Selanjutnya?) then (Klik "Lihat Syarat & Cara Permintaan")
-  |Sistem|
-  :Scroll otomatis ke bagian ID #prosedur;
-  |User|
-  :Membaca prosedur permintaan darah;
-else if (Klik "Hubungi via WhatsApp")
-  |Sistem|
-  :Buka tautan WhatsApp Admin PMI;
-  |User|
-  :Meneruskan pesan permintaan stok darah;
-else (Hanya Scroll / Keluar)
-  |User|
-  :Eksplorasi manual atau meninggalkan halaman;
+if (Pilih aksi?) then (Lihat Syarat)
+
+    :Baca prosedur permintaan;
+
+    |Sistem|
+    :Arahkan ke bagian prosedur;
+
+else (Hubungi WhatsApp)
+
+    :Kirim pesan permintaan;
+
+    |Sistem|
+    :Buka aplikasi WhatsApp;
+
 endif
 
 |User|
 stop
-
 @enduml

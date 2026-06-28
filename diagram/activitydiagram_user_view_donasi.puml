@@ -1,57 +1,60 @@
-@startuml ACTIVITY_DIAGRAM_USER_VIEW_DONASI_FINAL
-title Activity Diagram - User Melakukan Donasi
+@startuml ACTIVITY_DIAGRAM_USER_VIEW_DONASI
+title Activity Diagram - Melakukan Donasi
 
 |User|
 start
 :Akses halaman Donasi;
 
 |Sistem|
-:Render halaman donasi\n(Formulir Donasi Uang & Info Donasi Barang);
+:Tampilkan halaman Donasi;
 
 |User|
-:Mengeksplorasi pilihan jenis donasi;
+if (Pilih jenis donasi?) then (Donasi Barang)
 
-if (Pilih jenis donasi?) then (Donasi Barang/Logistik)
-  :Klik tombol "Hubungi Markas";
-  
-  |Sistem|
-  :Arahkan rute ke halaman Kontak (/kontak);
-  
-  |User|
-  :Melihat informasi kontak markas;
-  stop
+    :Pilih Hubungi Markas;
+
+    |Sistem|
+    :Arahkan ke halaman Kontak;
+
+    |User|
+    stop
 
 else (Donasi Uang)
-  |User|
-  :Mengisi form donasi uang\n(Nama, No. WA, Keterangan);
-  :Klik tombol "Lanjut ke Pembayaran QRIS";
-  
-  |Sistem|
-  :Generate ID Donasi sementara;
-  :Simpan data donasi\n(Status: "Menunggu Pembayaran");
-  :Tampilkan kode QRIS dan form unggah bukti;
-  
-  |User|
-  :Scan QRIS dan transfer dana;
-  
-  repeat
-    |User|
-    :Unggah bukti transfer;
-    :Klik tombol "Konfirmasi Pembayaran";
+
+    :Isi form donasi uang;
+    :Lanjut ke Pembayaran QRIS;
+
     |Sistem|
-  repeat while (Validasi: Bukti terunggah?) is (Belum / Kosong)
-  ->Sudah (Valid);
+    :Buat data donasi awal;
+    :Tampilkan kode QRIS;
 
-  |Sistem|
-  :Perbarui data donasi\n(Simpan bukti, Status: "Sudah Bayar");
-  :Tampilkan notifikasi sukses;
-  
-  |User|
-  :Klik tombol "Kembali ke Beranda";
-  
-  |Sistem|
-  :Arahkan rute ke halaman utama (/);
-  stop
+    |User|
+    :Transfer dana;
+
+    repeat
+
+        :Unggah bukti transfer;
+        :Konfirmasi Pembayaran;
+
+        |Sistem|
+        :Validasi bukti;
+
+        |User|
+    repeat while (Valid?) is (Tidak)
+    ->Ya;
+
+    |Sistem|
+    :Perbarui status donasi;
+    :Tampilkan notifikasi sukses;
+
+    |User|
+    :Kembali ke Beranda;
+
+    |Sistem|
+    :Arahkan ke Beranda;
+
+    |User|
+    stop
+
 endif
-
 @enduml

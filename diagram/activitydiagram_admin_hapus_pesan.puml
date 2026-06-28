@@ -3,25 +3,19 @@ title Activity Diagram - Admin Hapus Pesan
 
 |Admin|
 start
-:Buka menu Pesan Masuk;
-:Klik tombol "Hapus" pada salah satu pesan;
+:Akses Pesan Masuk;
+:Pilih Hapus;
 
 |Sistem|
-:Tampilkan dialog konfirmasi penghapusan;
+:Minta konfirmasi;
 
 |Admin|
-if (Yakin hapus?) then (Ya)
-  :Klik "Konfirmasi / Hapus";
+:Konfirmasi hapus;
 
-  |Sistem|
-  :Hapus data dari sistem;
-  :Tampilkan notifikasi berhasil dihapus;
-else (Batal)
-  |Admin|
-  :Klik "Batal";
-endif
+|Sistem|
+:Hapus data;
+:Tampilkan notifikasi sukses;
 
 |Admin|
 stop
-
 @enduml

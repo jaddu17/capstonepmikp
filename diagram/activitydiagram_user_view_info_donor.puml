@@ -1,29 +1,30 @@
 @startuml ACTIVITY_DIAGRAM_USER_VIEW_INFO_DONOR
-title Activity Diagram - User View Info Donor
+title Activity Diagram - Lihat Info Donor
 
 |User|
 start
-:Akses halaman Info Donor\n(Melalui menu Navbar);
+:Akses halaman Info Donor;
 
 |Sistem|
-:Menerima permintaan rute /info-donor;
-:Render komponen InfoDonorDarah\n(Berisi data statis Panduan, Syarat, & Prosedur);
-:Tampilkan keseluruhan halaman Info Donor ke layar;
+:Tampilkan halaman Info Donor;
 
 |User|
-:Membaca informasi panduan, syarat,\ndan prosedur donor darah;
+:Baca panduan dan prosedur donor;
 
-if (Pilih Aksi Selanjutnya?) then (Klik Tombol Kontak / Hubungi PMI)
-  |Sistem|
-  :Arahkan rute ke halaman Kontak (/kontak);
-  |User|
-  :Melihat halaman Kontak;
-else (Tidak ada aksi / Keluar)
-  |User|
-  :Selesai membaca dan meninggalkan halaman;
+if (Pilih aksi?) then (Hubungi PMI)
+
+    :Klik tombol Hubungi PMI;
+
+    |Sistem|
+    :Arahkan ke halaman Kontak;
+
+    |User|
+    :Lihat halaman Kontak;
+
+else (Hanya Lihat)
+
 endif
 
 |User|
 stop
-
 @enduml

@@ -1,50 +1,36 @@
-@startuml ACTIVITY_DIAGRAM_USER_KONTAK_REVISI
-title Activity Diagram - User View Kontak & Interaksi
+@startuml ACTIVITY_DIAGRAM_USER_KONTAK
+title Activity Diagram - Kontak & Kirim Pesan
 
-|User|
 start
-:Akses halaman Kontak;
+:User akses halaman Kontak;
+:Sistem tampilkan halaman Kontak;
+:User pilih metode kontak;
 
-|Sistem|
-:Menerima permintaan rute /kontak;
-:Render halaman Kontak secara utuh\n(Informasi Kontak & Formulir Pesan);
+switch (Metode?)
+case ()
+    :**WhatsApp**;
+    :Sistem buka aplikasi WhatsApp;
+    :User kirim pesan via WhatsApp;
+    :Tampilkan status terkirim;
 
-|User|
-if (Pilih Tindakan / Interaksi?) then (Klik Hubungi via WhatsApp)
-  |Sistem|
-  :Buka aplikasi / tautan WhatsApp PMI;
-  |User|
-  :Melanjutkan komunikasi langsung via WhatsApp;
-  stop
+case ()
+    :**Email**;
+    :Sistem buka aplikasi Email;
+    :User kirim Email;
+    :Tampilkan status terkirim;
 
-else if (Klik Alamat Email)
-  |Sistem|
-  :Buka aplikasi klien email (mailto:);
-  |User|
-  :Melanjutkan penulisan email manual;
-  stop
+case ()
+    :**Form Pesan**;
+    repeat
+        :User isi Form Pesan;
+        :User klik "Kirim";
+        :Sistem validasi input;
+    repeat while (Input valid?) is (Tidak)
+    ->Ya;
+    :Sistem simpan pesan;
+    :Tampilkan notifikasi berhasil;
 
-else if (Kirim Pesan via Formulir)
-  repeat
-    |User|
-    :Mengisi form pesan\n(Nama, Email, Subjek, Pesan);
-    :Klik tombol "Kirim Pesan";
-    
-    |Sistem|
-  repeat while (Validasi Input Form?) is (Tidak Valid / Kosong)
-  ->Valid;
-  
-  |Sistem|
-  :Simpan data pesan baru ke dalam sistem;
-  :Tampilkan notifikasi sukses "Pesan terkirim";
-  |User|
-  :Membaca notifikasi sukses;
-  stop
+endswitch
 
-else (Hanya Melihat Info / Keluar)
-  |User|
-  :Meninggalkan halaman Kontak;
-  stop
-endif
-
+stop
 @enduml

@@ -1,53 +1,32 @@
-@startuml ACTIVITY_DIAGRAM_ADMIN_KELOLA_INFOGRAFIS
-title Activity Diagram - Kelola Infografis PMI
+@startuml ACTIVITY_DIAGRAM_ADMIN_TAMBAH_INFOGRAFIS
+title Activity Diagram - Tambah Infografis
 
 |Admin|
 start
-:Buka menu Infografis;
+:Akses menu Infografis;
 
 |Sistem|
-:Tampilkan halaman Kelola Infografis;
+:Tampilkan form;
 
 |Admin|
-:Pilih bulan dan tahun;
-
-:Isi atau ubah data kontak
-(Markas, Ambulance, Whatsapp);
-
-:Upload dokumentasi foto
-(Foto 1 sampai Foto 6);
-
-:Isi statistik layanan
-(Kebakaran, Kecelakaan,
-Bencana Alam, Home Emergency,
-Evakuasi Jenazah,
-Pertolongan Pertama);
-
-:Kelola daftar pelayanan
-(Tambah atau Hapus Pelayanan);
-
-:Isi kata-kata hari ini (Quote);
-
-:Klik tombol Simpan Semua;
+:Isi info umum (bulan/tahun);
+:Isi kontak & statistik;
+:Upload dokumentasi;
+:Isi kata motivasi;
+:Simpan Semua;
 
 |Sistem|
-:Validasi seluruh data;
-
-if (Data valid?) then (Ya)
-
-:Upload foto dokumentasi;
-:Simpan data kontak;
-:Simpan statistik layanan;
-:Simpan daftar pelayanan;
-:Simpan quote;
-:Update data infografis bulan terpilih;
-:Tampilkan notifikasi berhasil;
-
+:Validasi input;
+if (Valid?) then (Ya)
+  |Database|
+  :Simpan data;
+  |Sistem|
+  :Tampilkan notifikasi sukses;
 else (Tidak)
-
-:Tampilkan pesan kesalahan;
-
+  |Sistem|
+  :Tampilkan galat;
 endif
 
+|Admin|
 stop
 @enduml
