@@ -82,12 +82,14 @@ export function ManageBerita() {
     const isEdit = !!editingId;
     const url = isEdit ? `/api/beritas/${editingId}` : '/api/beritas';
     const method = isEdit ? 'PUT' : 'POST';
+    const token = localStorage.getItem("admin_token");
 
     fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(formData)
     })
@@ -130,7 +132,13 @@ export function ManageBerita() {
 
   const confirmDelete = () => {
     if (itemToDelete) {
-      fetch(`/api/beritas/${itemToDelete}`, { method: 'DELETE' })
+      const token = localStorage.getItem("admin_token");
+      fetch(`/api/beritas/${itemToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
       .then(() => {
         setNewsList(newsList.filter((n) => n.id !== itemToDelete));
         toast.success("Berita berhasil dihapus!");

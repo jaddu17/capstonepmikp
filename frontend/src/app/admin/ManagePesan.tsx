@@ -27,7 +27,13 @@ export function ManagePesan() {
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/pesans')
+    const token = localStorage.getItem("admin_token");
+    fetch('/api/pesans', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+      },
+    })
       .then(res => res.json())
       .then(data => {
         setMessages(data.map((item: any) => ({
@@ -51,7 +57,14 @@ export function ManagePesan() {
 
   const confirmDelete = () => {
     if (itemToDelete) {
-      fetch(`/api/pesans/${itemToDelete}`, { method: 'DELETE' })
+      const token = localStorage.getItem("admin_token");
+      fetch(`/api/pesans/${itemToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      })
       .then(() => {
         const updated = messages.filter(m => m.id !== itemToDelete);
         setMessages(updated);
@@ -75,9 +88,14 @@ export function ManagePesan() {
     setSelectedMessage(message);
     setReplyContent(message.reply_text || "");
     if (!message.read) {
+      const token = localStorage.getItem("admin_token");
       fetch(`/api/pesans/${message.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({ read: true }),
       })
       .then(res => res.json())
@@ -99,9 +117,14 @@ export function ManagePesan() {
       window.open(`https://wa.me/${selectedMessage.phone.replace(/^0/, "62")}?text=${encodeURIComponent(replyContent)}`);
     }
 
+    const token = localStorage.getItem("admin_token");
     fetch(`/api/pesans/${selectedMessage.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
       body: JSON.stringify({ replied: true, reply_text: replyContent }),
     })
     .then(res => res.json())
