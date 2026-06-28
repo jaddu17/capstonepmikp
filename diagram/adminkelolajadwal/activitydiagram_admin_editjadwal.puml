@@ -3,36 +3,29 @@ title Activity Diagram - Admin Edit Jadwal Donor Darah
 
 |Admin|
 start
-:Buka menu Jadwal Donor;
-:Klik tombol "Edit" pada salah satu jadwal;
+:Mengakses menu Jadwal Donor;
+:Memilih opsi Edit pada jadwal tertentu;
 
 |Sistem|
-:Tampilkan form edit dengan data jadwal;
+:Menampilkan form edit jadwal;
 
 |Admin|
-:Ubah data (Tanggal, Hari, Lokasi, Waktu, Kuota);
+:Mengubah informasi jadwal;
+:Mengklik tombol Simpan;
 
-if (Klik tombol?) then (Batal)
-  |Sistem|
-  :Tampilkan daftar jadwal;
+|Sistem|
+if (Data valid?) then (Tidak)
+  :Menampilkan pesan peringatan;
   |Admin|
+  :Memperbaiki data;
   stop
-else (Simpan)
+else (Ya)
   |Sistem|
-  :Validasi input data;
-  if (Validasi sukses?) then (Tidak)
-    :Tampilkan pesan error;
-    |Admin|
-    :Perbaiki data;
-    detach
-  else (Ya)
-    :Update data ke database;
-    :Tampilkan notifikasi berhasil;
-    :Perbarui daftar jadwal;
-  endif
+  :Menyimpan pembaruan ke database;
+  :Menampilkan pesan sukses;
 endif
 
 |Admin|
 stop
 
-@enduml
+@enduml           

@@ -3,24 +3,22 @@ title Activity Diagram - Admin Tambah Jadwal Donor Darah
 
 |Admin|
 start
-:Buka menu Jadwal Donor;
-:Klik tombol "Tambah Jadwal";
+:Memilih menu Jadwal Donor;
+:Memilih opsi Tambah Jadwal;
 
 |Sistem|
-:Tampilkan form tambah jadwal;
+:Menampilkan form tambah jadwal;
 
 |Admin|
-:Isi form (Tanggal, Waktu, Lokasi, Kuota, dll);
-:Klik "Simpan";
+:Mengisi form data jadwal baru;
+:Menekan tombol Simpan;
 
 |Sistem|
-:Validasi input data jadwal;
-if (Validasi sukses?) then (Ya)
-  :Kirim data & Simpan ke sistem;
-  :Tampilkan notifikasi berhasil;
-  :Perbarui tampilan daftar jadwal;
+if (Data valid?) then (Ya)
+  :Menyimpan data jadwal ;
+  :Menampilkan pesan sukses;
 else (Tidak)
-  :Tampilkan pesan error validasi;
+  :Menampilkan error message;
 endif
 
 |Admin|

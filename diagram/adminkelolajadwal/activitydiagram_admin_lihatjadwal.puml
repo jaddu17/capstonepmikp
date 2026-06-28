@@ -3,13 +3,11 @@ title Activity Diagram - Admin Lihat Jadwal Donor Darah
 
 |Admin|
 start
-:Login dan masuk ke Dashboard;
-:Klik menu "Jadwal Donor";
+:Mengakses menu Jadwal Donor;
 
 |Sistem|
-:Kirim request untuk mengambil data jadwal;
-:Terima balasan data jadwal terbaru;
-:Tampilkan data dalam bentuk tabel interaktif;
+:Mengambil data jadwal dari database;
+:Menampilkan daftar jadwal donor;
 
 |Admin|
 :Melihat daftar jadwal donor;

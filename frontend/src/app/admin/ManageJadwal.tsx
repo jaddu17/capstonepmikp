@@ -61,15 +61,34 @@ export function ManageJadwal() {
     const isEdit = !!editingId;
     const url = isEdit ? `/api/jadwal-donors/${editingId}` : '/api/jadwal-donors';
     const method = isEdit ? 'PUT' : 'POST';
+    const token = localStorage.getItem("admin_token");
 
     fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(formData),
     })
-    .then(res => res.json())
+    .then(async res => {
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        
+        let errorMessage = errData.message || 'Gagal menyimpan data jadwal';
+        if (errorMessage === "Unauthenticated.") {
+          errorMessage = "Sesi Anda telah berakhir, silakan login kembali.";
+        } else if (res.status === 404 || errorMessage.includes("could not be found") || errorMessage.includes("No query results")) {
+          errorMessage = "Data jadwal tidak ditemukan atau sudah dihapus dari sistem.";
+        }
+
+        throw new Error(errorMessage);
+      }
+      return res.json();
+    })
     .then(data => {
-      const formatted = { ...data, id: data.id.toString() };
+      const formatted = { ...data, id: data.id?.toString() || editingId || Date.now().toString() };
       if (isEdit) {
         setSchedules(schedules.map(s => s.id === editingId ? formatted : s));
         toast.success("Jadwal berhasil diperbarui!");
@@ -83,7 +102,7 @@ export function ManageJadwal() {
     })
     .catch(err => {
       console.error(err);
-      toast.error("Gagal menyimpan jadwal.");
+      toast.error(err.message || "Gagal menyimpan jadwal.");
     });
   };
 
@@ -94,12 +113,24 @@ export function ManageJadwal() {
 
   const confirmDelete = () => {
     if (itemToDelete) {
-      fetch(`/api/jadwal-donors/${itemToDelete}`, { method: 'DELETE' })
-      .then(() => {
+      const token = localStorage.getItem("admin_token");
+      fetch(`/api/jadwal-donors/${itemToDelete}`, { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(async res => {
+        if (!res.ok) {
+          throw new Error('Gagal menghapus data jadwal');
+        }
         setSchedules(schedules.filter(s => s.id !== itemToDelete));
         toast.success("Jadwal berhasil dihapus!");
       })
-      .catch(err => console.error(err))
+      .catch(err => {
+        console.error(err);
+        toast.error(err.message || "Gagal menghapus jadwal.");
+      })
       .finally(() => {
         setDeleteModalOpen(false);
         setItemToDelete(null);
@@ -214,55 +245,57 @@ export function ManageJadwal() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-border">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Tanggal</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Hari</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Lokasi</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Waktu</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Kuota</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {loading ? (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Memuat data jadwal...</td></tr>
-              ) : schedules.length === 0 ? (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Belum ada jadwal donor.</td></tr>
-              ) : (
-                schedules.map((schedule) => (
-                  <tr key={schedule.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">{schedule.date}</td>
-                    <td className="px-6 py-4">{schedule.day}</td>
-                    <td className="px-6 py-4">{schedule.location}</td>
-                    <td className="px-6 py-4">{schedule.time}</td>
-                    <td className="px-6 py-4">{schedule.quota}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(schedule)}
-                          className="text-blue-600 hover:text-blue-800 p-1"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(schedule.id)}
-                          className="text-red-600 hover:text-red-800 p-1"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {!isAdding && !editingId && (
+        <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-border">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Tanggal</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Hari</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Lokasi</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Waktu</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Kuota</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {loading ? (
+                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Memuat data jadwal...</td></tr>
+                ) : schedules.length === 0 ? (
+                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Belum ada jadwal donor.</td></tr>
+                ) : (
+                  schedules.map((schedule) => (
+                    <tr key={schedule.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">{schedule.date}</td>
+                      <td className="px-6 py-4">{schedule.day}</td>
+                      <td className="px-6 py-4">{schedule.location}</td>
+                      <td className="px-6 py-4">{schedule.time}</td>
+                      <td className="px-6 py-4">{schedule.quota}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEdit(schedule)}
+                            className="text-blue-600 hover:text-blue-800 p-1"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(schedule.id)}
+                            className="text-red-600 hover:text-red-800 p-1"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Delete Modal */}
       {deleteModalOpen && (

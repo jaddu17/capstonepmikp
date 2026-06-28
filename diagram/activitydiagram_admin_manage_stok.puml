@@ -1,38 +1,33 @@
 @startuml ACTIVITY_DIAGRAM_ADMIN_MANAGE_STOK
-title Activity Diagram - Admin Manage Stok Darah
+title Activity Diagram - Admin Kelola Stok Darah
 
 |Admin|
 start
-:Buka halaman Kelola Stok Darah;
+:Buka menu "Stok Darah";
 
 |Sistem|
-:Ambil data stok (WB, PRC, TC) terbaru;
-:Tampilkan form stok darah;
+:Ambil data stok terbaru dari database;
+:Tampilkan halaman kelola dan form input;
 
 |Admin|
-:Ubah jumlah WB, PRC, atau TC;
+:Ubah jumlah stok (WB/PRC/TC) pada golongan darah;
 
 |Sistem|
-:Hitung total (WB + PRC);
-if (Golongan Darah?) then (AB)
-  :Status otomatis: <= 10 (STOK KURANG),\n> 10 (STOK CUKUP);
-else (A, B, O)
-  :Status otomatis: <= 30 (STOK KURANG),\n> 30 (STOK CUKUP);
-endif
-:Tampilkan perubahan status secara realtime;
+:Update status (Stok Cukup/Kurang) berdasarkan WB + PRC;
 
 |Admin|
-:Klik tombol "Simpan Perubahan";
+:Klik "Simpan Perubahan";
 
 |Sistem|
-:Kirim data update (Bulk Update);
-if (Simpan Berhasil?) then (Ya)
+if (Data Tersimpan?) then (Ya)
   :Tampilkan notifikasi sukses;
+  :Update waktu terakhir diupdate;
+  |Admin|
+  stop
 else (Tidak)
-  :Tampilkan notifikasi error;
+  |Sistem|
+  :Tampilkan pesan error;
+  stop
 endif
-
-|Admin|
-stop
 
 @enduml

@@ -2,10 +2,12 @@
 left to right direction
 skinparam packageStyle rectangle
 
-actor "Administrator (Admin)" as Admin
+actor "Admin" as Admin
 
 package "PMI Kulon Progo Website - Admin" {
   usecase "Login" as UC_Login
+  usecase "Logout" as UC_Logout
+
   usecase "Melihat Dashboard" as UC_Dashboard
   usecase "Mengelola Stok Darah (Update)" as UC_ManageStock
   usecase "Mengelola Jadwal Donor (CRUD)" as UC_ManageJadwal
@@ -13,18 +15,24 @@ package "PMI Kulon Progo Website - Admin" {
   usecase "Mengelola Pesan Masuk (View/Reply/Delete)" as UC_ManagePesan
   usecase "Mengelola Infografis (CRUD)" as UC_ManageInfo
   usecase "Mengelola Donasi Masuk (View/Delete)" as UC_ManageDonasi
-  usecase "Logout" as UC_Logout
 }
 
 Admin --> UC_Login
 
-UC_Login --> UC_Dashboard
-UC_Login --> UC_ManageStock
-UC_Login --> UC_ManageJadwal
-UC_Login --> UC_ManageNews
-UC_Login --> UC_ManagePesan
-UC_Login --> UC_ManageInfo
-UC_Login --> UC_ManageDonasi
-UC_Login --> UC_Logout
+UC_Login ..> UC_Dashboard : <<include>>
+UC_Login ..> UC_ManageStock : <<include>>
+UC_Login ..> UC_ManageJadwal : <<include>>
+UC_Login ..> UC_ManageNews : <<include>>
+UC_Login ..> UC_ManagePesan : <<include>>
+UC_Login ..> UC_ManageInfo : <<include>>
+UC_Login ..> UC_ManageDonasi : <<include>>
+
+UC_Dashboard <.. UC_Logout : <<extend>>
+UC_ManageStock <.. UC_Logout : <<extend>>
+UC_ManageJadwal <.. UC_Logout : <<extend>>
+UC_ManageNews <.. UC_Logout : <<extend>>
+UC_ManagePesan <.. UC_Logout : <<extend>>
+UC_ManageInfo <.. UC_Logout : <<extend>>
+UC_ManageDonasi <.. UC_Logout : <<extend>>
 
 @enduml

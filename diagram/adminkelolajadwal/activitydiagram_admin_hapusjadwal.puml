@@ -3,20 +3,19 @@ title Activity Diagram - Admin Hapus Jadwal Donor Darah
 
 |Admin|
 start
-:Buka menu Jadwal Donor;
-:Klik tombol "Hapus" pada salah satu jadwal;
+:Mengakses menu Jadwal Donor;
+:Memilih opsi Hapus pada jadwal tertentu;
 
 |Sistem|
-:Tampilkan dialog konfirmasi penghapusan;
+:Menampilkan konfirmasi penghapusan;
 
 |Admin|
 if (Konfirmasi hapus?) then (Batal)
   stop
 else (Ya)
   |Sistem|
-  :Hapus data jadwal dari database;
-  :Tampilkan notifikasi berhasil dihapus;
-  :Perbarui daftar jadwal;
+  :Menghapus jadwal dari database;
+  :Menampilkan pesan sukses;
 endif
 
 |Admin|

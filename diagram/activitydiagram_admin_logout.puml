@@ -3,15 +3,24 @@ title Activity Diagram - Admin Logout
 
 |Admin|
 start
-:Klik tombol "Keluar" di Sidebar;
+:Mengklik tombol "Keluar" pada sidebar;
 
 |Sistem|
-:Terima permintaan logout;
-:Hapus session dan token autentikasi;
-:Redirect ke halaman login;
+:Menampilkan validasi konfirmasi logout;
 
 |Admin|
-:Melihat halaman login;
-stop
+if (Konfirmasi keluar?) then (Tidak)
+  :Kembali ke halaman sebelumnya;
+  stop
+else (Ya)
+  |Sistem|
+  :Menerima permintaan logout;
+  :Menghapus session dan token autentikasi;
+  :Redirect ke halaman login;
+  
+  |Admin|
+  :Melihat halaman login;
+  stop
+endif
 
 @enduml

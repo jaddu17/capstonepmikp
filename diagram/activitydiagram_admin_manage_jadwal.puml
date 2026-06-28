@@ -3,40 +3,29 @@ title Activity Diagram - Admin Manage Jadwal Donor
 
 |Admin|
 start
-:Buka Menu Jadwal Donor;
+:Mengakses menu Jadwal Donor;
 
 |Sistem|
-:Tampilkan data jadwal donor;
-
-|Database|
-:Query jadwal donor;
-
-|Sistem|
-:Tampilkan tabel jadwal;
+:Menampilkan daftar jadwal donor;
 
 |Admin|
-:Pilih aksi;
-if (Tambah/Edit/Hapus jadwal?) then (Ya)
-  :Isi form jadwal;
-  :Tentukan tanggal, waktu, lokasi &kuota;
+:Memilih aksi kelola (Tambah/Edit/Hapus);
+if (Aksi Kelola?) then (Ya)
+  :Mengisi form data jadwal;
 else (Tidak)
   stop
 endif
 
 |Sistem|
-:Terima data jadwal;
-:Validasi jadwal;
+:Memvalidasi kelengkapan dan konflik jadwal;
 
-|Database|
-if (Tanggal tidak bentrok?) then (Ya)
-  :Simpan/Update jadwal;
+if (Data valid?) then (Ya)
+  :Menyimpan data jadwal ke database;
+  :Menampilkan pesan sukses;
 else (Tidak)
-  :Tampilkan warning;
+  :Menampilkan pesan peringatan;
   stop
 endif
-
-|Sistem|
-:Notifikasi jadwal berhasil disimpan;
 
 |Admin|
 stop
