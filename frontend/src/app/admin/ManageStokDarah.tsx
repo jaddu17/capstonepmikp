@@ -59,9 +59,15 @@ export function ManageStokDarah() {
       status: item.status,
     }));
 
+    const token = localStorage.getItem("admin_token");
+
     fetch('/api/stok-darahs/bulk-update', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
       body: JSON.stringify(updates),
     })
     .then(res => res.json())
