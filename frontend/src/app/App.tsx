@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { Login } from "./admin/Login";
 import { ProtectedRoute } from "./admin/ProtectedRoute";
 import { DashboardOverview } from "./admin/DashboardOverview";
@@ -22,6 +23,7 @@ import KontakPage from "./pages/KontakPage";
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Toaster position="top-right" richColors />
       <Routes>
         <Route path="/" element={<Home />} />

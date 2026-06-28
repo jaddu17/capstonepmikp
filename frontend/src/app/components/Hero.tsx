@@ -1,5 +1,6 @@
 import { Heart, Droplet, Users, TrendingUp, PhoneCall } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CuacaBadge } from "./CuacaBadge";
 
 export function Hero() {
   const stats = [
@@ -11,6 +12,7 @@ export function Hero() {
 
   return (
     <section id="beranda" className="relative text-white overflow-hidden">
+      <CuacaBadge />
       {/* Background Grid Images */}
       <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-1 opacity-40 pointer-events-none">
         <img src="https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&q=80&w=400" alt="bg1" className="w-full h-full object-cover" />

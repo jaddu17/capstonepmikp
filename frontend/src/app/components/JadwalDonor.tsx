@@ -1,43 +1,30 @@
+import { useState, useEffect } from "react";
 import { Calendar, MapPin, Clock } from "lucide-react";
 
+interface Schedule {
+  id: string;
+  date: string;
+  day: string;
+  location: string;
+  time: string;
+  quota: string;
+}
+
 export function JadwalDonor() {
-  const schedules = [
-    {
-      date: "12 Mei 2026",
-      day: "Selasa",
-      location: "Alun-Alun Wates",
-      time: "08:00 - 13:00 WIB",
-      quota: "100 orang",
-    },
-    {
-      date: "15 Mei 2026",
-      day: "Jumat",
-      location: "Kantor PMI Kulon Progo",
-      time: "09:00 - 14:00 WIB",
-      quota: "75 orang",
-    },
-    {
-      date: "19 Mei 2026",
-      day: "Selasa",
-      location: "Pasar Sentolo",
-      time: "08:00 - 12:00 WIB",
-      quota: "80 orang",
-    },
-    {
-      date: "22 Mei 2026",
-      day: "Jumat",
-      location: "Kampus UNY Wates",
-      time: "09:00 - 15:00 WIB",
-      quota: "150 orang",
-    },
-    {
-      date: "26 Mei 2026",
-      day: "Selasa",
-      location: "Puskesmas Galur",
-      time: "08:30 - 13:30 WIB",
-      quota: "60 orang",
-    },
-  ];
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+
+  useEffect(() => {
+    fetch('/api/jadwal-donors')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setSchedules(data);
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching jadwal donors:", err);
+      });
+  }, []);
 
   return (
     <section id="jadwal" className="py-16 bg-white">

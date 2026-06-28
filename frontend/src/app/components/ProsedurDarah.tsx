@@ -48,12 +48,12 @@ export function ProsedurDarah() {
           <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -z-10 transform -translate-y-12"></div>
           
           {steps.map((step, idx) => (
-            <div key={idx} className="relative group">
-              <div className="flex flex-col items-center text-center">
-                <div className={`w-20 h-20 ${step.color} rounded-3xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300 mb-6 border-4 border-white`}>
+            <div key={idx} className="relative group h-full">
+              <div className="flex flex-col items-center text-center h-full">
+                <div className={`w-20 h-20 shrink-0 ${step.color} rounded-3xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300 mb-6 border-4 border-white`}>
                   <step.icon className="w-10 h-10 text-white" />
                 </div>
-                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:border-primary/20 transition-colors h-full">
+                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:border-primary/20 transition-colors h-full w-full">
                   <h3 className="font-black text-gray-900 mb-2 uppercase tracking-tight text-sm">Langkah {idx + 1}: {step.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{step.description}</p>
                 </div>

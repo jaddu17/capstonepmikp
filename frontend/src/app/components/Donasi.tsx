@@ -80,9 +80,6 @@ export function Donasi() {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-6">
-            <Heart className="w-8 h-8 text-primary fill-primary animate-pulse" />
-          </div>
           <h2 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
             Salurkan Kebaikan Anda
           </h2>
