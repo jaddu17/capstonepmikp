@@ -8,8 +8,6 @@ interface Message {
   name: string;
   email: string;
   phone?: string;
-  type: string;
-  subject: string;
   message: string;
   date: string;
   read: boolean;
@@ -112,7 +110,7 @@ export function ManagePesan() {
     if (!selectedMessage) return;
 
     if (method === "email") {
-      window.open(`mailto:${selectedMessage.email}?subject=Re: ${selectedMessage.subject}&body=${encodeURIComponent(replyContent)}`);
+      window.open(`mailto:${selectedMessage.email}?body=${encodeURIComponent(replyContent)}`);
     } else if (method === "whatsapp" && selectedMessage.phone) {
       window.open(`https://wa.me/${selectedMessage.phone.replace(/^0/, "62")}?text=${encodeURIComponent(replyContent)}`);
     }
@@ -145,15 +143,7 @@ export function ManagePesan() {
     return true;
   });
 
-  const getTypeColor = (type: string) => {
-    const colors: any = {
-      umum: "bg-blue-100 text-blue-800",
-      donor: "bg-red-100 text-red-800",
-      relawan: "bg-green-100 text-green-800",
-      saran: "bg-purple-100 text-purple-800",
-    };
-    return colors[type] || "bg-gray-100 text-gray-800";
-  };
+
 
   return (
     <DashboardLayout>
@@ -202,13 +192,12 @@ export function ManagePesan() {
                     <span className={`font-black text-sm ${!message.read ? "text-primary" : "text-gray-800"}`}>{message.name}</span>
                     {message.replied && <span className="bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">REPLIED</span>}
                   </div>
-                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tighter ${getTypeColor(message.type)}`}>{message.type}</span>
                 </div>
                 <button onClick={e => { e.stopPropagation(); handleDelete(message.id); }} className="p-2 hover:bg-red-50 text-red-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
-              <div className="text-sm font-bold text-gray-600 mb-2 line-clamp-1">{message.subject}</div>
+              <div className="text-sm font-bold text-gray-600 mb-2 line-clamp-1">{message.message}</div>
               <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{message.date}</div>
             </div>
           ))}
@@ -220,7 +209,7 @@ export function ManagePesan() {
               <div className="p-10 bg-gray-50/30 border-b border-gray-100">
                 <div className="flex justify-between items-start mb-8">
                   <div>
-                    <h2 className="text-3xl font-black text-gray-900 mb-3">{selectedMessage.subject}</h2>
+                    <h2 className="text-3xl font-black text-gray-900 mb-3">Pesan Masuk</h2>
                     <div className="flex items-center gap-4 text-sm font-bold">
                       <span className="text-primary">{selectedMessage.name}</span>
                       <span className="text-gray-300">•</span>
@@ -234,7 +223,6 @@ export function ManagePesan() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest ${getTypeColor(selectedMessage.type)}`}>{selectedMessage.type}</span>
                     <div className="text-xs font-bold text-gray-400 mt-3">{selectedMessage.date}</div>
                   </div>
                 </div>

@@ -13,8 +13,6 @@ class Pesan extends Model
         'name',
         'email',
         'phone',
-        'type',
-        'subject',
         'message',
         'date',
         'read',
