@@ -1,44 +1,34 @@
-@startuml ACTIVITY_DIAGRAM_USER_HOME
+@startuml ACTIVITY_DIAGRAM_USER_BERANDA
 title Activity Diagram - User Beranda
 
 |User|
 start
-:Akses website (Halaman Beranda);
+:Akses halaman Beranda;
 
 |Sistem|
-:Permintaan data Beranda;
-:Ambil data Infografis Kinerja 
-(Kontak Darurat, Statistik, Dokumentasi);
-:Render Hero Section (Tombol Cek Stok Darah & Jadwal Donor);
-:Render bagian Tentang PMI (Visi, Misi, dll);
-:Render bagian Infografis Kinerja Bulanan;
-:Tampilkan keseluruhan halaman Beranda;
+:Ambil data infografis;
+:Tampilkan halaman Beranda;
 
 |User|
-:Eksplorasi konten Beranda;
+:Lihat menu navigasi;
 
-if (Pilih navigasi/aksi?) then (Klik Tombol Akses Cepat)
-  :Klik "Cek Stok Darah" atau "Jadwal Donor";
-  |Sistem|
-  :Arahkan ke halaman terkait;
-else if (Klik Menu Navbar)
-  |User|
-  :Pilih menu (Berita/Stok/Jadwal/Donasi/dll);
-  |Sistem|
-  :Arahkan ke halaman yang dipilih;
-else if (Pilih Bulan Infografis)
-  |User|
-  :Pilih bulan pada dropdown "Laporan Kinerja";
-  |Sistem|
-  :Filter dan perbarui tampilan data infografis 
-  sesuai bulan yang dipilih;
-else (Scroll Halaman)
-  |User|
-  :Melihat visi misi, kontak darurat, 
-  dan dokumentasi infografis;
+if (Pilih menu?) 
+
+    :Pilih menu yang dituju;
+
+    |Sistem|
+    :Tampilkan halaman yang dipilih;
+
+else ()
+
+    |User|
+    :Pilih bulan laporan;
+
+    |Sistem|
+    :Perbarui tampilan data;
+
 endif
 
 |User|
 stop
-
 @enduml

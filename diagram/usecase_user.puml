@@ -24,9 +24,4 @@ Visitor --> UC_InfoDonor
 Visitor --> UC_SubmitDonation
 Visitor --> UC_Contact
 
-note right of UC_SubmitDonation
-  Donasi dari publik disimpan (localStorage)
-  dan dilihat oleh Admin di menu "Donasi Masuk".
-end note
-
 @enduml

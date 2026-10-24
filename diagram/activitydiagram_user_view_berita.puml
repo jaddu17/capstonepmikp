@@ -1,35 +1,28 @@
 @startuml ACTIVITY_DIAGRAM_USER_VIEW_BERITA
-title Activity Diagram - User View Berita
+title Activity Diagram - Lihat Berita
 
 |User|
 start
-:Akses halaman Berita\n(Melalui menu Navbar);
+:Akses halaman Berita;
 
 |Sistem|
-:Menerima permintaan rute /berita;
-:Ambil data seluruh berita terkini\n(Beserta konten isi lengkapnya);
-:Render daftar kartu berita\n(Menampilkan Thumbnail, Kategori, Judul, Tanggal);
-:Tampilkan keseluruhan halaman Berita ke layar;
+:Ambil data berita;
+:Tampilkan halaman Berita;
 
 |User|
-:Melihat dan mengeksplorasi daftar berita;
+:Lihat daftar berita;
 
-if (Pilih Aksi Selanjutnya?) then (Klik "Baca Selengkapnya")
-  |Sistem|
-  :Render dan tampilkan modal pop-up detail berita\n(Menggunakan data di memori tanpa query ulang);
-  
-  |User|
-  :Membaca isi detail berita;
-  :Selesai membaca, klik tombol "Tutup" (X);
-  
-  |Sistem|
-  :Tutup modal pop-up dan\nkembali menampilkan daftar berita;
-else (Hanya Scroll / Keluar)
-  |User|
-  :Meninggalkan halaman;
+if (Pilih aksi?) then (Baca Selengkapnya)
+    |Sistem|
+    :Tampilkan pop-up detail berita;
+    |User|
+    :Baca isi berita;
+    :Tutup pop-up detail;
+    |Sistem|
+    :Sembunyikan pop-up berita;
+else (Hanya Lihat)
 endif
 
 |User|
 stop
-
 @enduml

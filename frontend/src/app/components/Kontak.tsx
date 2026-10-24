@@ -8,9 +8,7 @@ export function Kontak() {
     name: "",
     email: "",
     phone: "",
-    subject: "",
     message: "",
-    type: "umum",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -164,35 +162,7 @@ export function Kontak() {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm mb-2">Tipe Pesan</label>
-                <select
-                  value={formData.type}
-                  onChange={(e) =>
-                    setFormData({ ...formData, type: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="umum">Pertanyaan Umum</option>
-                  <option value="donor">Donor Darah</option>
-                  <option value="relawan">Pendaftaran Relawan</option>
-                  <option value="saran">Saran & Masukan</option>
-                </select>
-              </div>
 
-              <div>
-                <label className="block text-sm mb-2">Subjek</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.subject}
-                  onChange={(e) =>
-                    setFormData({ ...formData, subject: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="Subjek pesan"
-                />
-              </div>
 
               <div>
                 <label className="block text-sm mb-2">Pesan</label>

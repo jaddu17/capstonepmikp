@@ -1,21 +1,18 @@
 @startuml ACTIVITY_DIAGRAM_ADMIN_LIHAT_PESAN
-title Activity Diagram - Admin Lihat Pesan Masuk
+title Activity Diagram - Admin Lihat Pesan
 
 |Admin|
 start
-:Login dan masuk ke Dashboard;
-:Klik menu "Pesan Masuk";
+:Pilih Pesan Masuk;
 
 |Sistem|
-:Tampilkan daftar pesan masuk dalam tabel;
+:Tampilkan daftar pesan;
 
 |Admin|
-:Klik salah satu pesan untuk melihat detail;
+:Pilih pesan;
 
 |Sistem|
-:Tampilkan popup/halaman detail pesan;
+:Tampilkan detail pesan;
 
-|Admin|
 stop
-
 @enduml
