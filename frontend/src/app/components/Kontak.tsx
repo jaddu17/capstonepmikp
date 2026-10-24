@@ -25,7 +25,7 @@ export function Kontak() {
       });
 
       toast.success("Terima kasih! Pesan Anda telah terkirim. Tim kami akan segera menghubungi Anda.");
-      setFormData({ name: "", email: "", phone: "", subject: "", message: "", type: "umum" });
+      setFormData({ name: "", email: "", phone: "", message: "" });
     } catch (error: any) {
       console.error("Error sending message:", error);
       toast.error(error.message || "Gagal mengirim pesan. Silakan coba lagi.");
