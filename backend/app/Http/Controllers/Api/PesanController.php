@@ -10,7 +10,7 @@ class PesanController extends Controller
 {
     public function index()
     {
-        return Pesan::orderBy('created_at', 'desc')->get();
+        return Pesan::orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function store(Request $request)

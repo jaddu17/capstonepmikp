@@ -1,6 +1,7 @@
 import { Phone, Mail, MapPin, Send, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { api } from "@/config/api";
 
 export function Kontak() {
   const [formData, setFormData] = useState({
@@ -18,30 +19,18 @@ export function Kontak() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/pesans", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          date: new Date().toLocaleString("id-ID"),
-          read: false,
-          replied: false,
-        }),
+      await api.post("/api/pesans", {
+        ...formData,
+        date: new Date().toLocaleString("id-ID"),
+        read: false,
+        replied: false,
       });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.message || "Gagal mengirim pesan");
-      }
 
       toast.success("Terima kasih! Pesan Anda telah terkirim. Tim kami akan segera menghubungi Anda.");
       setFormData({ name: "", email: "", phone: "", subject: "", message: "", type: "umum" });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending message:", error);
-      toast.error("Gagal mengirim pesan. Silakan coba lagi.");
+      toast.error(error.message || "Gagal mengirim pesan. Silakan coba lagi.");
     } finally {
       setIsSubmitting(false);
     }

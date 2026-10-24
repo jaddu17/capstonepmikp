@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Droplet, AlertCircle, Calendar } from "lucide-react";
+import { api } from "@/config/api";
 
 interface BloodStockItem {
   id: string;
@@ -15,8 +16,8 @@ export function StokDarah() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/stok-darahs')
-      .then(res => res.json())
+    api.get('/api/stok-darahs')
+      .then(d => d.data || d)
       .then(data => {
         // Filter hanya tipe darah A, B, O, AB
         const filtered = data.filter((item: any) => ['A', 'B', 'O', 'AB'].includes(item.type));

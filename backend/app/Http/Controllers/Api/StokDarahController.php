@@ -10,7 +10,7 @@ class StokDarahController extends Controller
 {
     public function index()
     {
-        return StokDarah::all();
+        return StokDarah::orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function store(Request $request)
@@ -72,6 +72,8 @@ class StokDarahController extends Controller
             ]);
         }
 
-        return response()->json(StokDarah::all());
+        \App\Services\FonnteService::notifyStokDarahUpdated();
+
+        return response()->json(StokDarah::orderBy('created_at', 'desc')->paginate(10));
     }
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Wallet, CreditCard, Landmark, ArrowRight, Heart, User, Phone, MessageSquare, CheckCircle2, Upload, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/config/api";
 
 export function Donasi() {
   const [step, setStep] = useState(1);
@@ -44,29 +45,18 @@ export function Donasi() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/donasis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          proof: proofFile,
-          date: new Date().toLocaleString("id-ID"),
-          status: "Sudah Bayar",
-        }),
+      await api.post('/api/donasis', {
+        ...formData,
+        proof: proofFile,
+        date: new Date().toLocaleString("id-ID"),
+        status: "Sudah Bayar",
       });
-
-      if (!response.ok) {
-        throw new Error('Gagal mengupload bukti transfer');
-      }
 
       setStep(3);
       toast.success("Terima kasih! Bukti transfer telah terkirim.");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error confirming payment:", error);
-      toast.error("Gagal mengirim bukti transfer. Silakan coba lagi.");
+      toast.error(error.message || "Gagal mengirim bukti transfer. Silakan coba lagi.");
     } finally {
       setIsSubmitting(false);
     }
@@ -160,7 +150,7 @@ export function Donasi() {
                   <div className="relative group/upload">
                     <input 
                       type="file" 
-                      accept="image/*"
+                      accept=".jpg,.jpeg,.png"
                       onChange={handleFileUpload}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
@@ -239,4 +229,5 @@ export function Donasi() {
     </section>
   );
 }
+
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Mail, Trash2, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/config/api";
 
 interface Message {
   id: string;
@@ -27,14 +28,8 @@ export function ManagePesan() {
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    fetch('/api/pesans', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-      },
-    })
-      .then(res => res.json())
+    api.get('/api/pesans')
+      .then(d => d.data || d)
       .then(data => {
         setMessages(data.map((item: any) => ({
           ...item,
@@ -57,25 +52,21 @@ export function ManagePesan() {
 
   const confirmDelete = () => {
     if (itemToDelete) {
-      const token = localStorage.getItem("admin_token");
-      fetch(`/api/pesans/${itemToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-        },
-      })
-      .then(() => {
-        const updated = messages.filter(m => m.id !== itemToDelete);
-        setMessages(updated);
-        if (selectedMessage?.id === itemToDelete) setSelectedMessage(null);
-        toast.success("Pesan berhasil dihapus!");
-      })
-      .catch(err => console.error(err))
-      .finally(() => {
-        setDeleteModalOpen(false);
-        setItemToDelete(null);
-      });
+      api.delete(`/api/pesans/${itemToDelete}`)
+        .then(() => {
+          const updated = messages.filter(m => m.id !== itemToDelete);
+          setMessages(updated);
+          if (selectedMessage?.id === itemToDelete) setSelectedMessage(null);
+          toast.success("Pesan berhasil dihapus!");
+        })
+        .catch((err: any) => {
+          console.error(err);
+          toast.error(err.message || "Gagal menghapus pesan");
+        })
+        .finally(() => {
+          setDeleteModalOpen(false);
+          setItemToDelete(null);
+        });
     }
   };
 
@@ -88,23 +79,14 @@ export function ManagePesan() {
     setSelectedMessage(message);
     setReplyContent(message.reply_text || "");
     if (!message.read) {
-      const token = localStorage.getItem("admin_token");
-      fetch(`/api/pesans/${message.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ read: true }),
-      })
-      .then(res => res.json())
-      .then(data => {
-        const updated = messages.map(m => m.id === message.id ? { ...m, read: true } : m);
-        setMessages(updated);
-        setSelectedMessage({ ...message, read: true });
-      })
-      .catch(err => console.error(err));
+      api.put(`/api/pesans/${message.id}`, { read: true })
+        .then(d => d.data || d)
+        .then(() => {
+          const updated = messages.map(m => m.id === message.id ? { ...m, read: true } : m);
+          setMessages(updated);
+          setSelectedMessage({ ...message, read: true });
+        })
+        .catch(err => console.error(err));
     }
   };
 
@@ -117,26 +99,20 @@ export function ManagePesan() {
       window.open(`https://wa.me/${selectedMessage.phone.replace(/^0/, "62")}?text=${encodeURIComponent(replyContent)}`);
     }
 
-    const token = localStorage.getItem("admin_token");
-    fetch(`/api/pesans/${selectedMessage.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ replied: true, reply_text: replyContent }),
-    })
-    .then(res => res.json())
-    .then(() => {
-      const updated = messages.map(m =>
-        m.id === selectedMessage.id ? { ...m, replied: true, reply_text: replyContent } : m
-      );
-      setMessages(updated);
-      setSelectedMessage({ ...selectedMessage, replied: true, reply_text: replyContent });
-      toast.success("Balasan berhasil disimpan!");
-    })
-    .catch(err => console.error(err));
+    api.put(`/api/pesans/${selectedMessage.id}`, { replied: true, reply_text: replyContent })
+      .then(d => d.data || d)
+      .then(() => {
+        const updated = messages.map(m =>
+          m.id === selectedMessage.id ? { ...m, replied: true, reply_text: replyContent } : m
+        );
+        setMessages(updated);
+        setSelectedMessage({ ...selectedMessage, replied: true, reply_text: replyContent });
+        toast.success("Balasan berhasil disimpan!");
+      })
+      .catch((err: any) => {
+        console.error(err);
+        toast.error(err.message || "Gagal menyimpan balasan");
+      });
   };
 
   const filteredMessages = messages.filter(m => {

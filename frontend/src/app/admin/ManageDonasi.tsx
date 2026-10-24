@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Trash2, Calendar, Upload, X } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/config/api";
 
 interface Donation {
   id: string;
@@ -21,14 +22,8 @@ export function ManageDonasi() {
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    fetch('/api/donasis', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
-    })
-      .then(res => res.json())
+    api.get('/api/donasis')
+      .then(d => d.data || d)
       .then(data => {
         if (Array.isArray(data)) {
           setDonations(data.map((item: any) => ({ ...item, id: item.id.toString() })));
@@ -50,23 +45,19 @@ export function ManageDonasi() {
 
   const confirmDelete = () => {
     if (itemToDelete) {
-      const token = localStorage.getItem("admin_token");
-      fetch(`/api/donasis/${itemToDelete}`, { 
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
-      })
-      .then(() => {
-        setDonations(donations.filter(d => d.id !== itemToDelete));
-        toast.success("Data berhasil dihapus!");
-      })
-      .catch(err => console.error(err))
-      .finally(() => {
-        setDeleteModalOpen(false);
-        setItemToDelete(null);
-      });
+      api.delete(`/api/donasis/${itemToDelete}`)
+        .then(() => {
+          setDonations(donations.filter(d => d.id !== itemToDelete));
+          toast.success("Data berhasil dihapus!");
+        })
+        .catch((err: any) => {
+          console.error(err);
+          toast.error(err.message || "Gagal menghapus donasi");
+        })
+        .finally(() => {
+          setDeleteModalOpen(false);
+          setItemToDelete(null);
+        });
     }
   };
 
@@ -80,22 +71,16 @@ export function ManageDonasi() {
     if (!don) return;
     const newStatus = don.status === "Selesai" ? "Sudah Bayar" : "Selesai";
 
-    const token = localStorage.getItem("admin_token");
-    fetch(`/api/donasis/${id}`, {
-      method: 'PUT',
-      headers: { 
-        'Content-Type': 'application/json', 
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ status: newStatus }),
-    })
-    .then(res => res.json())
-    .then(data => {
-      setDonations(donations.map(d => d.id === id ? { ...d, status: data.status } : d));
-      toast.success("Status donasi diperbarui!");
-    })
-    .catch(err => console.error(err));
+    api.put(`/api/donasis/${id}`, { status: newStatus })
+      .then(d => d.data || d)
+      .then(data => {
+        setDonations(donations.map(d => d.id === id ? { ...d, status: data.status } : d));
+        toast.success("Status donasi diperbarui!");
+      })
+      .catch((err: any) => {
+        console.error(err);
+        toast.error(err.message || "Gagal memperbarui status");
+      });
   };
 
   return (

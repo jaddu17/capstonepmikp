@@ -13,7 +13,7 @@ use App\Http\Controllers\Api\StokDarahController;
 // ==========================================
 // RUTE PUBLIK (Bisa diakses siapa saja)
 // ==========================================
-Route::post('login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
 // Masyarakat hanya boleh melihat data (index & show)
 Route::apiResource('beritas', BeritaController::class)->only(['index', 'show']);

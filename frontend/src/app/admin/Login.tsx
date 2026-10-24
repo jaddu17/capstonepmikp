@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, User } from "lucide-react";
+import { api } from "@/config/api";
 
 export function Login() {
   const navigate = useNavigate();
@@ -14,30 +15,16 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify({
-          username: credentials.username,
-          password: credentials.password,
-        }),
+      const data = await api.post("/api/login", {
+        username: credentials.username,
+        password: credentials.password,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Username atau password salah!");
-        return;
-      }
 
       localStorage.setItem("pmi_admin_logged_in", "true");
       localStorage.setItem("admin_token", data.access_token);
       navigate("/admin/dashboard");
-    } catch (err) {
-      setError("Terjadi kesalahan. Silakan coba lagi.");
+    } catch (err: any) {
+      setError(err.message || "Username atau password salah!");
     } finally {
       setIsLoading(false);
     }

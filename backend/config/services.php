@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'fonnte' => [
+        'token' => env('FONNTE_TOKEN'),
+        'target' => env('FONNTE_TARGET'),
+        'endpoint' => 'https://api.fonnte.com/send',
+    ],
+
 ];

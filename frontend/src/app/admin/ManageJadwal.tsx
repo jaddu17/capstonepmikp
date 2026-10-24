@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Plus, Edit, Trash2, Save, X } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/config/api";
 
 interface Schedule {
   id: string;
@@ -17,8 +18,8 @@ export function ManageJadwal() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/jadwal-donors')
-      .then(res => res.json())
+    api.get('/api/jadwal-donors')
+      .then(d => d.data || d)
       .then(data => {
         setSchedules(data.map((item: any) => ({ ...item, id: item.id.toString() })));
         setLoading(false);
@@ -59,51 +60,33 @@ export function ManageJadwal() {
 
   const handleSave = () => {
     const isEdit = !!editingId;
-    const url = isEdit ? `/api/jadwal-donors/${editingId}` : '/api/jadwal-donors';
-    const method = isEdit ? 'PUT' : 'POST';
-    const token = localStorage.getItem("admin_token");
+    const request = isEdit
+      ? api.put(`/api/jadwal-donors/${editingId}`, formData)
+      : api.post('/api/jadwal-donors', formData);
 
-    fetch(url, {
-      method,
-      headers: { 
-        'Content-Type': 'application/json', 
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(formData),
-    })
-    .then(async res => {
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        
-        let errorMessage = errData.message || 'Gagal menyimpan data jadwal';
+    request
+      .then(d => d.data || d)
+      .then(data => {
+        const formatted = { ...data, id: data.id?.toString() || editingId || Date.now().toString() };
+        if (isEdit) {
+          setSchedules(schedules.map(s => s.id === editingId ? formatted : s));
+          toast.success("Jadwal berhasil diperbarui!");
+          setEditingId(null);
+        } else {
+          setSchedules([...schedules, formatted]);
+          toast.success("Jadwal berhasil ditambahkan!");
+          setIsAdding(false);
+        }
+        setFormData({ date: "", day: "", location: "", time: "", quota: "" });
+      })
+      .catch((err: any) => {
+        console.error(err);
+        let errorMessage = err.message || 'Gagal menyimpan data jadwal';
         if (errorMessage === "Unauthenticated.") {
           errorMessage = "Sesi Anda telah berakhir, silakan login kembali.";
-        } else if (res.status === 404 || errorMessage.includes("could not be found") || errorMessage.includes("No query results")) {
-          errorMessage = "Data jadwal tidak ditemukan atau sudah dihapus dari sistem.";
         }
-
-        throw new Error(errorMessage);
-      }
-      return res.json();
-    })
-    .then(data => {
-      const formatted = { ...data, id: data.id?.toString() || editingId || Date.now().toString() };
-      if (isEdit) {
-        setSchedules(schedules.map(s => s.id === editingId ? formatted : s));
-        toast.success("Jadwal berhasil diperbarui!");
-        setEditingId(null);
-      } else {
-        setSchedules([...schedules, formatted]);
-        toast.success("Jadwal berhasil ditambahkan!");
-        setIsAdding(false);
-      }
-      setFormData({ date: "", day: "", location: "", time: "", quota: "" });
-    })
-    .catch(err => {
-      console.error(err);
-      toast.error(err.message || "Gagal menyimpan jadwal.");
-    });
+        toast.error(errorMessage);
+      });
   };
 
   const handleDelete = (id: string) => {
@@ -113,28 +96,19 @@ export function ManageJadwal() {
 
   const confirmDelete = () => {
     if (itemToDelete) {
-      const token = localStorage.getItem("admin_token");
-      fetch(`/api/jadwal-donors/${itemToDelete}`, { 
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      .then(async res => {
-        if (!res.ok) {
-          throw new Error('Gagal menghapus data jadwal');
-        }
-        setSchedules(schedules.filter(s => s.id !== itemToDelete));
-        toast.success("Jadwal berhasil dihapus!");
-      })
-      .catch(err => {
-        console.error(err);
-        toast.error(err.message || "Gagal menghapus jadwal.");
-      })
-      .finally(() => {
-        setDeleteModalOpen(false);
-        setItemToDelete(null);
-      });
+      api.delete(`/api/jadwal-donors/${itemToDelete}`)
+        .then(() => {
+          setSchedules(schedules.filter(s => s.id !== itemToDelete));
+          toast.success("Jadwal berhasil dihapus!");
+        })
+        .catch((err: any) => {
+          console.error(err);
+          toast.error(err.message || "Gagal menghapus jadwal.");
+        })
+        .finally(() => {
+          setDeleteModalOpen(false);
+          setItemToDelete(null);
+        });
     }
   };
 

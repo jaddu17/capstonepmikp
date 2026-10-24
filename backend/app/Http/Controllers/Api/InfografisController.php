@@ -13,7 +13,7 @@ class InfografisController extends Controller
      */
     public function index()
     {
-        return Infografis::orderBy('created_at', 'desc')->get();
+        return Infografis::orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function store(Request $request)
@@ -24,6 +24,7 @@ class InfografisController extends Controller
             'kontak' => 'nullable|array',
             'stats' => 'nullable|array',
             'dokumentasi' => 'nullable|array',
+            'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
             'pelayanan' => 'nullable|array',
             'quote' => 'nullable|string',
         ]);
@@ -45,6 +46,7 @@ class InfografisController extends Controller
             'kontak' => 'nullable|array',
             'stats' => 'nullable|array',
             'dokumentasi' => 'nullable|array',
+            'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
             'pelayanan' => 'nullable|array',
             'quote' => 'nullable|string',
         ]);

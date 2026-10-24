@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Calendar, ArrowRight, X, Clock, Tag, Share2 } from "lucide-react";
+import { api } from "@/config/api";
 
 interface NewsItem {
   id?: string;
@@ -17,8 +18,8 @@ export function Berita() {
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
 
   useEffect(() => {
-    fetch('/api/beritas')
-      .then(res => res.json())
+    api.get('/api/beritas')
+      .then(d => d.data || d)
       .then(data => {
         if (Array.isArray(data)) {
           // Filter only published news for public view

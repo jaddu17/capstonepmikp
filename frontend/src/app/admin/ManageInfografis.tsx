@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Save, RefreshCw, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/config/api";
 
 interface InfografisData {
   id: string;
@@ -54,17 +55,21 @@ export function ManageInfografis() {
   };
 
   useEffect(() => {
-    fetch('/api/infografis')
-      .then(res => res.json())
+    api.get('/api/infografis')
+      .then(d => d.data || d)
       .then(data => {
-        if (data && data.length > 0) {
+        if (!Array.isArray(data)) {
+          console.error("Data is not an array:", data);
+          return;
+        }
+        if (data.length > 0) {
           const formatted = data.map((d: any) => ({
             ...d,
             id: d.id.toString(),
-            kontak: typeof d.kontak === 'string' ? JSON.parse(d.kontak) : d.kontak,
-            stats: typeof d.stats === 'string' ? JSON.parse(d.stats) : d.stats,
-            dokumentasi: typeof d.dokumentasi === 'string' ? JSON.parse(d.dokumentasi) : d.dokumentasi,
-            pelayanan: typeof d.pelayanan === 'string' ? JSON.parse(d.pelayanan) : d.pelayanan
+            kontak: d.kontak ? (typeof d.kontak === 'string' ? JSON.parse(d.kontak) : d.kontak) : defaultData.kontak,
+            stats: d.stats ? (typeof d.stats === 'string' ? JSON.parse(d.stats) : d.stats) : defaultData.stats,
+            dokumentasi: d.dokumentasi ? (typeof d.dokumentasi === 'string' ? JSON.parse(d.dokumentasi) : d.dokumentasi) : defaultData.dokumentasi,
+            pelayanan: d.pelayanan ? (typeof d.pelayanan === 'string' ? JSON.parse(d.pelayanan) : d.pelayanan) : defaultData.pelayanan
           }));
           setInfografisList(formatted);
           setActiveId(formatted[0].id);
@@ -81,37 +86,32 @@ export function ManageInfografis() {
   const activeData = infografisList.find(d => d.id === activeId) || defaultData;
 
   const handleSave = () => {
-    const url = activeId.startsWith("new-") ? '/api/infografis' : `/api/infografis/${activeId}`;
-    const method = activeId.startsWith("new-") ? 'POST' : 'PUT';
+    const isNew = activeId.startsWith("new-");
+    const request = isNew
+      ? api.post('/api/infografis', activeData)
+      : api.put(`/api/infografis/${activeId}`, activeData);
 
-    fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(activeData)
-    })
-    .then(res => res.json())
-    .then(data => {
-      const formatted = {
-        ...data,
-        id: data.id.toString(),
-        kontak: typeof data.kontak === 'string' ? JSON.parse(data.kontak) : data.kontak,
-        stats: typeof data.stats === 'string' ? JSON.parse(data.stats) : data.stats,
-        dokumentasi: typeof data.dokumentasi === 'string' ? JSON.parse(data.dokumentasi) : data.dokumentasi,
-        pelayanan: typeof data.pelayanan === 'string' ? JSON.parse(data.pelayanan) : data.pelayanan
-      };
-      setInfografisList(infografisList.map(d => d.id === activeId ? formatted : d));
-      if (activeId.startsWith("new-")) {
-        setActiveId(formatted.id);
-      }
-      toast.success("Data infografis berhasil disimpan!");
-    })
-    .catch(err => {
-      console.error(err);
-      toast.error("Gagal menyimpan data.");
-    });
+    request
+      .then(d => d.data || d)
+      .then(data => {
+        const formatted = {
+          ...data,
+          id: data.id?.toString() || "",
+          kontak: data.kontak ? (typeof data.kontak === 'string' ? JSON.parse(data.kontak) : data.kontak) : defaultData.kontak,
+          stats: data.stats ? (typeof data.stats === 'string' ? JSON.parse(data.stats) : data.stats) : defaultData.stats,
+          dokumentasi: data.dokumentasi ? (typeof data.dokumentasi === 'string' ? JSON.parse(data.dokumentasi) : data.dokumentasi) : defaultData.dokumentasi,
+          pelayanan: data.pelayanan ? (typeof data.pelayanan === 'string' ? JSON.parse(data.pelayanan) : data.pelayanan) : defaultData.pelayanan
+        };
+        setInfografisList(infografisList.map(d => d.id === activeId ? formatted : d));
+        if (activeId.startsWith("new-")) {
+          setActiveId(formatted.id);
+        }
+        toast.success("Data infografis berhasil disimpan!");
+      })
+      .catch((err: any) => {
+        console.error(err);
+        toast.error(err.message || "Gagal menyimpan data.");
+      });
   };
 
   const handleAddNew = () => {
@@ -141,18 +141,21 @@ export function ManageInfografis() {
         setDeleteModalOpen(false);
         setItemToDelete(null);
       } else {
-        fetch(`/api/infografis/${itemToDelete}`, { method: 'DELETE' })
-        .then(() => {
-          const updated = infografisList.filter(d => d.id !== itemToDelete);
-          setInfografisList(updated);
-          setActiveId(updated[0].id);
-          toast.success("Data berhasil dihapus dari database!");
-        })
-        .catch(err => console.error(err))
-        .finally(() => {
-          setDeleteModalOpen(false);
-          setItemToDelete(null);
-        });
+        api.delete(`/api/infografis/${itemToDelete}`)
+          .then(() => {
+            const updated = infografisList.filter(d => d.id !== itemToDelete);
+            setInfografisList(updated);
+            setActiveId(updated[0].id);
+            toast.success("Data berhasil dihapus dari database!");
+          })
+          .catch((err: any) => {
+            console.error(err);
+            toast.error(err.message || "Gagal menghapus data.");
+          })
+          .finally(() => {
+            setDeleteModalOpen(false);
+            setItemToDelete(null);
+          });
       }
     }
   };
@@ -350,10 +353,14 @@ export function ManageInfografis() {
                     )}
                     <input
                       type="file"
-                      accept="image/*"
+                      accept=".jpg,.jpeg,.png"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          if (file.size > 2 * 1024 * 1024) {
+                            toast.error("Ukuran file maksimal 2MB");
+                            return;
+                          }
                           const reader = new FileReader();
                           reader.onloadend = () => {
                             handleUpdateDokumentasi(idx, reader.result as string);

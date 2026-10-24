@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Save, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/config/api";
 
 interface BloodStock {
   id: string;
@@ -17,8 +18,8 @@ export function ManageStokDarah() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/stok-darahs')
-      .then(res => res.json())
+    api.get('/api/stok-darahs')
+      .then(d => d.data || d)
       .then(data => {
         // Filter hanya tipe darah A, B, O, AB
         const filtered = data.filter((item: any) => ['A', 'B', 'O', 'AB'].includes(item.type));
@@ -59,26 +60,16 @@ export function ManageStokDarah() {
       status: item.status,
     }));
 
-    const token = localStorage.getItem("admin_token");
-
-    fetch('/api/stok-darahs/bulk-update', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(updates),
-    })
-    .then(res => res.json())
-    .then(data => {
-      setBloodStock(data.map((item: any) => ({ ...item, id: item.id.toString() })));
-      toast.success("Stok darah berhasil diperbarui!");
-    })
-    .catch(err => {
-      console.error(err);
-      toast.error("Gagal menyimpan stok darah.");
-    });
+    api.post('/api/stok-darahs/bulk-update', updates)
+      .then(d => d.data || d)
+      .then(data => {
+        setBloodStock(data.map((item: any) => ({ ...item, id: item.id.toString() })));
+        toast.success("Stok darah berhasil diperbarui!");
+      })
+      .catch((err: any) => {
+        console.error(err);
+        toast.error(err.message || "Gagal menyimpan stok darah.");
+      });
   };
 
   const getStatusColor = (status: string) => {

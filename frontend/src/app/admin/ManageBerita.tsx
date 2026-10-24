@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Plus, Edit, Trash2, Save, X, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/config/api";
 
 interface News {
   id: string;
@@ -18,9 +19,13 @@ export function ManageBerita() {
   const [newsList, setNewsList] = useState<News[]>([]);
 
   useEffect(() => {
-    fetch('/api/beritas')
-      .then(res => res.json())
+    api.get('/api/beritas')
+      .then(d => d.data || d)
       .then(data => {
+        if (!Array.isArray(data)) {
+          console.error("Data is not an array:", data);
+          return;
+        }
         // Map data to match the frontend types (e.g. converting ID from number to string if needed)
         const formattedData = data.map((item: any) => ({
           ...item,
@@ -80,49 +85,44 @@ export function ManageBerita() {
 
   const handleSave = () => {
     const isEdit = !!editingId;
-    const url = isEdit ? `/api/beritas/${editingId}` : '/api/beritas';
-    const method = isEdit ? 'PUT' : 'POST';
-    const token = localStorage.getItem("admin_token");
+    const request = isEdit
+      ? api.put(`/api/beritas/${editingId}`, formData)
+      : api.post('/api/beritas', formData);
 
-    fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(formData)
-    })
-    .then(res => res.json())
-    .then(data => {
-      // Format data to match frontend requirements
-      const formattedData = {
-        ...data,
-        id: data.id.toString(),
-        published: Boolean(data.published)
-      };
+    request
+      .then(d => d.data || d)
+      .then(data => {
+        // Format data to match frontend requirements
+        const formattedData = {
+          ...data,
+          id: data.id?.toString() || "",
+          published: Boolean(data.published)
+        };
 
-      if (isEdit) {
-        setNewsList(newsList.map((n) => (n.id === editingId ? formattedData : n)));
-        toast.success("Berita berhasil diperbarui!");
-      } else {
-        setNewsList([formattedData, ...newsList]);
-        toast.success("Berita berhasil ditambahkan!");
-      }
-      
-      setEditingId(null);
-      setIsAdding(false);
-      setFormData({
-        title: "",
-        date: "",
-        category: "",
-        excerpt: "",
-        content: "",
-        image: "",
-        published: false,
+        if (isEdit) {
+          setNewsList(newsList.map((n) => (n.id === editingId ? formattedData : n)));
+          toast.success("Berita berhasil diperbarui!");
+        } else {
+          setNewsList([formattedData, ...newsList]);
+          toast.success("Berita berhasil ditambahkan!");
+        }
+        
+        setEditingId(null);
+        setIsAdding(false);
+        setFormData({
+          title: "",
+          date: "",
+          category: "",
+          excerpt: "",
+          content: "",
+          image: "",
+          published: false,
+        });
+      })
+      .catch((err: any) => {
+        console.error(err);
+        toast.error(err.message || "Gagal menyimpan data");
       });
-    })
-    .catch(err => console.error(err));
   };
 
   const handleDelete = (id: string) => {
@@ -132,22 +132,19 @@ export function ManageBerita() {
 
   const confirmDelete = () => {
     if (itemToDelete) {
-      const token = localStorage.getItem("admin_token");
-      fetch(`/api/beritas/${itemToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      .then(() => {
-        setNewsList(newsList.filter((n) => n.id !== itemToDelete));
-        toast.success("Berita berhasil dihapus!");
-      })
-      .catch(err => console.error(err))
-      .finally(() => {
-        setDeleteModalOpen(false);
-        setItemToDelete(null);
-      });
+      api.delete(`/api/beritas/${itemToDelete}`)
+        .then(() => {
+          setNewsList(newsList.filter((n) => n.id !== itemToDelete));
+          toast.success("Berita berhasil dihapus!");
+        })
+        .catch((err: any) => {
+          console.error(err);
+          toast.error(err.message || "Gagal menghapus berita");
+        })
+        .finally(() => {
+          setDeleteModalOpen(false);
+          setItemToDelete(null);
+        });
     }
   };
 
@@ -270,10 +267,14 @@ export function ManageBerita() {
                   <div className="relative group/upload">
                     <input
                       type="file"
-                      accept="image/*"
+                      accept=".jpg,.jpeg,.png"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          if (file.size > 2 * 1024 * 1024) {
+                            toast.error("Ukuran file maksimal 2MB");
+                            return;
+                          }
                           const reader = new FileReader();
                           reader.onloadend = () => {
                             setFormData({ ...formData, image: reader.result as string });

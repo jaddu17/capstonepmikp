@@ -10,7 +10,7 @@ class BeritaController extends Controller
 {
     public function index()
     {
-        return Berita::all();
+        return Berita::orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function store(Request $request)
@@ -21,11 +21,16 @@ class BeritaController extends Controller
             'category' => 'nullable|string',
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
-            'image' => 'nullable|string',
+            'image' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
             'published' => 'boolean',
         ]);
 
         $berita = Berita::create($validated);
+
+        if ($berita->published ?? true) {
+            \App\Services\FonnteService::notifyNewBerita($berita);
+        }
+
         return response()->json($berita, 201);
     }
 
@@ -42,7 +47,7 @@ class BeritaController extends Controller
             'category' => 'nullable|string',
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
-            'image' => 'nullable|string',
+            'image' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
             'published' => 'boolean',
         ]);
 

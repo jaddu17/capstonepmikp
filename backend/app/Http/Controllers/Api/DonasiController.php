@@ -10,7 +10,7 @@ class DonasiController extends Controller
 {
     public function index()
     {
-        return Donasi::orderBy('created_at', 'desc')->get();
+        return Donasi::orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function store(Request $request)
@@ -19,7 +19,7 @@ class DonasiController extends Controller
             'nama' => 'nullable|string|max:255',
             'wa' => 'nullable|string|max:20',
             'keterangan' => 'nullable|string',
-            'proof' => 'nullable|string',
+            'proof' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
             'date' => 'required|string',
             'status' => 'nullable|string',
         ]);
@@ -43,7 +43,7 @@ class DonasiController extends Controller
             'nama' => 'sometimes|nullable|string|max:255',
             'wa' => 'sometimes|nullable|string|max:20',
             'keterangan' => 'nullable|string',
-            'proof' => 'nullable|string',
+            'proof' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
             'date' => 'sometimes|required|string',
             'status' => 'sometimes|required|string',
         ]);

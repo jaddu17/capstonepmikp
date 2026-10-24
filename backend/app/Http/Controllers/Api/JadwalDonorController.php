@@ -10,7 +10,7 @@ class JadwalDonorController extends Controller
 {
     public function index()
     {
-        return JadwalDonor::orderBy('created_at', 'asc')->get();
+        return JadwalDonor::orderBy('created_at', 'asc')->paginate(10);
     }
 
     public function store(Request $request)
@@ -36,6 +36,9 @@ class JadwalDonorController extends Controller
         ], $messages);
 
         $jadwal = JadwalDonor::create($validated);
+
+        \App\Services\FonnteService::notifyNewJadwal($jadwal);
+
         return response()->json($jadwal, 201);
     }
 

@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Phone, MessageCircle, Activity, Shield, Flame, Wind, Heart, Home, Camera, Info } from "lucide-react";
+import { api } from "@/config/api";
+
 export function Infografis() {
   const [infografisList, setInfografisList] = useState<any[]>([]);
   const [activeData, setActiveData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/infografis')
-      .then(res => res.json())
+    api.get('/api/infografis')
+      .then(d => d.data || d)
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           setInfografisList(data);

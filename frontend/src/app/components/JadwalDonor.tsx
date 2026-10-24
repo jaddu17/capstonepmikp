@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Calendar, MapPin, Clock } from "lucide-react";
+import { api } from "@/config/api";
 
 interface Schedule {
   id: string;
@@ -14,8 +15,8 @@ export function JadwalDonor() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
 
   useEffect(() => {
-    fetch('/api/jadwal-donors')
-      .then(res => res.json())
+    api.get('/api/jadwal-donors')
+      .then(d => d.data || d)
       .then(data => {
         if (Array.isArray(data)) {
           setSchedules(data);
