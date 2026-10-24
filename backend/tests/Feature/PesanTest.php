@@ -18,8 +18,6 @@ class PesanTest extends TestCase
             'name' => 'Ahmad Fauzi',
             'email' => 'ahmad@gmail.com',
             'phone' => '085712345678',
-            'type' => 'Pertanyaan',
-            'subject' => 'Info Pelayanan Ambulans',
             'message' => 'Apakah layanan ambulans PMI KP buka 24 jam?',
             'date' => '24 Oktober 2026',
         ];
@@ -29,7 +27,8 @@ class PesanTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonFragment([
                 'name' => 'Ahmad Fauzi',
-                'subject' => 'Info Pelayanan Ambulans',
+                'email' => 'ahmad@gmail.com',
+                'message' => 'Apakah layanan ambulans PMI KP buka 24 jam?',
             ]);
 
         $this->assertDatabaseHas('pesans', [
@@ -39,11 +38,11 @@ class PesanTest extends TestCase
 
     public function test_message_validation_requires_mandatory_fields(): void
     {
-        // Name, email, subject, message wajib diisi
+        // Name, email, message wajib diisi
         $response = $this->postJson('/api/pesans', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['name', 'email', 'subject', 'message']);
+            ->assertJsonValidationErrors(['name', 'email', 'message']);
     }
 
     public function test_admin_can_read_and_reply_message(): void
@@ -59,7 +58,6 @@ class PesanTest extends TestCase
         $pesan = Pesan::create([
             'name' => 'Rina',
             'email' => 'rina@gmail.com',
-            'subject' => 'Donor darah',
             'message' => 'Kapan ada donor di Sentolo?',
             'read' => false,
             'replied' => false,
@@ -97,7 +95,6 @@ class PesanTest extends TestCase
         $pesan = Pesan::create([
             'name' => 'Spam',
             'email' => 'spam@test.com',
-            'subject' => 'Spam message',
             'message' => 'Promo...',
         ]);
 
@@ -115,7 +112,6 @@ class PesanTest extends TestCase
         $pesan = Pesan::create([
             'name' => 'Pengguna',
             'email' => 'user@gmail.com',
-            'subject' => 'Pesan Masuk',
             'message' => 'Halo',
         ]);
 
