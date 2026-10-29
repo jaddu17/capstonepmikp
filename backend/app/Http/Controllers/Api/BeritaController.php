@@ -29,6 +29,7 @@ class BeritaController extends Controller
 
         if ($berita->published ?? true) {
             \App\Services\FonnteService::notifyNewBerita($berita);
+            \App\Services\InstagramService::notifyNewBerita($berita);
         }
 
         return response()->json($berita, 201);

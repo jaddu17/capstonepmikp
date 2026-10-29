@@ -104,7 +104,7 @@ export function ManageBerita() {
           toast.success("Berita berhasil diperbarui!");
         } else {
           setNewsList([formattedData, ...newsList]);
-          toast.success("Berita berhasil ditambahkan!");
+          toast.success("Berita berhasil ditambahkan & disinkronkan ke WhatsApp & Instagram!");
         }
         
         setEditingId(null);
@@ -306,6 +306,9 @@ export function ManageBerita() {
               <label htmlFor="published" className="text-sm font-medium">
                 Publikasikan berita
               </label>
+            </div>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-800">
+              <span className="font-bold">Otomatisasi Multi-Channel:</span> Saat berita dipublikasikan, sistem otomatis mempublikasikan pembaruan ke <strong>Grup WhatsApp PMI</strong> dan postingan feed <strong>Instagram resmi</strong> via API.
             </div>
           </div>
           <div className="flex gap-3 mt-4">

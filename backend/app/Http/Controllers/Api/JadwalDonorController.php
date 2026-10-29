@@ -38,6 +38,7 @@ class JadwalDonorController extends Controller
         $jadwal = JadwalDonor::create($validated);
 
         \App\Services\FonnteService::notifyNewJadwal($jadwal);
+        \App\Services\InstagramService::notifyNewJadwal($jadwal);
 
         return response()->json($jadwal, 201);
     }

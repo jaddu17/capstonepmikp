@@ -74,7 +74,7 @@ export function ManageJadwal() {
           setEditingId(null);
         } else {
           setSchedules([...schedules, formatted]);
-          toast.success("Jadwal berhasil ditambahkan!");
+          toast.success("Jadwal berhasil ditambahkan & disinkronkan ke WhatsApp & Instagram!");
           setIsAdding(false);
         }
         setFormData({ date: "", day: "", location: "", time: "", quota: "" });
