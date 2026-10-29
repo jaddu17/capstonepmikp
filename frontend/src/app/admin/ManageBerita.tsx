@@ -3,7 +3,7 @@ import { DashboardLayout } from "./DashboardLayout";
 import { Plus, Edit, Trash2, Save, X, Eye, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/config/api";
-import { Pagination } from "../components/ui/Pagination";
+import { Pagination } from "../components/ui/pagination";
 
 interface News {
   id: string;

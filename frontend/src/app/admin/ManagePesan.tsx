@@ -3,7 +3,7 @@ import { DashboardLayout } from "./DashboardLayout";
 import { Mail, Trash2, MessageCircle, Send, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/config/api";
-import { Pagination } from "../components/ui/Pagination";
+import { Pagination } from "../components/ui/pagination";
 
 interface Message {
   id: string;

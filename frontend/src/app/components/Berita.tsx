@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Calendar, ArrowRight, X, Clock, Tag, Share2, Loader2, AlertCircle } from "lucide-react";
 import { api } from "@/config/api";
-import { Pagination } from "./ui/Pagination";
+import { Pagination } from "./ui/pagination";
 
 interface NewsItem {
   id?: string;

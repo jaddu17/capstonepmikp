@@ -3,7 +3,7 @@ import { DashboardLayout } from "./DashboardLayout";
 import { Trash2, Calendar, Upload, X, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/config/api";
-import { Pagination } from "../components/ui/Pagination";
+import { Pagination } from "../components/ui/pagination";
 
 interface Donation {
   id: string;
