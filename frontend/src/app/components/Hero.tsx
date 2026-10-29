@@ -1,6 +1,7 @@
 import { Heart, Droplet, Users, TrendingUp, PhoneCall } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CuacaBadge } from "./CuacaBadge";
+import { SITE_CONFIG } from "@/config/site";
 
 export function Hero() {
   const stats = [
@@ -60,7 +61,7 @@ export function Hero() {
             
             {/* WhatsApp */}
             <a
-              href="https://wa.me/6282133403011"
+              href={SITE_CONFIG.whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white text-[#C21219] px-6 py-3.5 rounded-2xl font-black shadow-xl hover:scale-105 hover:bg-red-50 transition-all flex items-center gap-3 border-b-4 border-red-200 group animate-in slide-in-from-bottom-4 delay-75"
@@ -70,7 +71,7 @@ export function Hero() {
               </div>
               <div className="text-left">
                 <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">WhatsApp Admin</div>
-                <div className="text-xl leading-none">0821-3340-3011</div>
+                <div className="text-xl leading-none">{SITE_CONFIG.whatsapp}</div>
               </div>
             </a>
           </div>

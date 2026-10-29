@@ -45,6 +45,18 @@ class PesanTest extends TestCase
             ->assertJsonValidationErrors(['name', 'email', 'message']);
     }
 
+    public function test_pesan_rejects_invalid_email_format(): void
+    {
+        $response = $this->postJson('/api/pesans', [
+            'name' => 'Budi',
+            'email' => 'bukan-email',
+            'message' => 'Halo halo',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+    }
+
     public function test_admin_can_read_and_reply_message(): void
     {
         $admin = User::create([

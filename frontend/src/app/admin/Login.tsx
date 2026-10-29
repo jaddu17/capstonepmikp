@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Lock, User } from "lucide-react";
 import { api } from "@/config/api";
 
@@ -86,9 +86,9 @@ export function Login() {
         </form>
 
         <div className="mt-6 text-center">
-          <a href="/" className="text-sm text-primary hover:underline">
+          <Link to="/" className="text-sm text-primary hover:underline">
             ← Kembali ke Website
-          </a>
+          </Link>
         </div>
       </div>
     </div>

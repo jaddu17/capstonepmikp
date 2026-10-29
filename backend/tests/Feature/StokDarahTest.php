@@ -82,4 +82,16 @@ class StokDarahTest extends TestCase
         $response = $this->postJson('/api/stok-darahs/bulk-update', []);
         $response->assertStatus(401);
     }
+
+    public function test_daily_stok_notification_command_executes_successfully(): void
+    {
+        Http::fake();
+
+        StokDarah::create(['type' => 'A', 'wb' => 10, 'prc' => 15, 'tc' => 5, 'status' => 'STOK CUKUP']);
+
+        $this->artisan('notif:stok-harian')
+            ->expectsOutputToContain('Mengambil data stok darah terkini')
+            ->expectsOutputToContain('Notifikasi harian stok darah berhasil dijalankan')
+            ->assertExitCode(0);
+    }
 }

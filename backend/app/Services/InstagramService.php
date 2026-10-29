@@ -61,9 +61,12 @@ class InstagramService
                 $targetImageUrl = 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=1200&q=80';
             }
 
+            $verifySsl = filter_var(env('CURL_VERIFY_SSL', env('APP_ENV') === 'production'), FILTER_VALIDATE_BOOLEAN);
+            $client = $verifySsl ? Http::timeout(15) : Http::withoutVerifying()->timeout(15);
+
             // Step 1: Create Media Container
             $containerUrl = "https://graph.facebook.com/v20.0/{$accountId}/media";
-            $containerResponse = Http::withoutVerifying()->post($containerUrl, [
+            $containerResponse = $client->post($containerUrl, [
                 'image_url' => $targetImageUrl,
                 'caption' => $caption,
                 'access_token' => $accessToken,
@@ -81,7 +84,7 @@ class InstagramService
 
             // Step 2: Publish Media Container
             $publishUrl = "https://graph.facebook.com/v20.0/{$accountId}/media_publish";
-            $publishResponse = Http::withoutVerifying()->post($publishUrl, [
+            $publishResponse = $client->post($publishUrl, [
                 'creation_id' => $containerId,
                 'access_token' => $accessToken,
             ]);

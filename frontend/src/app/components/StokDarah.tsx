@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Droplet, AlertCircle, Calendar } from "lucide-react";
 import { api } from "@/config/api";
 
@@ -129,13 +130,13 @@ export function StokDarah() {
               <p className="text-red-800 mb-4">
                 Beberapa stok darah sedang menipis (Stok Kurang). Kami sangat membutuhkan partisipasi donor Anda untuk membantu sesama.
               </p>
-              <a
-                href="/info-donor"
+              <Link
+                to="/info-donor"
                 className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors"
               >
                 Lihat Syarat & Cara Donor
                 <AlertCircle className="w-4 h-4" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>

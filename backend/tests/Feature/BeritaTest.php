@@ -178,4 +178,25 @@ class BeritaTest extends TestCase
         $responseDelete = $this->deleteJson("/api/beritas/{$berita->id}");
         $responseDelete->assertStatus(401);
     }
+
+    public function test_public_cannot_view_draft_news(): void
+    {
+        // Berita terbit
+        Berita::create([
+            'title' => 'Berita Terbit Publik',
+            'published' => true,
+        ]);
+
+        // Berita draft (belum dipublikasikan)
+        Berita::create([
+            'title' => 'Berita Rahasia Masih Draft',
+            'published' => false,
+        ]);
+
+        $response = $this->getJson('/api/beritas');
+
+        $response->assertStatus(200);
+        $this->assertEquals(1, $response->json('total'));
+        $this->assertEquals('Berita Terbit Publik', $response->json('data')[0]['title']);
+    }
 }

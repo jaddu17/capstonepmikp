@@ -23,7 +23,7 @@ class InfografisController extends Controller
             'tahun' => 'required|string',
             'kontak' => 'nullable|array',
             'stats' => 'nullable|array',
-            'dokumentasi' => 'nullable|array',
+            'dokumentasi' => 'nullable|array|max:8',
             'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
             'pelayanan' => 'nullable|array',
             'quote' => 'nullable|string',

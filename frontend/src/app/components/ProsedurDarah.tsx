@@ -1,4 +1,5 @@
 import { ClipboardCheck, FileText, Smartphone, Truck, MessageCircle } from "lucide-react";
+import { SITE_CONFIG } from "@/config/site";
 
 export function ProsedurDarah() {
   const steps = [
@@ -30,7 +31,7 @@ export function ProsedurDarah() {
 
   const handleWhatsApp = () => {
     const message = "Halo Admin PMI Kulon Progo, saya ingin menanyakan prosedur/permintaan stok darah untuk pasien...";
-    window.open(`https://wa.me/6281328861118?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(`https://wa.me/${SITE_CONFIG.whatsappRaw}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
   return (

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
-import { Mail, Trash2, MessageCircle, Send } from "lucide-react";
+import { Mail, Trash2, MessageCircle, Send, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/config/api";
+import { Pagination } from "../components/ui/Pagination";
 
 interface Message {
   id: string;
@@ -19,17 +20,26 @@ interface Message {
 export function ManagePesan() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
   const [replyContent, setReplyContent] = useState("");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    api.get('/api/pesans')
-      .then(d => d.data || d)
-      .then(data => {
-        setMessages(data.map((item: any) => ({
+  const fetchMessages = (page = 1) => {
+    setLoading(true);
+    setFetchError("");
+    api.get(`/api/pesans?page=${page}`)
+      .then(res => {
+        const items = res.data || (Array.isArray(res) ? res : []);
+        setTotalPages(res.last_page || 1);
+        setTotalItems(res.total || items.length);
+        setCurrentPage(res.current_page || page);
+        setMessages(items.map((item: any) => ({
           ...item,
           id: item.id.toString(),
           read: Boolean(item.read),
@@ -39,8 +49,13 @@ export function ManagePesan() {
       })
       .catch(err => {
         console.error("Error fetching pesans:", err);
+        setFetchError("Gagal memuat pesan masuk. Silakan periksa koneksi.");
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchMessages(1);
   }, []);
 
   const handleDelete = (id: string) => {
@@ -149,34 +164,58 @@ export function ManagePesan() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] pr-2">
-          {loading ? (
-            <div className="text-center py-12 text-muted-foreground">Memuat pesan...</div>
-          ) : filteredMessages.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">Tidak ada pesan.</div>
-          ) : filteredMessages.map(message => (
-            <div
-              key={message.id}
-              onClick={() => handleRead(message)}
-              className={`bg-white rounded-3xl border-2 p-5 cursor-pointer transition-all relative group ${
-                selectedMessage?.id === message.id ? "border-primary shadow-2xl" : "border-gray-50 shadow-sm hover:border-gray-200"
-              } ${!message.read ? "bg-red-50/20" : ""}`}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`font-black text-sm ${!message.read ? "text-primary" : "text-gray-800"}`}>{message.name}</span>
-                    {message.replied && <span className="bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">REPLIED</span>}
-                  </div>
-                </div>
-                <button onClick={e => { e.stopPropagation(); handleDelete(message.id); }} className="p-2 hover:bg-red-50 text-red-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Trash2 className="w-4 h-4" />
+        <div className="lg:col-span-1 space-y-4">
+          <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-380px)] pr-2">
+            {loading ? (
+              <div className="text-center py-16 text-muted-foreground flex flex-col items-center justify-center gap-2">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                <span className="text-sm">Memuat pesan...</span>
+              </div>
+            ) : fetchError ? (
+              <div className="text-center py-12 text-red-600 flex flex-col items-center justify-center gap-2">
+                <AlertCircle className="w-6 h-6" />
+                <span className="text-sm font-medium">{fetchError}</span>
+                <button
+                  onClick={() => fetchMessages(currentPage)}
+                  className="mt-2 text-xs bg-red-100 text-red-800 px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors font-semibold"
+                >
+                  Coba Lagi
                 </button>
               </div>
-              <div className="text-sm font-bold text-gray-600 mb-2 line-clamp-1">{message.message}</div>
-              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{message.date}</div>
-            </div>
-          ))}
+            ) : filteredMessages.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground text-sm">Tidak ada pesan.</div>
+            ) : filteredMessages.map(message => (
+              <div
+                key={message.id}
+                onClick={() => handleRead(message)}
+                className={`bg-white rounded-3xl border-2 p-5 cursor-pointer transition-all relative group ${
+                  selectedMessage?.id === message.id ? "border-primary shadow-2xl" : "border-gray-50 shadow-sm hover:border-gray-200"
+                } ${!message.read ? "bg-red-50/20" : ""}`}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`font-black text-sm ${!message.read ? "text-primary" : "text-gray-800"}`}>{message.name}</span>
+                      {message.replied && <span className="bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">REPLIED</span>}
+                    </div>
+                  </div>
+                  <button onClick={e => { e.stopPropagation(); handleDelete(message.id); }} className="p-2 hover:bg-red-50 text-red-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="text-sm font-bold text-gray-600 mb-2 line-clamp-1">{message.message}</div>
+                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{message.date}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            lastPage={totalPages}
+            total={totalItems}
+            onPageChange={fetchMessages}
+          />
         </div>
 
         <div className="lg:col-span-2">

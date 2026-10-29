@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Wallet, CreditCard, Landmark, ArrowRight, Heart, User, Phone, MessageSquare, CheckCircle2, Upload, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/config/api";
@@ -215,12 +216,12 @@ export function Donasi() {
                 Silakan hubungi markas kami untuk koordinasi lebih lanjut.
               </p>
             </div>
-            <a 
-              href="/kontak"
+            <Link 
+              to="/kontak"
               className="bg-primary text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-[#C21219] transition-all shadow-lg hover:shadow-primary/20 whitespace-nowrap"
             >
               Hubungi Markas
-            </a>
+            </Link>
           </div>
           
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl transition-transform group-hover:scale-110"></div>

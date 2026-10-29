@@ -16,15 +16,19 @@ class PesanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string',
-            'phone' => 'nullable|string',
-            'message' => 'required|string',
-            'date' => 'nullable|string',
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|max:25',
+            'message' => 'required|string|max:5000',
+            'date' => 'nullable|string|max:50',
             'read' => 'boolean',
             'replied' => 'boolean',
             'reply_text' => 'nullable|string',
         ]);
+
+        // Masking / Sanitasi input untuk mencegah XSS & karakter berbahaya (SOP Poin 1)
+        $validated['name'] = strip_tags($validated['name']);
+        $validated['message'] = strip_tags($validated['message']);
 
         $pesan = Pesan::create($validated);
         return response()->json($pesan, 201);

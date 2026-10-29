@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
-import { Trash2, Calendar, Upload, X } from "lucide-react";
+import { Trash2, Calendar, Upload, X, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/config/api";
+import { Pagination } from "../components/ui/Pagination";
 
 interface Donation {
   id: string;
@@ -17,25 +18,35 @@ interface Donation {
 export function ManageDonasi() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [selectedProof, setSelectedProof] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    api.get('/api/donasis')
-      .then(d => d.data || d)
-      .then(data => {
-        if (Array.isArray(data)) {
-          setDonations(data.map((item: any) => ({ ...item, id: item.id.toString() })));
-        } else {
-          console.error("Invalid data format:", data);
-        }
+  const fetchDonations = (page = 1) => {
+    setLoading(true);
+    setFetchError("");
+    api.get(`/api/donasis?page=${page}`)
+      .then(res => {
+        const items = res.data || (Array.isArray(res) ? res : []);
+        setTotalPages(res.last_page || 1);
+        setTotalItems(res.total || items.length);
+        setCurrentPage(res.current_page || page);
+        setDonations(items.map((item: any) => ({ ...item, id: item.id.toString() })));
         setLoading(false);
       })
       .catch(err => {
         console.error("Error fetching donasi:", err);
+        setFetchError("Gagal memuat data donasi masuk. Silakan periksa koneksi.");
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchDonations(1);
   }, []);
 
   const handleDelete = (id: string) => {
@@ -110,10 +121,32 @@ export function ManageDonasi() {
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
-                <tr><td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">Memuat data donasi...</td></tr>
+                <tr>
+                  <td colSpan={7} className="px-6 py-16 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                      <span className="text-sm">Memuat data donasi...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : fetchError ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center text-red-600">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <AlertCircle className="w-6 h-6" />
+                      <span className="text-sm font-medium">{fetchError}</span>
+                      <button
+                        onClick={() => fetchDonations(currentPage)}
+                        className="mt-2 text-xs bg-red-100 text-red-800 px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors font-semibold"
+                      >
+                        Coba Lagi
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               ) : donations.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground text-sm">
                     Belum ada data donasi masuk.
                   </td>
                 </tr>
@@ -173,6 +206,14 @@ export function ManageDonasi() {
               )}
             </tbody>
           </table>
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            lastPage={totalPages}
+            total={totalItems}
+            onPageChange={fetchDonations}
+          />
         </div>
       </div>
 

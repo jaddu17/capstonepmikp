@@ -1,58 +1,133 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Informasi & Pelayanan Publik PMI Kabupaten Kulon Progo
+### Capstone Project - Teknologi Informasi
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web terintegrasi untuk pelayanan publik, pemantauan stok darah, jadwal mobile unit donor darah, publikasi kegiatan kemanusiaan, serta laporan donasi masyarakat pada Palang Merah Indonesia (PMI) Kabupaten Kulon Progo.
 
-## About Laravel
+Aplikasi ini dibangun dengan pemisahan tegas antara **Presentation Layer (Frontend: React + Vite)** dan **Business Logic/Data Access Layer (Backend: Laravel 11 REST API)**, serta mematuhi seluruh **Standar Operasional Prosedur (SOP) Capstone Project**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. **Dashboard & Manajemen Pelayanan Admin:**
+   - **Kelola Berita & Publikasi:** CRUD berita kemanusiaan dan edukasi donor.
+   - **Kelola Stok Darah:** Pembaruan jumlah kantong darah (WB, PRC, TC) untuk golongan darah A, B, O, dan AB.
+   - **Kelola Jadwal Mobile Unit:** Publikasi lokasi, waktu, dan kuota donor darah.
+   - **Laporan Donasi Masuk:** Verifikasi bukti transfer donasi masyarakat.
+   - **Pesan Masuk & Respon:** Komunikasi dua arah dengan masyarakat melalui email & WhatsApp langsung.
+   - **Infografis Bulanan:** Rekap visual capaian pelayanan dan dokumentasi kegiatan.
+2. **Portal Informasi Publik:**
+   - Cek stok darah terkini secara real-time.
+   - Informasi persyaratan donor darah & edukasi kemanusiaan.
+   - Form donasi online dengan upload bukti transfer.
+   - Form kontak pengaduan/pertanyaan langsung ke PMI.
+3. **Otomatisasi Multi-Channel (Integrasi API WhatsApp & Instagram):**
+   - **WhatsApp Gateway (Fonnte API):** Broadcast otomatis ke Grup WhatsApp PMI Kulon Progo saat ada Berita Baru, Jadwal Donor Baru, dan Perubahan Stok Darah.
+   - **Instagram Meta Graph API:** Publikasi otomatis ke Feed Instagram PMI Kulon Progo saat ada publikasi baru.
+   - **Scheduler Harian (`notif:stok-harian`):** Pengiriman rekap ketersediaan kantong darah harian setiap pukul 07:00 WIB.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🛡️ Kepatuhan Standar Operasional Prosedur (SOP)
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Poin SOP | Ketentuan | Implementasi di Sistem |
+| :--- | :--- | :--- |
+| **SOP 1 & 6** | Keamanan & Mitigasi Serangan | Rate limiter `throttle:5,1` pada login, hashing password `bcrypt`, sanitasi input `strip_tags`, validasi eksplisit `email`, proteksi route otorisasi `auth:sanctum`. |
+| **SOP 1** | Pembatasan File Upload | Pembatasan ekstensi `.jpg, .jpeg, .png`, ukuran maksimal `2MB` (`Base64ImageRule`), dan pembatasan jumlah file maksimal 8. |
+| **SOP 2** | User Interface & Responsivitas | Responsive design mobile, tablet, desktop menggunakan TailwindCSS. Terdapat `loading state` (spinner) dan `error state` (alert retry). |
+| **SOP 3** | Clean Code & Subdirectory | Routing dengan `basename` dinamis, `base: './'` pada Vite, tanpa `<a>` hardcoded, konstanta kontak terpusat di `src/config/site.ts`. |
+| **SOP 4** | Manajemen API & Environment | Panggilan API terpusat di `api.ts`, seluruh credential (Fonnte Token, Meta Token, DB Password) disimpan di `.env`. |
+| **SOP 5** | Database & Query Pagination | Seluruh pengambilan data menggunakan `->paginate(10)`. Frontend dilengkapi kontrol pagination navigasi halaman. |
+| **SOP 7** | Automated Testing | 8 Test Suite lengkap (`36 feature tests`, `124 assertions`) 100% lulus uji regresi otomatis. |
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## 🛠️ Tech Stack
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- **Backend:** PHP 8.2+, Laravel 11, Laravel Sanctum, SQLite (Testing) / MySQL (Production).
+- **Frontend:** TypeScript, React 19, Vite 6, TailwindCSS, Lucide React, Sonner Toast.
+- **Third-Party APIs:** Fonnte WhatsApp API Gateway, Meta Instagram Graph API v20.0, Open-Meteo Weather API.
 
+---
+
+## 💻 Panduan Instalasi & Menjalankan Lokal
+
+### 1. Prasyarat Sistem
+- PHP >= 8.2 & Composer
+- Node.js >= 18.x & pnpm / npm
+- MySQL Server (XAMPP / Laragon / Native)
+
+### 2. Konfigurasi Backend (Laravel)
 ```bash
-composer require laravel/boost --dev
+# Masuk ke folder backend
+cd backend
 
-php artisan boost:install
+# Salin konfigurasi environment
+cp .env.example .env
+
+# Pasang dependencies
+composer install
+
+# Buat Application Key
+php artisan key:generate
+
+# Jalankan migrasi dan seeder database
+php artisan migrate --seed
+
+# Jalankan server backend (Port 8000)
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 3. Konfigurasi Frontend (React + Vite)
+```bash
+# Buka terminal baru dan masuk ke folder frontend
+cd frontend
 
-## Contributing
+# Salin konfigurasi environment (opsional untuk dev)
+cp .env.example .env
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Pasang dependencies
+pnpm install # atau npm install
 
-## Code of Conduct
+# Jalankan development server (Port 5173)
+pnpm run dev # atau npm run dev
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Buka browser di: **`http://localhost:5173`**
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🔑 Akun Demo Administrator
 
-## License
+- **URL Login Admin:** `http://localhost:5173/admin/login`
+- **Username:** `admin`
+- **Password:** `pmi2026`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## 🧪 Menjalankan Automated Testing
+
+Untuk memverifikasi integritas seluruh fitur dan kepatuhan SOP Keamanan & Database:
+```bash
+cd backend
+php artisan test
+```
+*Hasil: 36 Tests, 124 Assertions, 100% PASSED.*
+
+---
+
+## ⏰ Menjalankan Scheduler Notifikasi Harian Manual
+
+Untuk menguji rekap stok darah harian ke WhatsApp & Instagram:
+```bash
+cd backend
+php artisan notif:stok-harian
+```
+
+---
+
+## 👥 Tim Pengembang & Hak Cipta
+
+- **Institusi:** Program Studi Teknologi Informasi, Universitas Muhammadiyah Yogyakarta
+- **Mitra:** Palang Merah Indonesia (PMI) Kabupaten Kulon Progo
+- **Tahun:** 2026

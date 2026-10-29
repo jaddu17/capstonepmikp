@@ -29,9 +29,10 @@ class FonnteService
         }
 
         try {
-            $response = Http::withoutVerifying()->withHeaders([
-                'Authorization' => $token,
-            ])->timeout(10)->post($endpoint, [
+            $verifySsl = filter_var(env('CURL_VERIFY_SSL', env('APP_ENV') === 'production'), FILTER_VALIDATE_BOOLEAN);
+            $client = $verifySsl ? Http::withHeaders(['Authorization' => $token]) : Http::withoutVerifying()->withHeaders(['Authorization' => $token]);
+
+            $response = $client->timeout(10)->post($endpoint, [
                 'target' => $target,
                 'message' => $message,
                 'countryCode' => '62',

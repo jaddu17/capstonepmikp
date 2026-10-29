@@ -113,4 +113,19 @@ class DonasiTest extends TestCase
         $response = $this->getJson('/api/donasis');
         $response->assertStatus(401);
     }
+
+    public function test_guest_cannot_update_donation_status(): void
+    {
+        $donasi = Donasi::create([
+            'nama' => 'Hamba Allah',
+            'date' => '24 Oktober 2026',
+            'status' => 'Sudah Bayar',
+        ]);
+
+        // Tamu tanpa login tidak boleh merubah status donasi (Keamanan Poin 1 & 6)
+        $response = $this->putJson("/api/donasis/{$donasi->id}", [
+            'status' => 'Selesai',
+        ]);
+        $response->assertStatus(401);
+    }
 }

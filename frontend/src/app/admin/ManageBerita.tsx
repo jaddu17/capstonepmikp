@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
-import { Plus, Edit, Trash2, Save, X, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, Save, X, Eye, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/config/api";
+import { Pagination } from "../components/ui/Pagination";
 
 interface News {
   id: string;
@@ -17,24 +18,37 @@ interface News {
 
 export function ManageBerita() {
   const [newsList, setNewsList] = useState<News[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
 
-  useEffect(() => {
-    api.get('/api/beritas')
-      .then(d => d.data || d)
-      .then(data => {
-        if (!Array.isArray(data)) {
-          console.error("Data is not an array:", data);
-          return;
-        }
-        // Map data to match the frontend types (e.g. converting ID from number to string if needed)
-        const formattedData = data.map((item: any) => ({
+  const fetchNews = (page = 1) => {
+    setLoading(true);
+    setFetchError("");
+    api.get(`/api/beritas?page=${page}`)
+      .then(res => {
+        const items = res.data || (Array.isArray(res) ? res : []);
+        setTotalPages(res.last_page || 1);
+        setTotalItems(res.total || items.length);
+        setCurrentPage(res.current_page || page);
+        setNewsList(items.map((item: any) => ({
           ...item,
           id: item.id.toString(),
           published: Boolean(item.published)
-        }));
-        setNewsList(formattedData);
+        })));
+        setLoading(false);
       })
-      .catch(err => console.error("Error fetching beritas:", err));
+      .catch(err => {
+        console.error("Error fetching beritas:", err);
+        setFetchError("Gagal memuat data berita. Silakan periksa koneksi.");
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchNews(1);
   }, []);
 
   const [isAdding, setIsAdding] = useState(false);
@@ -339,52 +353,82 @@ export function ManageBerita() {
           <div className="col-span-1 text-center">Aksi</div>
         </div>
         
-        {/* Rows */}
-        {newsList.map((news, index) => (
-          <div
-            key={news.id}
-            className={`grid grid-cols-12 gap-4 p-4 items-start ${
-              index < newsList.length - 1 ? 'border-b border-border' : ''
-            } hover:bg-gray-50 transition-colors`}
-          >
-            <div className="col-span-4">
-              <h3 className="font-semibold text-sm">{news.title}</h3>
-            </div>
-            <div className="col-span-5">
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {news.excerpt}
-              </p>
-            </div>
-            <div className="col-span-2">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    news.published ? "bg-green-500" : "bg-gray-400"
-                  }`}
-                ></div>
-                <span className="text-xs font-medium">
-                  {news.published ? "Published" : "Draft"}
-                </span>
+        {/* Table Content */}
+        {loading ? (
+          <div className="py-16 text-center text-muted-foreground flex flex-col items-center justify-center gap-2">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            <span className="text-sm">Memuat data berita...</span>
+          </div>
+        ) : fetchError ? (
+          <div className="py-12 px-4 text-center text-red-600 flex flex-col items-center justify-center gap-2">
+            <AlertCircle className="w-6 h-6" />
+            <span className="text-sm font-medium">{fetchError}</span>
+            <button
+              onClick={() => fetchNews(currentPage)}
+              className="mt-2 text-xs bg-red-100 text-red-800 px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors font-semibold"
+            >
+              Coba Lagi
+            </button>
+          </div>
+        ) : newsList.length === 0 ? (
+          <div className="py-16 text-center text-muted-foreground text-sm">
+            Belum ada berita yang tersedia.
+          </div>
+        ) : (
+          newsList.map((news, index) => (
+            <div
+              key={news.id}
+              className={`grid grid-cols-12 gap-4 p-4 items-start ${
+                index < newsList.length - 1 ? 'border-b border-border' : ''
+              } hover:bg-gray-50 transition-colors`}
+            >
+              <div className="col-span-4">
+                <h3 className="font-semibold text-sm">{news.title}</h3>
+              </div>
+              <div className="col-span-5">
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {news.excerpt}
+                </p>
+              </div>
+              <div className="col-span-2">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      news.published ? "bg-green-500" : "bg-gray-400"
+                    }`}
+                  ></div>
+                  <span className="text-xs font-medium">
+                    {news.published ? "Published" : "Draft"}
+                  </span>
+                </div>
+              </div>
+              <div className="col-span-1 flex justify-center gap-1">
+                <button
+                  onClick={() => handleEdit(news)}
+                  className="text-blue-600 hover:text-blue-800 p-1.5 rounded hover:bg-blue-50 transition-colors"
+                  title="Review / Edit berita"
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDelete(news.id)}
+                  className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 transition-colors"
+                  title="Hapus berita"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             </div>
-            <div className="col-span-1 flex justify-center gap-1">
-              <button
-                onClick={() => handleEdit(news)}
-                className="text-blue-600 hover:text-blue-800 p-1.5 rounded hover:bg-blue-50 transition-colors"
-                title="Review / Edit berita"
-              >
-                <Eye className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleDelete(news.id)}
-                className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 transition-colors"
-                title="Hapus berita"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
+
+        {/* Pagination Controls */}
+        <Pagination
+          currentPage={currentPage}
+          lastPage={totalPages}
+          total={totalItems}
+          onPageChange={fetchNews}
+        />
       </div>
 
       {/* Delete Modal */}

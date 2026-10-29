@@ -1,4 +1,5 @@
 import { CheckCircle, AlertCircle, ClipboardList, Activity, Droplet, Heart, Clock, UserCheck } from "lucide-react";
+import { SITE_CONFIG } from "@/config/site";
 
 export function InfoDonorDarah() {
   const syarat = [
@@ -304,12 +305,12 @@ export function InfoDonorDarah() {
                 </p>
               </div>
               <a
-                href="https://wa.me/6282133403011"
+                href={SITE_CONFIG.whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-white text-primary px-8 py-4 rounded-xl font-bold hover:scale-105 transition-transform shadow-lg relative z-10 flex-shrink-0"
               >
-                Hubungi WhatsApp (0821-3340-3011)
+                Hubungi WhatsApp ({SITE_CONFIG.whatsapp})
               </a>
             </div>
           </div>

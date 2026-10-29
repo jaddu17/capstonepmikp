@@ -2,6 +2,7 @@ import { Phone, Mail, MapPin, Send, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { api } from "@/config/api";
+import { SITE_CONFIG } from "@/config/site";
 
 export function Kontak() {
   const [formData, setFormData] = useState({
@@ -38,25 +39,25 @@ export function Kontak() {
     {
       icon: Phone,
       title: "Telepon",
-      value: "(0274) 773456",
-      link: "tel:0274773456",
+      value: SITE_CONFIG.phone,
+      link: `tel:${SITE_CONFIG.phoneRaw}`,
     },
     {
       icon: Mail,
       title: "Email",
-      value: "pmi.kulonprogo@gmail.com",
-      link: "mailto:pmi.kulonprogo@gmail.com",
+      value: SITE_CONFIG.email,
+      link: `mailto:${SITE_CONFIG.email}`,
     },
     {
       icon: MessageSquare,
       title: "WhatsApp",
-      value: "0812-3456-7890",
-      link: "https://wa.me/6281234567890",
+      value: SITE_CONFIG.whatsapp,
+      link: SITE_CONFIG.whatsappLink,
     },
     {
       icon: MapPin,
       title: "Alamat",
-      value: "Jl. Bhayangkara, Serut, Pengasih, Kec. Pengasih, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55652",
+      value: SITE_CONFIG.address,
       link: "#",
     },
   ];

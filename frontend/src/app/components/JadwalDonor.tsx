@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Calendar, MapPin, Clock } from "lucide-react";
 import { api } from "@/config/api";
+import { SITE_CONFIG } from "@/config/site";
 
 interface Schedule {
   id: string;
@@ -79,7 +80,7 @@ export function JadwalDonor() {
 
                 <div className="flex-shrink-0">
                   <a
-                    href="https://wa.me/6281328861118?text=Halo%20Admin%20PMI%20Kulon%20Progo,%20saya%20ingin%20mendaftar%20donor%20darah%20untuk%20jadwal%20ini."
+                    href={`https://wa.me/${SITE_CONFIG.whatsappRaw}?text=${encodeURIComponent("Halo Admin PMI Kulon Progo, saya ingin mendaftar donor darah untuk jadwal ini.")}`}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-block bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#C21219] transition-colors"

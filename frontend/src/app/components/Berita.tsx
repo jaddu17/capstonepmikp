@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Calendar, ArrowRight, X, Clock, Tag, Share2 } from "lucide-react";
+import { Calendar, ArrowRight, X, Clock, Tag, Share2, Loader2, AlertCircle } from "lucide-react";
 import { api } from "@/config/api";
+import { Pagination } from "./ui/Pagination";
 
 interface NewsItem {
   id?: string;
@@ -16,19 +17,33 @@ interface NewsItem {
 export function Berita() {
   const [newsList, setNewsList] = useState<NewsItem[]>([]);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
-  useEffect(() => {
-    api.get('/api/beritas')
-      .then(d => d.data || d)
-      .then(data => {
-        if (Array.isArray(data)) {
-          // Filter only published news for public view
-          setNewsList(data.filter((n: any) => n.published !== false && n.published !== 0 && String(n.published) !== "0"));
-        }
+  const fetchNews = (page = 1) => {
+    setLoading(true);
+    setFetchError("");
+    api.get(`/api/beritas?page=${page}`)
+      .then(res => {
+        const items = res.data || (Array.isArray(res) ? res : []);
+        setTotalPages(res.last_page || 1);
+        setTotalItems(res.total || items.length);
+        setCurrentPage(res.current_page || page);
+        setNewsList(items);
+        setLoading(false);
       })
       .catch(err => {
         console.error("Error fetching beritas:", err);
+        setFetchError("Gagal memuat berita terbaru.");
+        setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchNews(1);
   }, []);
 
   const getCategoryColor = (category: string) => {
@@ -54,46 +69,78 @@ export function Berita() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {newsList.map((item, index) => (
-            <div
-              key={index}
-              className="group bg-white rounded-3xl overflow-hidden shadow-sm border border-border hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
+        {loading ? (
+          <div className="py-24 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <span className="text-base font-medium">Memuat berita terbaru...</span>
+          </div>
+        ) : fetchError ? (
+          <div className="py-16 text-center text-red-600 flex flex-col items-center justify-center gap-3">
+            <AlertCircle className="w-8 h-8" />
+            <span className="text-base font-medium">{fetchError}</span>
+            <button
+              onClick={() => fetchNews(currentPage)}
+              className="mt-2 text-sm bg-red-100 text-red-800 px-4 py-2 rounded-xl hover:bg-red-200 transition-colors font-semibold"
             >
-              <div className="aspect-[16/10] bg-gray-200 overflow-hidden relative">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute top-4 left-4">
-                  <span className={`px-4 py-1.5 rounded-full text-xs font-bold shadow-lg ${getCategoryColor(item.category)}`}>
-                    {item.category}
-                  </span>
-                </div>
-              </div>
-              <div className="p-8">
-                <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground mb-4 uppercase tracking-wider">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>{item.date}</span>
-                </div>
-                <h3 className="text-xl font-bold mb-4 text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-                  {item.title}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-6 line-clamp-3 leading-relaxed">
-                  {item.excerpt}
-                </p>
-                <button 
-                  onClick={() => setSelectedNews(item)}
-                  className="w-full py-3.5 bg-gray-50 text-gray-900 font-bold text-sm rounded-2xl flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-white transition-all shadow-sm"
+              Coba Lagi
+            </button>
+          </div>
+        ) : newsList.length === 0 ? (
+          <div className="py-24 text-center text-muted-foreground text-base">
+            Belum ada berita yang dipublikasikan saat ini.
+          </div>
+        ) : (
+          <>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+              {newsList.map((item, index) => (
+                <div
+                  key={index}
+                  className="group bg-white rounded-3xl overflow-hidden shadow-sm border border-border hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
                 >
-                  Baca Selengkapnya
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
+                  <div className="aspect-[16/10] bg-gray-200 overflow-hidden relative">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <span className={`px-4 py-1.5 rounded-full text-xs font-bold shadow-lg ${getCategoryColor(item.category)}`}>
+                        {item.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-8">
+                    <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground mb-4 uppercase tracking-wider">
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>{item.date}</span>
+                    </div>
+                    <h3 className="text-xl font-bold mb-4 text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-6 line-clamp-3 leading-relaxed">
+                      {item.excerpt}
+                    </p>
+                    <button 
+                      onClick={() => setSelectedNews(item)}
+                      className="w-full py-3.5 bg-gray-50 text-gray-900 font-bold text-sm rounded-2xl flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-white transition-all shadow-sm"
+                    >
+                      Baca Selengkapnya
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+
+            {/* Pagination Controls */}
+            <Pagination
+              currentPage={currentPage}
+              lastPage={totalPages}
+              total={totalItems}
+              onPageChange={fetchNews}
+            />
+          </>
+        )}
       </div>
 
       {/* Full Content Modal */}

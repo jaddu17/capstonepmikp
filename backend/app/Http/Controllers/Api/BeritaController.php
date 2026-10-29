@@ -8,9 +8,16 @@ use Illuminate\Http\Request;
 
 class BeritaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Berita::orderBy('created_at', 'desc')->paginate(10);
+        $query = Berita::orderBy('created_at', 'desc');
+
+        // Jika bukan admin (tidak ada token sanctum), publik hanya boleh melihat berita yang dipublikasikan
+        if (!$request->user('sanctum')) {
+            $query->where('published', true);
+        }
+
+        return $query->paginate(10);
     }
 
     public function store(Request $request)
@@ -27,7 +34,7 @@ class BeritaController extends Controller
 
         $berita = Berita::create($validated);
 
-        if ($berita->published ?? true) {
+        if ($berita->published) {
             \App\Services\FonnteService::notifyNewBerita($berita);
             \App\Services\InstagramService::notifyNewBerita($berita);
         }
