@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('category')->nullable();
             $table->text('excerpt')->nullable();
             $table->text('content')->nullable();
-            $table->text('image')->nullable();
+            $table->longText('image')->nullable();
             $table->boolean('published')->default(false);
             $table->timestamps();
         });

@@ -78,6 +78,9 @@ class BeritaTest extends TestCase
         $this->assertDatabaseHas('beritas', [
             'title' => 'Kegiatan Donor Darah di Wates',
         ]);
+
+        $createdBerita = Berita::where('title', 'Kegiatan Donor Darah di Wates')->first();
+        $this->assertStringStartsWith('/storage/berita/', $createdBerita->image);
     }
 
     public function test_berita_rejects_invalid_image_format(): void

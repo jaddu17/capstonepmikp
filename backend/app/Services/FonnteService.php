@@ -29,7 +29,7 @@ class FonnteService
         }
 
         try {
-            $verifySsl = filter_var(env('CURL_VERIFY_SSL', env('APP_ENV') === 'production'), FILTER_VALIDATE_BOOLEAN);
+            $verifySsl = filter_var(config('services.fonnte.verify_ssl'), FILTER_VALIDATE_BOOLEAN);
             $client = $verifySsl ? Http::withHeaders(['Authorization' => $token]) : Http::withoutVerifying()->withHeaders(['Authorization' => $token]);
 
             $response = $client->timeout(10)->post($endpoint, [

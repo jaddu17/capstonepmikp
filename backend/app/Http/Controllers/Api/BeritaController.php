@@ -32,6 +32,10 @@ class BeritaController extends Controller
             'published' => 'boolean',
         ]);
 
+        if (isset($validated['image'])) {
+            $validated['image'] = \App\Helpers\ImageStorageHelper::storeIfBase64($validated['image'], 'berita');
+        }
+
         $berita = Berita::create($validated);
 
         if ($berita->published) {
@@ -58,6 +62,10 @@ class BeritaController extends Controller
             'image' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
             'published' => 'boolean',
         ]);
+
+        if (isset($validated['image'])) {
+            $validated['image'] = \App\Helpers\ImageStorageHelper::storeIfBase64($validated['image'], 'berita');
+        }
 
         $berita->update($validated);
         return response()->json($berita);

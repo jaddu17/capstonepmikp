@@ -59,6 +59,13 @@ class SendDailyStokNotification extends Command
 
         $this->info('Mengirim notifikasi ke WhatsApp Group PMI...');
         $waResult = FonnteService::send($waMessage);
+        $waOk = !empty($waResult['status']);
+        if ($waOk) {
+            $this->info('✓ [WhatsApp] Notifikasi rekap stok berhasil terkirim ke WhatsApp Group PMI.');
+        } else {
+            $waErrMsg = $waResult['error'] ?? $waResult['message'] ?? 'Gagal mengirim pesan via WhatsApp Gateway';
+            $this->error("✗ [WhatsApp] Pengiriman gagal: {$waErrMsg}");
+        }
 
         // Format Caption Instagram
         $igCaption = "🩸 UPDATE STOK DARAH HARIAN PMI KULON PROGO 🩸\n\n"
@@ -74,9 +81,26 @@ class SendDailyStokNotification extends Command
 
         $this->info('Mempublikasikan ke Instagram Feed...');
         $igResult = InstagramService::publishPhoto($igCaption, null);
+        $igOk = !empty($igResult['success']);
+        if ($igOk) {
+            $mode = $igResult['mode'] ?? 'live';
+            $this->info("✓ [Instagram] Postingan rekap stok berhasil dipublikasikan (Mode: {$mode}).");
+        } else {
+            $igErrMsg = is_array($igResult['error'] ?? null) ? json_encode($igResult['error']) : ($igResult['message'] ?? 'Gagal posting ke Instagram');
+            $this->error("✗ [Instagram] Publikasi gagal: {$igErrMsg}");
+        }
 
-        $this->info('Notifikasi harian stok darah berhasil dijalankan.');
+        if (!$waOk && !$igOk) {
+            $this->error('Gagal mengirimkan notifikasi harian stok darah ke WhatsApp maupun Instagram.');
+            return Command::FAILURE;
+        }
 
+        if (!$waOk || !$igOk) {
+            $this->warn('Notifikasi harian selesai dengan sebagian peringatan.');
+            return Command::SUCCESS;
+        }
+
+        $this->info('Notifikasi harian stok darah berhasil dijalankan. Semua saluran (WhatsApp & Instagram) sukses terkirim!');
         return Command::SUCCESS;
     }
 }

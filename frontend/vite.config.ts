@@ -16,7 +16,7 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
-  base: process.env.VITE_BASE_PATH || './',
+  base: process.env.VITE_BASE_PATH || '/',
   plugins: [
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if
@@ -36,9 +36,13 @@ export default defineConfig({
 
   server: {
     port: 5173,
-    // TAMBAHKAN BLOK PROXY INI
     proxy: {
       '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/storage': {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,

@@ -18,17 +18,18 @@ class InstagramService
      */
     public static function publishPhoto(string $caption, ?string $imageUrl = null): array
     {
-        $enabled = filter_var(env('INSTAGRAM_ENABLED', true), FILTER_VALIDATE_BOOLEAN);
+        $enabled = filter_var(config('services.instagram.enabled', true), FILTER_VALIDATE_BOOLEAN);
         if (!$enabled) {
             return [
                 'success' => false,
-                'message' => 'Instagram auto-post dinonaktifkan di .env',
+                'message' => 'Instagram auto-post dinonaktifkan di konfigurasi',
             ];
         }
 
-        $isMock = filter_var(env('INSTAGRAM_MOCK', true), FILTER_VALIDATE_BOOLEAN);
-        $accountId = env('INSTAGRAM_ACCOUNT_ID', '17841400000000000');
-        $accessToken = env('INSTAGRAM_ACCESS_TOKEN');
+        $isMock = filter_var(config('services.instagram.mock', true), FILTER_VALIDATE_BOOLEAN);
+        $accountId = config('services.instagram.account_id', '17841400000000000');
+        $accessToken = config('services.instagram.access_token');
+        $defaultImage = config('services.instagram.default_image', 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=1200&q=80');
 
         // Jika mode MOCK aktif atau token belum diatur, jalankan simulasi sukses
         if ($isMock || empty($accessToken) || empty($accountId)) {
@@ -38,7 +39,7 @@ class InstagramService
             Log::info('[InstagramService - SIMULATOR] Auto-post Instagram berhasil disimulasikan:', [
                 'account_id' => $accountId,
                 'caption' => $caption,
-                'image_url' => $imageUrl ? (strlen($imageUrl) > 80 ? substr($imageUrl, 0, 80) . '...' : $imageUrl) : 'Default Banner PMI',
+                'image_url' => $imageUrl ? (strlen($imageUrl) > 80 ? substr($imageUrl, 0, 80) . '...' : $imageUrl) : 'Official PMI Default Banner',
                 'container_id' => $simulatedContainerId,
                 'post_id' => $simulatedPostId,
                 'timestamp' => now()->toDateTimeString(),
@@ -55,13 +56,18 @@ class InstagramService
 
         // Mode LIVE: Menghubungi Meta Graph API
         try {
-            // URL gambar fallback jika tidak ada gambar (Meta Graph API mewajibkan URL gambar publik HTTPS)
+            // URL gambar fallback jika tidak ada gambar atau berupa base64
+            // (Meta Graph API mewajibkan URL gambar publik HTTPS yang dapat diakses oleh server Meta)
             $targetImageUrl = $imageUrl;
-            if (empty($targetImageUrl) || str_starts_with($targetImageUrl, 'data:image')) {
-                $targetImageUrl = 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=1200&q=80';
+            if (!empty($targetImageUrl) && str_starts_with($targetImageUrl, '/storage/')) {
+                $targetImageUrl = url($targetImageUrl);
             }
 
-            $verifySsl = filter_var(env('CURL_VERIFY_SSL', env('APP_ENV') === 'production'), FILTER_VALIDATE_BOOLEAN);
+            if (empty($targetImageUrl) || str_starts_with($targetImageUrl, 'data:image') || str_starts_with($targetImageUrl, 'http://localhost') || str_starts_with($targetImageUrl, 'http://127.0.0.1')) {
+                $targetImageUrl = $defaultImage;
+            }
+
+            $verifySsl = filter_var(config('services.instagram.verify_ssl'), FILTER_VALIDATE_BOOLEAN);
             $client = $verifySsl ? Http::timeout(15) : Http::withoutVerifying()->timeout(15);
 
             // Step 1: Create Media Container

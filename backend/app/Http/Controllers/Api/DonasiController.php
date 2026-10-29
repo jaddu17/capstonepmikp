@@ -24,6 +24,10 @@ class DonasiController extends Controller
             'status' => 'nullable|string',
         ]);
 
+        if (isset($validated['proof'])) {
+            $validated['proof'] = \App\Helpers\ImageStorageHelper::storeIfBase64($validated['proof'], 'donasi');
+        }
+
         if (!isset($validated['status'])) {
             $validated['status'] = 'Sudah Bayar';
         }
@@ -47,6 +51,10 @@ class DonasiController extends Controller
             'date' => 'sometimes|required|string',
             'status' => 'sometimes|required|string',
         ]);
+
+        if (isset($validated['proof'])) {
+            $validated['proof'] = \App\Helpers\ImageStorageHelper::storeIfBase64($validated['proof'], 'donasi');
+        }
 
         $donasi->update($validated);
         return response()->json($donasi);

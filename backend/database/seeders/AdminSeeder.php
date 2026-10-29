@@ -18,7 +18,7 @@ class AdminSeeder extends Seeder
             [
                 'name' => 'admin',
                 'email' => 'admin@pmikp.id',
-                'password' => Hash::make(env('ADMIN_PASSWORD', 'pmi2026')),
+                'password' => Hash::make(config('services.admin.password') ?: env('ADMIN_PASSWORD', 'pmi2026')),
             ]
         );
     }
