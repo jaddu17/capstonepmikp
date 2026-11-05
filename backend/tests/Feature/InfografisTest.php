@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Infografis;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -32,6 +33,8 @@ class InfografisTest extends TestCase
 
     public function test_admin_can_create_and_delete_infografis(): void
     {
+        Http::fake();
+
         $admin = User::create([
             'name' => 'adminpmi',
             'email' => 'admin@pmi.org',
@@ -43,6 +46,11 @@ class InfografisTest extends TestCase
         $payload = [
             'bulan' => 'November',
             'tahun' => '2026',
+            'stats' => [
+                'pertolongan_pertama' => 10,
+                'kecelakaan' => 5,
+                'bencana_alam' => 1,
+            ],
             'quote' => 'Setetes darah Anda nyawa bagi sesama',
         ];
 

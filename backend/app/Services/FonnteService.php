@@ -107,4 +107,37 @@ class FonnteService
 
         return self::send($message);
     }
+
+    /**
+     * Notifikasi saat Infografis Bulanan Baru diterbitkan.
+     */
+    public static function notifyNewInfografis($infografis): array
+    {
+        $bulan = strtoupper($infografis->bulan ?? 'Terbaru');
+        $tahun = $infografis->tahun ?? date('Y');
+        $stats = is_array($infografis->stats) ? $infografis->stats : json_decode($infografis->stats ?? '[]', true);
+
+        $pp = $stats['pertolongan_pertama'] ?? 0;
+        $ambulance = $stats['pelayanan_ambulance'] ?? ($stats['home_emergency'] ?? 0);
+        $kecelakaan = $stats['kecelakaan'] ?? 0;
+        $kebakaran = $stats['kebakaran'] ?? 0;
+        $bencana = $stats['bencana_alam'] ?? 0;
+        $jenazah = $stats['evakuasi_jenazah'] ?? 0;
+
+        $quote = !empty($infografis->quote) ? "💬 _{$infografis->quote}_\n\n" : "";
+
+        $message = "📊 *[LAPORAN INFOGRAFIS PELAYANAN PMI - {$bulan} {$tahun}]*\n\n"
+                 . "Berikut capaian pelayanan kemanusiaan PMI Kabupaten Kulon Progo periode {$bulan} {$tahun}:\n\n"
+                 . "🚑 *Rekapitulasi Layanan:*\n"
+                 . "   • Pertolongan Pertama : {$pp} Kejadian\n"
+                 . "   • Kecelakaan Lalu Lintas : {$kecelakaan} Kejadian\n"
+                 . "   • Bencana Alam : {$bencana} Lokasi\n"
+                 . "   • Kebakaran : {$kebakaran} Kejadian\n"
+                 . "   • Evakuasi Jenazah : {$jenazah} Pasien\n"
+                 . "   • Home Emergency / Ambulans : {$ambulance} Layanan\n\n"
+                 . $quote
+                 . "Informasi dan dokumentasi pelayanan lengkap dapat dilihat di website resmi PMI Kulon Progo.";
+
+        return self::send($message);
+    }
 }

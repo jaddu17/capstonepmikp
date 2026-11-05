@@ -115,10 +115,18 @@ export function ManageBerita() {
 
         if (isEdit) {
           setNewsList(newsList.map((n) => (n.id === editingId ? formattedData : n)));
-          toast.success("Berita berhasil diperbarui!");
+          if (formattedData.published) {
+            toast.success("Berita berhasil diperbarui dan dipublikasikan!");
+          } else {
+            toast.success("Draft berita berhasil diperbarui!");
+          }
         } else {
           setNewsList([formattedData, ...newsList]);
-          toast.success("Berita berhasil ditambahkan & disinkronkan ke WhatsApp & Instagram!");
+          if (formattedData.published) {
+            toast.success("Berita berhasil dipublikasikan & disinkronkan ke WhatsApp & Instagram!");
+          } else {
+            toast.success("Draft berita berhasil disimpan (belum dipublikasikan ke publik)!");
+          }
         }
         
         setEditingId(null);
@@ -315,15 +323,21 @@ export function ManageBerita() {
                 id="published"
                 checked={formData.published}
                 onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-                className="w-4 h-4 text-primary border-border rounded focus:ring-primary"
+                className="w-4 h-4 text-primary border-border rounded focus:ring-primary cursor-pointer"
               />
-              <label htmlFor="published" className="text-sm font-medium">
+              <label htmlFor="published" className="text-sm font-medium cursor-pointer">
                 Publikasikan berita
               </label>
             </div>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-800">
-              <span className="font-bold">Otomatisasi Multi-Channel:</span> Saat berita dipublikasikan, sistem otomatis mempublikasikan pembaruan ke <strong>Grup WhatsApp PMI</strong> dan postingan feed <strong>Instagram resmi</strong> via API.
-            </div>
+            {formData.published ? (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-800">
+                <span className="font-bold">Otomatisasi Multi-Channel:</span> Berita akan langsung tampil di portal publik dan otomatis dipublikasikan ke <strong>Grup WhatsApp PMI</strong> dan postingan feed <strong>Instagram resmi</strong> via API.
+              </div>
+            ) : (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-700">
+                <span className="font-bold">Mode Draft:</span> Berita hanya tersimpan di dashboard admin dan <strong>tidak</strong> akan muncul di portal publik maupun disiarkan ke WhatsApp/Instagram sampai opsi publikasi dicentang.
+              </div>
+            )}
           </div>
           <div className="flex gap-3 mt-4">
             <button
@@ -331,7 +345,9 @@ export function ManageBerita() {
               className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-[#C21219] transition-colors flex items-center gap-2"
             >
               <Save className="w-5 h-5" />
-              Simpan
+              {formData.published
+                ? (editingId ? "Perbarui & Publikasikan" : "Publikasikan Berita")
+                : (editingId ? "Perbarui Draft" : "Simpan Draft")}
             </button>
             <button
               onClick={handleCancel}

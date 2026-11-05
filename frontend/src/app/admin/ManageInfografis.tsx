@@ -106,7 +106,7 @@ export function ManageInfografis() {
         if (activeId.startsWith("new-")) {
           setActiveId(formatted.id);
         }
-        toast.success("Data infografis berhasil disimpan!");
+        toast.success("Data infografis berhasil disimpan & disinkronkan ke WhatsApp & Instagram!");
       })
       .catch((err: any) => {
         console.error(err);

@@ -29,7 +29,17 @@ class InfografisController extends Controller
             'quote' => 'nullable|string',
         ]);
 
+        if (isset($validated['dokumentasi']) && is_array($validated['dokumentasi'])) {
+            $validated['dokumentasi'] = array_map(function ($doc) {
+                return \App\Helpers\ImageStorageHelper::storeIfBase64($doc, 'infografis');
+            }, $validated['dokumentasi']);
+        }
+
         $infografis = Infografis::create($validated);
+
+        \App\Services\FonnteService::notifyNewInfografis($infografis);
+        \App\Services\InstagramService::notifyNewInfografis($infografis);
+
         return response()->json($infografis, 201);
     }
 
@@ -51,7 +61,17 @@ class InfografisController extends Controller
             'quote' => 'nullable|string',
         ]);
 
+        if (isset($validated['dokumentasi']) && is_array($validated['dokumentasi'])) {
+            $validated['dokumentasi'] = array_map(function ($doc) {
+                return \App\Helpers\ImageStorageHelper::storeIfBase64($doc, 'infografis');
+            }, $validated['dokumentasi']);
+        }
+
         $infografi->update($validated);
+
+        \App\Services\FonnteService::notifyNewInfografis($infografi);
+        \App\Services\InstagramService::notifyNewInfografis($infografi);
+
         return response()->json($infografi);
     }
 

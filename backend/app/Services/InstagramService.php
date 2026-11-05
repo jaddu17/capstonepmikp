@@ -154,4 +154,47 @@ class InstagramService
 
         return self::publishPhoto($caption, null);
     }
+
+    /**
+     * Otomatis posting ke Instagram saat ada Infografis bulanan baru.
+     */
+    public static function notifyNewInfografis($infografis): array
+    {
+        $bulan = strtoupper($infografis->bulan ?? 'Terbaru');
+        $tahun = $infografis->tahun ?? date('Y');
+        $stats = is_array($infografis->stats) ? $infografis->stats : json_decode($infografis->stats ?? '[]', true);
+
+        $pp = $stats['pertolongan_pertama'] ?? 0;
+        $ambulance = $stats['pelayanan_ambulance'] ?? ($stats['home_emergency'] ?? 0);
+        $kecelakaan = $stats['kecelakaan'] ?? 0;
+        $kebakaran = $stats['kebakaran'] ?? 0;
+        $bencana = $stats['bencana_alam'] ?? 0;
+        $jenazah = $stats['evakuasi_jenazah'] ?? 0;
+
+        $caption = "📊 LAPORAN INFOGRAFIS PELAYANAN PMI - {$bulan} {$tahun} 📊\n\n"
+            . "Berikut rekapitulasi data pelayanan kemanusiaan UDD dan Markas PMI Kabupaten Kulon Progo selama bulan {$bulan} {$tahun}:\n\n"
+            . "🚑 Pertolongan Pertama : {$pp} Kejadian\n"
+            . "🚗 Kecelakaan Lalu Lintas : {$kecelakaan} Kejadian\n"
+            . "🌧️ Bencana Alam : {$bencana} Lokasi\n"
+            . "🔥 Kebakaran : {$kebakaran} Kasus\n"
+            . "🕊️ Evakuasi Jenazah : {$jenazah} Pasien\n"
+            . "🏥 Home Emergency / Ambulans : {$ambulance} Layanan\n\n"
+            . (!empty($infografis->quote) ? "\"{$infografis->quote}\"\n\n" : "")
+            . "Kunjungi website resmi PMI Kulon Progo untuk informasi selengkapnya.\n\n"
+            . "#InfografisPMI #PMIKulonProgo #PalangMerahIndonesia #Kemanusiaan #KulonProgo";
+
+        // Ambil gambar dokumentasi pertama jika ada
+        $image = null;
+        $docs = is_array($infografis->dokumentasi) ? $infografis->dokumentasi : json_decode($infografis->dokumentasi ?? '[]', true);
+        if (!empty($docs) && is_array($docs)) {
+            foreach ($docs as $doc) {
+                if (!empty($doc)) {
+                    $image = $doc;
+                    break;
+                }
+            }
+        }
+
+        return self::publishPhoto($caption, $image);
+    }
 }

@@ -67,7 +67,16 @@ class BeritaController extends Controller
             $validated['image'] = \App\Helpers\ImageStorageHelper::storeIfBase64($validated['image'], 'berita');
         }
 
+        $wasDraft = !$berita->published;
+
         $berita->update($validated);
+
+        // Jika sebelumnya berstatus draft lalu sekarang dipublikasikan, kirimkan notifikasi
+        if ($wasDraft && $berita->published) {
+            \App\Services\FonnteService::notifyNewBerita($berita);
+            \App\Services\InstagramService::notifyNewBerita($berita);
+        }
+
         return response()->json($berita);
     }
 

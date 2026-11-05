@@ -202,4 +202,35 @@ class BeritaTest extends TestCase
         $this->assertEquals(1, $response->json('total'));
         $this->assertEquals('Berita Terbit Publik', $response->json('data')[0]['title']);
     }
+
+    public function test_admin_can_update_draft_berita_with_existing_storage_image(): void
+    {
+        $admin = User::create([
+            'name' => 'adminpmi',
+            'email' => 'admin@pmi.org',
+            'password' => 'secret123',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $berita = Berita::create([
+            'title' => 'Draft Berita',
+            'category' => 'Donor Darah',
+            'image' => '/storage/berita/sample_test.png',
+            'published' => false,
+        ]);
+
+        $response = $this->putJson("/api/beritas/{$berita->id}", [
+            'title' => 'Draft Berita Diperbarui',
+            'image' => '/storage/berita/sample_test.png',
+            'published' => false,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'title' => 'Draft Berita Diperbarui',
+                'image' => '/storage/berita/sample_test.png',
+                'published' => false,
+            ]);
+    }
 }
