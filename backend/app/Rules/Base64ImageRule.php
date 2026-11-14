@@ -57,8 +57,8 @@ class Base64ImageRule implements ValidationRule
                 str_starts_with($value, 'donasi/')
             ) {
                 $extension = strtolower(pathinfo(parse_url($value, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
-                if (!empty($extension) && !in_array($extension, ['jpg', 'jpeg', 'png', 'webp'])) {
-                    $fail("Ekstensi gambar harus berupa jpg, jpeg, png, atau webp.");
+                if (!empty($extension) && !in_array($extension, ['jpg', 'jpeg', 'png'])) {
+                    $fail("Ekstensi gambar harus berupa jpg, jpeg, atau png.");
                     return;
                 }
                 return;
