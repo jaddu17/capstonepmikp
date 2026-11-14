@@ -1,9 +1,32 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
-import { Plus, Edit, Trash2, Save, X, Loader2, AlertCircle } from "lucide-react";
+import { Plus, Edit, Trash2, Save, X, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, Check, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/config/api";
 import { Pagination } from "../components/ui/pagination";
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
+import { Calendar } from "../components/ui/calendar";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+
+const parseIndoDateToObj = (indoDateStr: string): Date | undefined => {
+  if (!indoDateStr) return undefined;
+  const MONTH_NAMES = [
+    "januari", "februari", "maret", "april", "mei", "juni",
+    "juli", "agustus", "september", "oktober", "november", "desember"
+  ];
+  const parts = indoDateStr.trim().split(/\s+/);
+  if (parts.length >= 3) {
+    const day = parseInt(parts[0], 10);
+    const monthIndex = MONTH_NAMES.indexOf(parts[1].toLowerCase());
+    const year = parseInt(parts[2], 10);
+    if (!isNaN(day) && monthIndex !== -1 && !isNaN(year)) {
+      return new Date(year, monthIndex, day);
+    }
+  }
+  const fallback = new Date(indoDateStr);
+  return isNaN(fallback.getTime()) ? undefined : fallback;
+};
 
 interface Schedule {
   id: string;
@@ -12,6 +35,109 @@ interface Schedule {
   location: string;
   time: string;
   quota: string;
+}
+
+function TimePickerPopover({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [hour, minute] = value && value.includes(":") ? value.split(":") : ["08", "00"];
+  const [currentHour, setCurrentHour] = useState(hour || "08");
+
+  useEffect(() => {
+    if (value && value.includes(":")) {
+      const [h] = value.split(":");
+      setCurrentHour(h);
+    }
+  }, [value]);
+
+  const hours = [
+    "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"
+  ];
+  const minutes = [
+    "00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"
+  ];
+
+  const handleHourClick = (h: string) => {
+    setCurrentHour(h);
+    onChange(`${h}:${minute || "00"}`);
+  };
+
+  const handleMinuteClick = (m: string) => {
+    onChange(`${currentHour}:${m}`);
+    setOpen(false); // Otomatis menutup seketika saat menit diklik!
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white border border-border rounded-xl text-sm font-semibold text-gray-800 hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-xs group"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">{label}</span>
+            <span className="text-sm font-bold text-gray-900 bg-gray-100 px-2.5 py-0.5 rounded-lg border border-gray-200">
+              {value || "08:00"}
+            </span>
+          </div>
+          <Clock className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-3 bg-white border border-border rounded-2xl shadow-xl z-50" align="start">
+        <div className="text-xs font-semibold text-gray-500 mb-2 px-1 flex justify-between">
+          <span>Pilih Jam</span>
+          <span>Pilih Menit</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {/* Kolom Jam (Scroll Mandiri) */}
+          <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
+            {hours.map((h) => (
+              <button
+                key={h}
+                type="button"
+                onClick={() => handleHourClick(h)}
+                className={`w-full py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                  currentHour === h
+                    ? "bg-primary text-white shadow-xs"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}
+              >
+                {h}
+              </button>
+            ))}
+          </div>
+
+          {/* Kolom Menit (Scroll Mandiri) */}
+          <div className="space-y-1 border-l border-border pl-2 max-h-48 overflow-y-auto pr-1">
+            {minutes.map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => handleMinuteClick(m)}
+                className={`w-full py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                  minute === m
+                    ? "bg-primary text-white shadow-xs"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-2.5 pt-2 border-t border-border text-[10px] text-muted-foreground text-center italic">
+          *Klik menit untuk langsung menutup
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
 }
 
 export function ManageJadwal() {
@@ -49,31 +175,115 @@ export function ManageJadwal() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [startTime, setStartTime] = useState("08:00");
+  const [endTime, setEndTime] = useState("12:00");
+  const [quotaCount, setQuotaCount] = useState("100");
+
   const [formData, setFormData] = useState<Omit<Schedule, "id">>({
     date: "",
     day: "",
     location: "",
-    time: "",
-    quota: "",
+    time: "08:00 - 12:00 WIB",
+    quota: "100 orang",
   });
+
+  const handleCalendarSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    if (!date) {
+      setFormData(prev => ({ ...prev, date: "", day: "" }));
+      return;
+    }
+    const formattedDay = format(date, "EEEE", { locale: id });
+    const formattedDate = format(date, "d MMMM yyyy", { locale: id });
+    setFormData(prev => ({
+      ...prev,
+      day: formattedDay,
+      date: formattedDate
+    }));
+    setCalendarOpen(false);
+  };
+
+  const handleTimeChange = (start: string, end: string) => {
+    setStartTime(start);
+    setEndTime(end);
+    if (start && end) {
+      setFormData(prev => ({ ...prev, time: `${start} - ${end} WIB` }));
+    } else if (start) {
+      setFormData(prev => ({ ...prev, time: `${start} WIB` }));
+    }
+  };
+
+  const handleQuotaChange = (val: string) => {
+    setQuotaCount(val);
+    const num = parseInt(val, 10);
+    if (!isNaN(num) && num > 0) {
+      setFormData(prev => ({ ...prev, quota: `${num} orang` }));
+    } else {
+      setFormData(prev => ({ ...prev, quota: "" }));
+    }
+  };
 
   const handleAdd = () => {
     setIsAdding(true);
-    setFormData({ date: "", day: "", location: "", time: "", quota: "" });
+    setSelectedDate(undefined);
+    setCalendarOpen(false);
+    setStartTime("08:00");
+    setEndTime("12:00");
+    setQuotaCount("100");
+    setFormData({
+      date: "",
+      day: "",
+      location: "",
+      time: "08:00 - 12:00 WIB",
+      quota: "100 orang"
+    });
   };
 
   const handleEdit = (schedule: Schedule) => {
     setEditingId(schedule.id);
+    const parsed = parseIndoDateToObj(schedule.date);
+    setSelectedDate(parsed);
+    setCalendarOpen(false);
+
+    // Parse waktu jam mulai & jam selesai
+    const matchTime = schedule.time ? schedule.time.match(/(\d{1,2}[:.]\d{2})\s*-\s*(\d{1,2}[:.]\d{2})/) : null;
+    if (matchTime) {
+      setStartTime(matchTime[1].replace(".", ":").padStart(5, "0"));
+      setEndTime(matchTime[2].replace(".", ":").padStart(5, "0"));
+    } else {
+      setStartTime("08:00");
+      setEndTime("12:00");
+    }
+
+    // Parse jumlah kuota
+    const matchQuota = schedule.quota ? schedule.quota.match(/\d+/) : null;
+    setQuotaCount(matchQuota ? matchQuota[0] : "100");
+
     setFormData({
       date: schedule.date,
       day: schedule.day,
       location: schedule.location,
-      time: schedule.time,
-      quota: schedule.quota,
+      time: schedule.time || "08:00 - 12:00 WIB",
+      quota: schedule.quota || "100 orang",
     });
   };
 
   const handleSave = () => {
+    if (!formData.date || !formData.day) {
+      toast.error("Silakan pilih tanggal kegiatan terlebih dahulu.");
+      return;
+    }
+    if (!formData.location.trim()) {
+      toast.error("Lokasi kegiatan wajib diisi.");
+      return;
+    }
+    if (!formData.time.trim()) {
+      toast.error("Waktu kegiatan wajib diisi.");
+      return;
+    }
+
     const isEdit = !!editingId;
     const request = isEdit
       ? api.put(`/api/jadwal-donors/${editingId}`, formData)
@@ -92,6 +302,8 @@ export function ManageJadwal() {
           toast.success("Jadwal berhasil ditambahkan & disinkronkan ke WhatsApp & Instagram!");
           setIsAdding(false);
         }
+        setSelectedDate(undefined);
+        setCalendarOpen(false);
         setFormData({ date: "", day: "", location: "", time: "", quota: "" });
       })
       .catch((err: any) => {
@@ -135,7 +347,12 @@ export function ManageJadwal() {
   const handleCancel = () => {
     setIsAdding(false);
     setEditingId(null);
-    setFormData({ date: "", day: "", location: "", time: "", quota: "" });
+    setSelectedDate(undefined);
+    setCalendarOpen(false);
+    setStartTime("08:00");
+    setEndTime("12:00");
+    setQuotaCount("100");
+    setFormData({ date: "", day: "", location: "", time: "08:00 - 12:00 WIB", quota: "100 orang" });
   };
 
   return (
@@ -164,55 +381,108 @@ export function ManageJadwal() {
             {editingId ? "Edit Jadwal" : "Tambah Jadwal Baru"}
           </h3>
           <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Tanggal</label>
-              <input
-                type="text"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                placeholder="12 Mei 2026"
-              />
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                Pilih Tanggal Kegiatan
+              </label>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="w-full sm:w-auto min-w-[280px] px-4 py-2.5 bg-white border border-gray-300 rounded-xl shadow-xs text-left font-medium text-sm hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all flex items-center justify-between gap-3 group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-red-50 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                          <CalendarIcon className="w-4 h-4" />
+                        </div>
+                        <span className={formData.date ? "text-gray-900 font-semibold" : "text-gray-400"}>
+                          {formData.date && formData.day ? `${formData.day}, ${formData.date}` : "Pilih tanggal di kalender..."}
+                        </span>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white border border-gray-200 rounded-2xl shadow-xl z-50" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={handleCalendarSelect}
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      initialFocus
+                      className="p-3"
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                {formData.date && formData.day && (
+                  <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-semibold shadow-xs">
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Terpilih: {formData.day}, {formData.date}</span>
+                  </div>
+                )}
+              </div>
+              {(!formData.date || !formData.day) && (
+                <p className="text-xs text-muted-foreground mt-1.5">
+                  *Klik tombol kalender di atas untuk memilih tanggal. Tanggal sebelum hari ini otomatis dinonaktifkan.
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Hari</label>
-              <input
-                type="text"
-                value={formData.day}
-                onChange={(e) => setFormData({ ...formData, day: e.target.value })}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                placeholder="Selasa"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Lokasi</label>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">Lokasi Kegiatan</label>
               <input
                 type="text"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                placeholder="Alun-Alun Wates"
+                className="w-full px-4 py-2.5 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white font-medium text-sm"
+                placeholder="Contoh: Alun-Alun Wates"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Waktu</label>
-              <input
-                type="text"
-                value={formData.time}
-                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                placeholder="08:00 - 13:00 WIB"
-              />
+              <label className="block text-sm font-semibold text-gray-800 mb-2">Target Kuota Pendonor</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  value={quotaCount}
+                  onChange={(e) => handleQuotaChange(e.target.value)}
+                  className="w-full px-4 py-2.5 pr-16 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white font-medium text-sm"
+                  placeholder="100"
+                />
+                <div className="absolute right-4 top-2.5 text-sm font-semibold text-muted-foreground pointer-events-none">
+                  orang
+                </div>
+              </div>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium mb-2">Kuota</label>
-              <input
-                type="text"
-                value={formData.quota}
-                onChange={(e) => setFormData({ ...formData, quota: e.target.value })}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                placeholder="100 orang"
-              />
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                Waktu Pelaksanaan (WIB)
+              </label>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex items-center gap-2 flex-1">
+                  <div className="flex-1">
+                    <TimePickerPopover
+                      label="Mulai"
+                      value={startTime}
+                      onChange={(val) => handleTimeChange(val, endTime)}
+                    />
+                  </div>
+                  <span className="text-gray-400 font-bold px-1">s/d</span>
+                  <div className="flex-1">
+                    <TimePickerPopover
+                      label="Selesai"
+                      value={endTime}
+                      onChange={(val) => handleTimeChange(startTime, val)}
+                    />
+                  </div>
+                </div>
+
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-gray-100 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold">
+                  <Clock className="w-3.5 h-3.5 text-primary" />
+                  <span>Format: <strong>{formData.time || "08:00 - 12:00 WIB"}</strong></span>
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex gap-3 mt-4">
