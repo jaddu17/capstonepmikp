@@ -5,28 +5,6 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 
-if (!interface_exists('SessionHandlerInterface', false)) {
-    interface SessionHandlerInterface {
-        public function close(): bool;
-        public function destroy(string $id): bool;
-        public function gc(int $max_lifetime): int|false;
-        public function open(string $path, string $name): bool;
-        public function read(string $id): string|false;
-        public function write(string $id, string $data): bool;
-    }
-}
-if (!interface_exists('SessionIdInterface', false)) {
-    interface SessionIdInterface {
-        public function create_sid(): string;
-    }
-}
-if (!interface_exists('SessionUpdateTimestampHandlerInterface', false)) {
-    interface SessionUpdateTimestampHandlerInterface {
-        public function validateId(string $id): bool;
-        public function updateTimestamp(string $id, string $data): bool;
-    }
-}
-
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
