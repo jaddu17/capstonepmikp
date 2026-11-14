@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Droplet, AlertCircle, Calendar } from "lucide-react";
+import { Droplet, AlertCircle, Calendar, RefreshCw } from "lucide-react";
 import { api } from "@/config/api";
 
 interface BloodStockItem {
@@ -15,21 +15,44 @@ interface BloodStockItem {
 export function StokDarah() {
   const [bloodStock, setBloodStock] = useState<BloodStockItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
+  const fetchBloodStock = useCallback((isInitial = false) => {
+    if (isInitial) {
+      setLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
+
     api.get('/api/stok-darahs')
       .then(d => d.data || d)
       .then(data => {
+        const rawList = Array.isArray(data) ? data : (data?.data || []);
         // Filter hanya tipe darah A, B, O, AB
-        const filtered = data.filter((item: any) => ['A', 'B', 'O', 'AB'].includes(item.type));
+        const filtered = rawList.filter((item: any) => ['A', 'B', 'O', 'AB'].includes(item.type));
         setBloodStock(filtered);
-        setLoading(false);
+        setLastUpdated(new Date());
       })
       .catch(err => {
         console.error("Error fetching stok darah:", err);
-        setLoading(false);
+      })
+      .finally(() => {
+        if (isInitial) setLoading(false);
+        setIsRefreshing(false);
       });
   }, []);
+
+  useEffect(() => {
+    fetchBloodStock(true);
+
+    // Auto-polling setiap 5 detik agar selalu real-time
+    const interval = setInterval(() => {
+      fetchBloodStock(false);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [fetchBloodStock]);
 
   const getTypeStyle = (type: string) => {
     switch (type) {
@@ -55,7 +78,7 @@ export function StokDarah() {
           </div>
           <h2 className="text-3xl font-bold mb-4">Informasi Stok Darah</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Stok darah terkini di PMI Kulon Progo. Data diperbarui secara real-time.
+            Stok darah terkini di PMI Kulon Progo. Data diperbarui secara otomatis dan real-time.
           </p>
         </div>
 
@@ -63,14 +86,34 @@ export function StokDarah() {
           <div className="text-center py-12 text-muted-foreground">Memuat data stok darah...</div>
         ) : (
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-border mb-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-red-50 border-b border-red-100 gap-4">
-              <div className="flex items-center gap-2 text-red-800 font-bold">
-                <Calendar className="w-5 h-5" />
-                {new Date().toLocaleDateString("id-ID", {
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-red-50 border-b border-red-100 gap-4">
+              <div className="flex items-center gap-2 text-red-800 font-bold text-sm sm:text-base">
+                <Calendar className="w-5 h-5 text-red-700" />
+                {lastUpdated.toLocaleDateString("id-ID", {
                   day: "2-digit",
                   month: "long",
                   year: "numeric"
-                }).toUpperCase()} | {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB
+                }).toUpperCase()} | {lastUpdated.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} WIB
+              </div>
+
+              {/* Badge Indikator Real-Time */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-100/90 text-emerald-800 text-xs font-bold rounded-full border border-emerald-300 shadow-xs">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+                  </span>
+                  <span>LIVE REAL-TIME</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fetchBloodStock(false)}
+                  title="Perbarui data sekarang"
+                  className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-red-700 transition-colors p-1"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-red-600' : ''}`} />
+                  <span className="hidden sm:inline">Refresh</span>
+                </button>
               </div>
             </div>
             
