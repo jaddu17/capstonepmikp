@@ -48,10 +48,17 @@ class Base64ImageRule implements ValidationRule
 
         // 2. Hanya jika diizinkan untuk update record lama oleh admin
         if ($this->allowExistingStorage) {
-            if (str_starts_with($value, '/storage/') || str_starts_with($value, 'storage/') || str_starts_with($value, 'donasi/')) {
-                $extension = strtolower(pathinfo(parse_url($value, PHP_URL_PATH), PATHINFO_EXTENSION));
-                if (!empty($extension) && !in_array($extension, ['jpg', 'jpeg', 'png'])) {
-                    $fail("Ekstensi gambar harus berupa jpg, jpeg, atau png.");
+            if (
+                filter_var($value, FILTER_VALIDATE_URL) ||
+                str_starts_with($value, '/images/') ||
+                str_starts_with($value, 'images/') ||
+                str_starts_with($value, '/storage/') ||
+                str_starts_with($value, 'storage/') ||
+                str_starts_with($value, 'donasi/')
+            ) {
+                $extension = strtolower(pathinfo(parse_url($value, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
+                if (!empty($extension) && !in_array($extension, ['jpg', 'jpeg', 'png', 'webp'])) {
+                    $fail("Ekstensi gambar harus berupa jpg, jpeg, png, atau webp.");
                     return;
                 }
                 return;

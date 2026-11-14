@@ -53,13 +53,19 @@ class BeritaController extends Controller
 
     public function update(Request $request, Berita $berita)
     {
+        $imageRules = ['nullable', 'string'];
+        // Jika nilai gambar diubah oleh user dan bukan gambar yang sudah tersimpan sebelumnya
+        if ($request->filled('image') && $request->image !== $berita->image) {
+            $imageRules[] = new \App\Rules\Base64ImageRule(allowExistingStorage: true, maxKilobytes: 2048);
+        }
+
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'date' => 'nullable|string',
             'category' => 'nullable|string',
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
-            'image' => ['nullable', 'string', new \App\Rules\Base64ImageRule(allowExistingStorage: true, maxKilobytes: 2048)],
+            'image' => $imageRules,
             'published' => 'boolean',
         ]);
 

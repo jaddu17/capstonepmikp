@@ -32,7 +32,21 @@ export function StokDarah() {
         // Filter hanya tipe darah A, B, O, AB
         const filtered = rawList.filter((item: any) => ['A', 'B', 'O', 'AB'].includes(item.type));
         setBloodStock(filtered);
-        setLastUpdated(new Date());
+
+        // Ambil waktu pembaruan terakhir yang valid dari data database
+        let latestDate: Date | null = null;
+        for (const item of filtered) {
+          const timestamp = item.updated_at || item.created_at;
+          if (timestamp) {
+            const itemDate = new Date(timestamp);
+            if (!latestDate || itemDate > latestDate) {
+              latestDate = itemDate;
+            }
+          }
+        }
+        if (latestDate) {
+          setLastUpdated(latestDate);
+        }
       })
       .catch(err => {
         console.error("Error fetching stok darah:", err);
@@ -46,12 +60,26 @@ export function StokDarah() {
   useEffect(() => {
     fetchBloodStock(true);
 
-    // Auto-polling setiap 5 detik agar selalu real-time
+    // Polling setiap 60 detik (SOP Poin 5: efisiensi request dan tidak membebani database)
     const interval = setInterval(() => {
-      fetchBloodStock(false);
-    }, 5000);
+      // Hentikan polling jika tab browser sedang tidak dibuka oleh pengguna
+      if (document.visibilityState === 'visible') {
+        fetchBloodStock(false);
+      }
+    }, 60000);
 
-    return () => clearInterval(interval);
+    // Saat pengguna kembali fokus ke tab ini, refresh data terkini
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchBloodStock(false);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [fetchBloodStock]);
 
   const getTypeStyle = (type: string) => {
@@ -87,13 +115,13 @@ export function StokDarah() {
         ) : (
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-border mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-red-50 border-b border-red-100 gap-4">
-              <div className="flex items-center gap-2 text-red-800 font-bold text-sm sm:text-base">
-                <Calendar className="w-5 h-5 text-red-700" />
-                {lastUpdated.toLocaleDateString("id-ID", {
+              <div className="flex items-center gap-2 text-red-800 font-bold text-xs sm:text-sm">
+                <Calendar className="w-4 h-4 text-red-700" />
+                <span>Terakhir Diperbarui: {lastUpdated.toLocaleDateString("id-ID", {
                   day: "2-digit",
                   month: "long",
                   year: "numeric"
-                }).toUpperCase()} | {lastUpdated.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} WIB
+                }).toUpperCase()} | {lastUpdated.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB</span>
               </div>
 
               {/* Badge Indikator Real-Time */}

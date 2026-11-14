@@ -241,4 +241,35 @@ class BeritaTest extends TestCase
                 'published' => false,
             ]);
     }
+
+    public function test_admin_can_update_seeded_berita_with_unsplash_image_url(): void
+    {
+        $admin = User::create([
+            'name' => 'adminpmi',
+            'email' => 'admin@pmi.org',
+            'password' => 'secret123',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $unsplashUrl = 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=800&h=500&fit=crop';
+        $berita = Berita::create([
+            'title' => 'PMI Kulon Progo Kumpulkan Darah',
+            'category' => 'Donor Darah',
+            'image' => $unsplashUrl,
+            'published' => true,
+        ]);
+
+        // Mengedit berita seeder tanpa mengubah gambarnya tidak boleh ditolak
+        $response = $this->putJson("/api/beritas/{$berita->id}", [
+            'title' => 'PMI Kulon Progo Kumpulkan 300 Kantong Darah',
+            'image' => $unsplashUrl,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'title' => 'PMI Kulon Progo Kumpulkan 300 Kantong Darah',
+                'image' => $unsplashUrl,
+            ]);
+    }
 }
