@@ -1,0 +1,11 @@
+{
+  "name": "capstonepmikp",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "backend": "node backend/server.cjs",
+    "frontend": "npm --prefix frontend run dev",
+    "dev": "./frontend/node_modules/.bin/concurrently -n \"backend,frontend\" -c \"blue,green\" \"npm run backend\" \"npm run frontend\"",
+    "start": "npm run dev"
+  }
+}
