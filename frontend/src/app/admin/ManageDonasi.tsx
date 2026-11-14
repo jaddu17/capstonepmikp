@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Trash2, Calendar, Upload, X, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "@/config/api";
+import { api, getApiUrl } from "@/config/api";
 import { Pagination } from "../components/ui/pagination";
 
 interface Donation {
@@ -23,8 +23,46 @@ export function ManageDonasi() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [selectedProof, setSelectedProof] = useState<string | null>(null);
+  const [proofBlobUrl, setProofBlobUrl] = useState<string | null>(null);
+  const [loadingProof, setLoadingProof] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+
+  const handleViewProof = async (don: Donation) => {
+    setSelectedProof(don.id);
+    setLoadingProof(true);
+    setProofBlobUrl(null);
+
+    try {
+      const token = localStorage.getItem('admin_token');
+      const response = await fetch(getApiUrl(`/api/donasis/${don.id}/proof`), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'image/*',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal mengambil bukti transfer dari server.");
+      }
+
+      const blob = await response.blob();
+      setProofBlobUrl(URL.createObjectURL(blob));
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Gagal memuat bukti transfer.");
+    } finally {
+      setLoadingProof(false);
+    }
+  };
+
+  const handleCloseProof = () => {
+    if (proofBlobUrl) {
+      URL.revokeObjectURL(proofBlobUrl);
+    }
+    setProofBlobUrl(null);
+    setSelectedProof(null);
+  };
 
   const fetchDonations = (page = 1) => {
     setLoading(true);
@@ -172,7 +210,7 @@ export function ManageDonasi() {
                     <td className="px-6 py-4">
                       {don.proof ? (
                         <button
-                          onClick={() => setSelectedProof(don.proof)}
+                          onClick={() => handleViewProof(don)}
                           className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors"
                         >
                           <Upload className="w-3 h-3" /> Lihat Bukti
@@ -222,24 +260,36 @@ export function ManageDonasi() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
             <div className="p-4 border-b border-border flex justify-between items-center">
-              <h3 className="font-bold">Bukti Transfer</h3>
+              <div>
+                <h3 className="font-bold">Bukti Transfer</h3>
+                <p className="text-[11px] text-muted-foreground">Akses privat tervalidasi token Sanctum (SOP Poin 1)</p>
+              </div>
               <button
-                onClick={() => setSelectedProof(null)}
+                onClick={handleCloseProof}
                 className="p-1 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="p-4 bg-gray-50 flex justify-center">
-              <img
-                src={selectedProof}
-                alt="Bukti Transfer"
-                className="max-h-[70vh] rounded-lg shadow-md"
-              />
+            <div className="p-4 bg-gray-50 flex justify-center min-h-[220px] items-center">
+              {loadingProof ? (
+                <div className="flex flex-col items-center gap-2 py-8 text-gray-500">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  <span className="text-xs">Mengunduh bukti terenkripsi...</span>
+                </div>
+              ) : proofBlobUrl ? (
+                <img
+                  src={proofBlobUrl}
+                  alt="Bukti Transfer"
+                  className="max-h-[70vh] rounded-lg shadow-md object-contain"
+                />
+              ) : (
+                <span className="text-sm text-gray-500 italic">Bukti transfer tidak dapat dimuat.</span>
+              )}
             </div>
             <div className="p-4 border-t border-border text-right">
               <button
-                onClick={() => setSelectedProof(null)}
+                onClick={handleCloseProof}
                 className="px-6 py-2 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition-all"
               >
                 Tutup

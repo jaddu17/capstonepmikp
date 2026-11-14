@@ -128,4 +128,56 @@ class DonasiTest extends TestCase
         ]);
         $response->assertStatus(401);
     }
+
+    public function test_guest_cannot_view_donation_proof(): void
+    {
+        $donasi = Donasi::create([
+            'nama' => 'Hamba Allah',
+            'date' => '24 Oktober 2026',
+            'status' => 'Sudah Bayar',
+            'proof' => 'donasi/test_proof.png',
+        ]);
+
+        // Tamu dilarang mengakses bukti transfer privat (SOP Poin 1 & 6)
+        $response = $this->getJson("/api/donasis/{$donasi->id}/proof");
+        $response->assertStatus(401);
+    }
+
+    public function test_admin_can_view_donation_proof(): void
+    {
+        $admin = User::create([
+            'name' => 'adminpmi',
+            'email' => 'admin@pmi.org',
+            'password' => 'secret123',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        \Illuminate\Support\Facades\Storage::disk('local')->put('donasi/test_proof.png', 'dummy-image-content');
+
+        $donasi = Donasi::create([
+            'nama' => 'Hamba Allah',
+            'date' => '24 Oktober 2026',
+            'status' => 'Sudah Bayar',
+            'proof' => 'donasi/test_proof.png',
+        ]);
+
+        $response = $this->get("/api/donasis/{$donasi->id}/proof");
+        $response->assertStatus(200);
+        $this->assertEquals('dummy-image-content', $response->streamedContent());
+    }
+
+    public function test_donation_rejects_arbitrary_storage_path_as_proof(): void
+    {
+        // Publik tidak boleh menyisipkan path file internal server sebagai bukti (SOP Poin 1 & 6)
+        $payload = [
+            'nama' => 'Hacker',
+            'date' => '24 Oktober 2026',
+            'proof' => '/storage/secret_data.png',
+        ];
+
+        $response = $this->postJson('/api/donasis', $payload);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['proof']);
+    }
 }

@@ -103,10 +103,13 @@ export function ManageInfografis() {
           pelayanan: data.pelayanan ? (typeof data.pelayanan === 'string' ? JSON.parse(data.pelayanan) : data.pelayanan) : defaultData.pelayanan
         };
         setInfografisList(infografisList.map(d => d.id === activeId ? formatted : d));
-        if (activeId.startsWith("new-")) {
+        const isNewRecord = activeId.startsWith("new-");
+        if (isNewRecord) {
           setActiveId(formatted.id);
+          toast.success("Data infografis baru berhasil disimpan & disinkronkan ke WhatsApp!");
+        } else {
+          toast.success("Data infografis berhasil diperbarui!");
         }
-        toast.success("Data infografis berhasil disimpan & disinkronkan ke WhatsApp & Instagram!");
       })
       .catch((err: any) => {
         console.error(err);

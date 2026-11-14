@@ -24,7 +24,7 @@ class InfografisController extends Controller
             'kontak' => 'nullable|array',
             'stats' => 'nullable|array',
             'dokumentasi' => 'nullable|array|max:8',
-            'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
+            'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule(allowExistingStorage: false, maxKilobytes: 1024)],
             'pelayanan' => 'nullable|array',
             'quote' => 'nullable|string',
         ]);
@@ -55,8 +55,8 @@ class InfografisController extends Controller
             'tahun' => 'sometimes|string',
             'kontak' => 'nullable|array',
             'stats' => 'nullable|array',
-            'dokumentasi' => 'nullable|array',
-            'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
+            'dokumentasi' => 'nullable|array|max:8',
+            'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule(allowExistingStorage: true, maxKilobytes: 1024)],
             'pelayanan' => 'nullable|array',
             'quote' => 'nullable|string',
         ]);
@@ -69,14 +69,20 @@ class InfografisController extends Controller
 
         $infografi->update($validated);
 
-        \App\Services\FonnteService::notifyNewInfografis($infografi);
-        \App\Services\InstagramService::notifyNewInfografis($infografi);
+        // Catatan: Notifikasi WA/IG hanya dikirim saat Infografis pertama kali dibuat di store(),
+        // agar proses edit typo / revisi angka tidak membanjiri grup WhatsApp dan feed Instagram.
 
         return response()->json($infografi);
     }
 
     public function destroy(Infografis $infografi)
     {
+        if (is_array($infografi->dokumentasi)) {
+            foreach ($infografi->dokumentasi as $doc) {
+                \App\Helpers\ImageStorageHelper::deleteFile($doc, 'public');
+            }
+        }
+
         $infografi->delete();
         return response()->json(null, 204);
     }

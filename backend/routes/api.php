@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('infografis', InfografisController::class)->except(['index', 'show']);
 
     // Admin bisa melihat daftar donasi, verifikasi status (update), dan hapus
+    Route::get('donasis/{donasi}/proof', [DonasiController::class, 'showProof']);
     Route::apiResource('donasis', DonasiController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::apiResource('pesans', PesanController::class)->except(['store']);
     

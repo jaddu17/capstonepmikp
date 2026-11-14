@@ -28,7 +28,7 @@ class BeritaController extends Controller
             'category' => 'nullable|string',
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
-            'image' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
+            'image' => ['nullable', 'string', new \App\Rules\Base64ImageRule(allowExistingStorage: false, maxKilobytes: 2048)],
             'published' => 'boolean',
         ]);
 
@@ -59,11 +59,13 @@ class BeritaController extends Controller
             'category' => 'nullable|string',
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
-            'image' => ['nullable', 'string', new \App\Rules\Base64ImageRule()],
+            'image' => ['nullable', 'string', new \App\Rules\Base64ImageRule(allowExistingStorage: true, maxKilobytes: 2048)],
             'published' => 'boolean',
         ]);
 
-        if (isset($validated['image'])) {
+        if (isset($validated['image']) && str_starts_with($validated['image'], 'data:image')) {
+            // Hapus file gambar lama jika diganti (Clean Storage)
+            \App\Helpers\ImageStorageHelper::deleteFile($berita->image, 'public');
             $validated['image'] = \App\Helpers\ImageStorageHelper::storeIfBase64($validated['image'], 'berita');
         }
 
@@ -82,6 +84,8 @@ class BeritaController extends Controller
 
     public function destroy(Berita $berita)
     {
+        // Hapus file gambar saat berita dihapus
+        \App\Helpers\ImageStorageHelper::deleteFile($berita->image, 'public');
         $berita->delete();
         return response()->json(null, 204);
     }
