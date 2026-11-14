@@ -33,6 +33,7 @@ export default function App() {
         <Route path="/berita" element={<BeritaPage />} />
         <Route path="/donasi" element={<DonasiPage />} />
         <Route path="/kontak" element={<KontakPage />} />
+        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
         <Route path="/admin/login" element={<Login />} />
         <Route
           path="/admin/dashboard"
