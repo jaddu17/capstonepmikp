@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BeritaController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DonasiController;
 use App\Http\Controllers\Api\InfografisController;
 use App\Http\Controllers\Api\JadwalDonorController;
@@ -35,6 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    // Ringkasan Statistik Real-Time untuk Dashboard Admin (SOP Poin 5)
+    Route::get('dashboard/stats', [DashboardController::class, 'stats']);
 
     // Admin bebas melakukan Tambah, Edit, Hapus (except index & show)
     Route::apiResource('beritas', BeritaController::class)->except(['index', 'show']);
