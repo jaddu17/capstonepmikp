@@ -85,7 +85,13 @@ class StokDarahTest extends TestCase
 
     public function test_daily_stok_notification_command_executes_successfully(): void
     {
-        Http::fake();
+        config([
+            'services.fonnte.token' => 'token-test',
+            'services.fonnte.target' => '6281234567890',
+        ]);
+        Http::fake([
+            'api.fonnte.com/*' => Http::response(['status' => true], 200),
+        ]);
 
         StokDarah::create(['type' => 'A', 'wb' => 10, 'prc' => 15, 'tc' => 5, 'status' => 'STOK CUKUP']);
 
@@ -93,5 +99,20 @@ class StokDarahTest extends TestCase
             ->expectsOutputToContain('Mengambil data stok darah terkini')
             ->expectsOutputToContain('Notifikasi harian stok darah berhasil dijalankan')
             ->assertExitCode(0);
+
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'api.fonnte.com'));
+    }
+
+    public function test_daily_stok_notification_still_runs_when_whatsapp_not_configured(): void
+    {
+        Http::fake();
+
+        StokDarah::create(['type' => 'A', 'wb' => 10, 'prc' => 15, 'tc' => 5, 'status' => 'STOK CUKUP']);
+
+        $this->artisan('notif:stok-harian')
+            ->expectsOutputToContain('Notifikasi harian selesai dengan sebagian peringatan')
+            ->assertExitCode(0);
+
+        Http::assertNothingSent();
     }
 }

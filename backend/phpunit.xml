@@ -29,5 +29,8 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="FONNTE_TOKEN" value="" force="true"/>
+        <env name="FONNTE_TARGET" value="" force="true"/>
+        <env name="INSTAGRAM_MOCK" value="true" force="true"/>
     </php>
 </phpunit>
