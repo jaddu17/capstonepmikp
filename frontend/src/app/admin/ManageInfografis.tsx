@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Save, RefreshCw, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "@/config/api";
+import { api, getStorageUrl } from "@/config/api";
 
 interface InfografisData {
   id: string;
@@ -341,13 +341,16 @@ export function ManageInfografis() {
         {/* Documentation & Pelayanan */}
         <div className="space-y-6">
           <div className="bg-white rounded-xl border border-border p-6 shadow-sm">
-            <h3 className="font-bold mb-4 text-lg border-b pb-2">Dokumentasi (Upload Gambar)</h3>
+            <div className="flex items-center justify-between border-b pb-2 mb-4">
+              <h3 className="font-bold text-lg">Dokumentasi (Upload Gambar)</h3>
+              <span className="text-xs text-muted-foreground">Maks 6 foto (Maks 750 KB/foto)</span>
+            </div>
             <div className="grid grid-cols-2 gap-4">
-              {activeData.dokumentasi.map((url, idx) => (
+              {activeData.dokumentasi.slice(0, 6).map((url, idx) => (
                 <div key={idx} className="relative group/doc">
                   <div className="aspect-video bg-gray-100 rounded-xl border-2 border-dashed border-gray-200 overflow-hidden relative">
                     {url ? (
-                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <img src={getStorageUrl(url)} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
                         <Plus className="w-6 h-6 mb-1" />
@@ -360,8 +363,8 @@ export function ManageInfografis() {
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
-                          if (file.size > 2 * 1024 * 1024) {
-                            toast.error("Ukuran file maksimal 2MB");
+                          if (file.size > 768 * 1024) {
+                            toast.error("Ukuran file maksimal 750 KB per foto");
                             return;
                           }
                           const reader = new FileReader();

@@ -23,8 +23,8 @@ class InfografisController extends Controller
             'tahun' => 'required|string',
             'kontak' => 'nullable|array',
             'stats' => 'nullable|array',
-            'dokumentasi' => 'nullable|array|max:8',
-            'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule(allowExistingStorage: false, maxKilobytes: 1024)],
+            'dokumentasi' => 'nullable|array|max:6',
+            'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule(allowExistingStorage: false, maxKilobytes: 768)],
             'pelayanan' => 'nullable|array',
             'quote' => 'nullable|string',
         ]);
@@ -55,16 +55,27 @@ class InfografisController extends Controller
             'tahun' => 'sometimes|string',
             'kontak' => 'nullable|array',
             'stats' => 'nullable|array',
-            'dokumentasi' => 'nullable|array|max:8',
-            'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule(allowExistingStorage: true, maxKilobytes: 1024)],
+            'dokumentasi' => 'nullable|array|max:6',
+            'dokumentasi.*' => ['nullable', 'string', new \App\Rules\Base64ImageRule(allowExistingStorage: true, maxKilobytes: 768)],
             'pelayanan' => 'nullable|array',
             'quote' => 'nullable|string',
         ]);
 
         if (isset($validated['dokumentasi']) && is_array($validated['dokumentasi'])) {
-            $validated['dokumentasi'] = array_map(function ($doc) {
+            $oldDocs = is_array($infografi->dokumentasi) ? $infografi->dokumentasi : [];
+
+            $newDocs = array_map(function ($doc) {
                 return \App\Helpers\ImageStorageHelper::storeIfBase64($doc, 'infografis');
             }, $validated['dokumentasi']);
+
+            // Hapus file lama yang diganti atau dihapus dari array dokumentasi
+            foreach ($oldDocs as $oldDoc) {
+                if (!empty($oldDoc) && !in_array($oldDoc, $newDocs)) {
+                    \App\Helpers\ImageStorageHelper::deleteFile($oldDoc, 'public');
+                }
+            }
+
+            $validated['dokumentasi'] = $newDocs;
         }
 
         $infografi->update($validated);

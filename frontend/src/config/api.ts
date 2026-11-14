@@ -5,6 +5,30 @@
 
 export const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 
+/**
+ * Helper untuk resolusi URL gambar dari storage backend.
+ * Jika path gambar adalah URL lengkap (http/https) atau base64 (data:image), biarkan apa adanya.
+ * Jika berupa path lokal (seperti /storage/... atau storage/...), tambahkan backend base URL jika didefinisikan.
+ */
+export function getStorageUrl(path?: string | null): string {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+
+  // Jika API_BASE_URL diatur (misal http://localhost:8000), ambil origin-nya
+  if (API_BASE_URL) {
+    try {
+      const url = new URL(API_BASE_URL);
+      return `${url.origin}${cleanPath}`;
+    } catch {
+      return `${API_BASE_URL.replace(/\/api$/, '')}${cleanPath}`;
+    }
+  }
+  return cleanPath;
+}
+
 export function getApiUrl(endpoint: string): string {
   let path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   

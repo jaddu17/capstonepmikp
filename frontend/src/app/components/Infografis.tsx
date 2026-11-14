@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Phone, MessageCircle, Activity, Shield, Flame, Wind, Heart, Home, Camera, Info } from "lucide-react";
-import { api } from "@/config/api";
+import { api, getStorageUrl } from "@/config/api";
 
 export function Infografis() {
   const [infografisList, setInfografisList] = useState<any[]>([]);
@@ -134,7 +134,7 @@ export function Infografis() {
                 {activeData.dokumentasi?.filter((img: string | null) => img).map((img: string, idx: number) => (
                   <div key={idx} className="aspect-[4/3] bg-gray-50 rounded-2xl overflow-hidden group relative shadow-md border border-gray-200">
                     <img 
-                      src={img} 
+                      src={getStorageUrl(img)} 
                       alt={`Dokumentasi ${idx + 1}`} 
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />

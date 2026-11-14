@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Calendar, ArrowRight, X, Clock, Tag, Share2, Loader2, AlertCircle } from "lucide-react";
-import { api } from "@/config/api";
+import { api, getStorageUrl } from "@/config/api";
 import { Pagination } from "./ui/pagination";
 
 interface NewsItem {
@@ -99,7 +99,7 @@ export function Berita() {
                 >
                   <div className="aspect-[16/10] bg-gray-200 overflow-hidden relative">
                     <img
-                      src={item.image}
+                      src={getStorageUrl(item.image)}
                       alt={item.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
@@ -157,7 +157,7 @@ export function Berita() {
             <div className="overflow-y-auto custom-scrollbar">
               <div className="aspect-[21/9] w-full overflow-hidden">
                 <img 
-                  src={selectedNews.image} 
+                  src={getStorageUrl(selectedNews.image)} 
                   alt={selectedNews.title} 
                   className="w-full h-full object-cover"
                 />

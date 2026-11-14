@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
 import { Plus, Edit, Trash2, Save, X, Eye, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "@/config/api";
+import { api, getStorageUrl } from "@/config/api";
 import { Pagination } from "../components/ui/pagination";
 
 interface News {
@@ -278,7 +278,7 @@ export function ManageBerita() {
               <div className="flex items-center gap-4">
                 <div className="w-32 h-20 bg-gray-100 rounded-lg border border-border overflow-hidden flex-shrink-0">
                   {formData.image ? (
-                    <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                    <img src={getStorageUrl(formData.image)} alt="Preview" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
                       <Plus className="w-6 h-6" />

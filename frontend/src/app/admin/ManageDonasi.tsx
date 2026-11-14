@@ -275,7 +275,7 @@ export function ManageDonasi() {
               {loadingProof ? (
                 <div className="flex flex-col items-center gap-2 py-8 text-gray-500">
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                  <span className="text-xs">Mengunduh bukti terenkripsi...</span>
+                  <span className="text-xs">Memuat bukti transfer...</span>
                 </div>
               ) : proofBlobUrl ? (
                 <img
