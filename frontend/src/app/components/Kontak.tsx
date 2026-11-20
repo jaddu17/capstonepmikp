@@ -18,9 +18,19 @@ export function Kontak() {
     setIsSubmitting(true);
 
     try {
+      const now = new Date();
+      const formattedDate = now.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
       await api.post("/api/pesans", {
         ...formData,
-        date: new Date().toLocaleString("id-ID"),
+        subject: "Pertanyaan / Pesan Masyarakat",
+        date: formattedDate,
         read: false,
         replied: false,
       });
