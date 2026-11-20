@@ -1,9 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DashboardLayout } from "./DashboardLayout";
-import { Plus, Edit, Trash2, Save, X, Eye, Loader2, AlertCircle } from "lucide-react";
+import { Plus, Edit, Trash2, Save, X, Eye, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, Upload, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { api, getStorageUrl } from "@/config/api";
 import { Pagination } from "../components/ui/pagination";
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
+import { Calendar } from "../components/ui/calendar";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+
+const parseIndoDateToObj = (indoDateStr: string): Date | undefined => {
+  if (!indoDateStr) return undefined;
+  const MONTH_NAMES = [
+    "januari", "februari", "maret", "april", "mei", "juni",
+    "juli", "agustus", "september", "oktober", "november", "desember"
+  ];
+  const parts = indoDateStr.trim().split(/\s+/);
+  if (parts.length >= 3) {
+    const day = parseInt(parts[0], 10);
+    const monthIndex = MONTH_NAMES.indexOf(parts[1].toLowerCase());
+    const year = parseInt(parts[2], 10);
+    if (!isNaN(day) && monthIndex !== -1 && !isNaN(year)) {
+      return new Date(year, monthIndex, day);
+    }
+  }
+  const fallback = new Date(indoDateStr);
+  return isNaN(fallback.getTime()) ? undefined : fallback;
+};
 
 interface News {
   id: string;
@@ -54,7 +77,36 @@ export function ManageBerita() {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteImageModalOpen, setDeleteImageModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Ukuran file maksimal 2MB");
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, image: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setFormData(prev => ({ ...prev, image: "" }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const [formData, setFormData] = useState<Omit<News, "id">>({
     title: "",
     date: "",
@@ -67,15 +119,26 @@ export function ManageBerita() {
 
   const categories = ["Donor Darah", "Pelatihan", "Tanggap Darurat", "Rekrutmen"];
 
+  const handleCalendarSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    if (date) {
+      const formattedDate = format(date, "d MMMM yyyy", { locale: id });
+      setFormData(prev => ({ ...prev, date: formattedDate }));
+    } else {
+      setFormData(prev => ({ ...prev, date: "" }));
+    }
+    setCalendarOpen(false);
+  };
+
   const handleAdd = () => {
     setIsAdding(true);
+    const now = new Date();
+    setSelectedDate(now);
+    setCalendarOpen(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
     setFormData({
       title: "",
-      date: new Date().toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }),
+      date: format(now, "d MMMM yyyy", { locale: id }),
       category: "Donor Darah",
       excerpt: "",
       content: "",
@@ -86,6 +149,10 @@ export function ManageBerita() {
 
   const handleEdit = (news: News) => {
     setEditingId(news.id);
+    const parsed = parseIndoDateToObj(news.date);
+    setSelectedDate(parsed || new Date());
+    setCalendarOpen(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
     setFormData({
       title: news.title,
       date: news.date,
@@ -98,6 +165,22 @@ export function ManageBerita() {
   };
 
   const handleSave = () => {
+    if (!formData.title.trim()) {
+      toast.error("Judul berita wajib diisi.");
+      return;
+    }
+
+    if (formData.published) {
+      if (!formData.excerpt.trim()) {
+        toast.error("Ringkasan berita wajib diisi sebelum dipublikasikan.");
+        return;
+      }
+      if (!formData.content.trim()) {
+        toast.error("Isi lengkap berita wajib diisi sebelum dipublikasikan.");
+        return;
+      }
+    }
+
     const isEdit = !!editingId;
     const request = isEdit
       ? api.put(`/api/beritas/${editingId}`, formData)
@@ -131,6 +214,7 @@ export function ManageBerita() {
         
         setEditingId(null);
         setIsAdding(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
         setFormData({
           title: "",
           date: "",
@@ -178,6 +262,9 @@ export function ManageBerita() {
   const handleCancel = () => {
     setIsAdding(false);
     setEditingId(null);
+    setSelectedDate(new Date());
+    setCalendarOpen(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
     setFormData({
       title: "",
       date: "",
@@ -216,7 +303,9 @@ export function ManageBerita() {
           </h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Judul Berita</label>
+              <label className="block text-sm font-medium mb-2">
+                Judul Berita <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 value={formData.title}
@@ -227,14 +316,34 @@ export function ManageBerita() {
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Tanggal</label>
-                <input
-                  type="text"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="8 Mei 2026"
-                />
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Tanggal Publikasi</label>
+                <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white border border-border rounded-xl text-sm font-medium text-gray-800 hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-xs group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-red-50 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                          <CalendarIcon className="w-4 h-4" />
+                        </div>
+                        <span className={formData.date ? "text-gray-900 font-semibold" : "text-gray-400"}>
+                          {formData.date || "Pilih tanggal berita..."}
+                        </span>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white border border-gray-200 rounded-2xl shadow-xl z-50" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={handleCalendarSelect}
+                      initialFocus
+                      className="p-3"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Kategori</label>
@@ -253,7 +362,9 @@ export function ManageBerita() {
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Ringkasan (Snippet)</label>
+                <label className="block text-sm font-medium mb-2">
+                  Ringkasan (Snippet) {formData.published && <span className="text-red-500">*</span>}
+                </label>
                 <textarea
                   value={formData.excerpt}
                   onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
@@ -263,7 +374,9 @@ export function ManageBerita() {
                 ></textarea>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Isi Berita Lengkap</label>
+                <label className="block text-sm font-medium mb-2">
+                  Isi Berita Lengkap {formData.published && <span className="text-red-500">*</span>}
+                </label>
                 <textarea
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -275,69 +388,81 @@ export function ManageBerita() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Gambar Berita</label>
-              <div className="flex items-center gap-4">
-                <div className="w-32 h-20 bg-gray-100 rounded-lg border border-border overflow-hidden flex-shrink-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {/* Box Preview (Murni Preview Hasil) */}
+                <div className="w-36 h-24 rounded-lg border border-border bg-gray-50 flex-shrink-0 flex flex-col items-center justify-center overflow-hidden">
                   {formData.image ? (
-                    <img src={getStorageUrl(formData.image)} alt="Preview" className="w-full h-full object-cover" />
+                    <img
+                      src={getStorageUrl(formData.image)}
+                      alt="Preview Berita"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <Plus className="w-6 h-6" />
+                    <div className="flex flex-col items-center justify-center text-gray-400 p-2 text-center select-none">
+                      <ImageIcon className="w-6 h-6 mb-1 text-gray-400" />
+                      <span className="text-[11px] font-medium text-gray-500">Preview Foto</span>
                     </div>
                   )}
                 </div>
-                <div className="flex-1">
-                  <div className="relative group/upload">
-                    <input
-                      type="file"
-                      accept=".jpg,.jpeg,.png"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          if (file.size > 2 * 1024 * 1024) {
-                            toast.error("Ukuran file maksimal 2MB");
-                            return;
-                          }
-                          const reader = new FileReader();
-                          reader.onloadend = () => {
-                            setFormData({ ...formData, image: reader.result as string });
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="flex items-center gap-2 px-4 py-2 bg-white border border-border rounded-lg text-sm font-medium group-hover/upload:border-primary transition-colors">
-                      <Plus className="w-4 h-4" />
-                      {formData.image ? "Ganti Gambar" : "Upload Gambar Berita"}
-                    </div>
+
+                {/* Hidden File Input yang dikontrol ref */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".jpg,.jpeg,.png"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+
+                {/* Tombol Aksi & Keterangan */}
+                <div className="flex-1 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-border hover:border-primary text-gray-700 hover:text-primary rounded-lg text-sm font-medium shadow-sm transition-all"
+                    >
+                      <Upload className="w-4 h-4 text-primary" />
+                      {formData.image ? "Ganti File Gambar" : "Pilih File Gambar"}
+                    </button>
+
+                    {formData.image && (
+                      <button
+                        type="button"
+                        onClick={() => setDeleteImageModalOpen(true)}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 rounded-lg text-sm font-medium transition-colors"
+                        title="Hapus gambar yang dipilih"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Hapus Foto
+                      </button>
+                    )}
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-2">
-                    Format: JPG, PNG. Maksimal 2MB.
+                  <p className="text-xs text-muted-foreground">
+                    Format yang didukung: <span className="font-semibold text-gray-600">JPG, PNG</span>. Maksimal ukuran: <span className="font-semibold text-gray-600">2 MB</span>.
                   </p>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="published"
-                checked={formData.published}
-                onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-                className="w-4 h-4 text-primary border-border rounded focus:ring-primary cursor-pointer"
-              />
-              <label htmlFor="published" className="text-sm font-medium cursor-pointer">
-                Publikasikan berita
-              </label>
+            <div className="pt-1">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="published"
+                  checked={formData.published}
+                  onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
+                  className="w-4 h-4 text-primary border-border rounded focus:ring-primary cursor-pointer"
+                />
+                <label htmlFor="published" className="text-sm font-semibold cursor-pointer text-gray-800">
+                  Publikasikan berita
+                </label>
+              </div>
+              <p className="text-xs text-muted-foreground ml-6 mt-1">
+                {formData.published
+                  ? "Berita akan langsung tampil di portal publik serta disiarkan ke WhatsApp & Instagram PMI."
+                  : "Berita disimpan sebagai draft internal (belum ditampilkan di portal publik)."}
+              </p>
             </div>
-            {formData.published ? (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-800">
-                <span className="font-bold">Otomatisasi Multi-Channel:</span> Berita akan langsung tampil di portal publik dan otomatis dipublikasikan ke <strong>Grup WhatsApp PMI</strong> dan postingan feed <strong>Instagram resmi</strong> via API.
-              </div>
-            ) : (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-700">
-                <span className="font-bold">Mode Draft:</span> Berita hanya tersimpan di dashboard admin dan <strong>tidak</strong> akan muncul di portal publik maupun disiarkan ke WhatsApp/Instagram sampai opsi publikasi dicentang.
-              </div>
-            )}
           </div>
           <div className="flex gap-3 mt-4">
             <button
@@ -464,6 +589,36 @@ export function ManageBerita() {
               </button>
               <button
                 onClick={confirmDelete}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
+              >
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Image Confirmation Modal */}
+      {deleteImageModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 transform transition-all">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Hapus Gambar</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Yakin ingin menghapus gambar?
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setDeleteImageModalOpen(false)}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  handleRemoveImage();
+                  setDeleteImageModalOpen(false);
+                  toast.info("Gambar berhasil dihapus");
+                }}
                 className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
               >
                 Ya, Hapus

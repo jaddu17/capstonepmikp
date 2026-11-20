@@ -30,6 +30,10 @@ class BeritaController extends Controller
             'content' => 'nullable|string',
             'image' => ['nullable', 'string', new \App\Rules\Base64ImageRule(allowExistingStorage: false, maxKilobytes: 2048)],
             'published' => 'boolean',
+        ], [
+            'title.required' => 'Judul berita wajib diisi.',
+            'title.string' => 'Judul berita harus berupa teks.',
+            'title.max' => 'Judul berita maksimal 255 karakter.',
         ]);
 
         if (isset($validated['image'])) {
@@ -60,13 +64,17 @@ class BeritaController extends Controller
         }
 
         $validated = $request->validate([
-            'title' => 'sometimes|string|max:255',
+            'title' => 'sometimes|required|string|max:255',
             'date' => 'nullable|string',
             'category' => 'nullable|string',
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
             'image' => $imageRules,
             'published' => 'boolean',
+        ], [
+            'title.required' => 'Judul berita wajib diisi.',
+            'title.string' => 'Judul berita harus berupa teks.',
+            'title.max' => 'Judul berita maksimal 255 karakter.',
         ]);
 
         if (isset($validated['image']) && str_starts_with($validated['image'], 'data:image')) {
