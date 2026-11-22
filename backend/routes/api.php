@@ -37,6 +37,8 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    Route::put('/user/credentials', [AuthController::class, 'updateCredentials']);
+
     // Ringkasan Statistik Real-Time untuk Dashboard Admin (SOP Poin 5)
     Route::get('dashboard/stats', [DashboardController::class, 'stats']);
 
