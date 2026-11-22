@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Phone, MessageCircle, Activity, Shield, Flame, Wind, Heart, Home, Camera, Info } from "lucide-react";
+import { Phone, MessageCircle, Activity, Shield, Flame, Wind, Heart, Home, Camera, Info, ChevronDown } from "lucide-react";
 import { api, getStorageUrl } from "@/config/api";
 
 export function Infografis() {
@@ -7,23 +7,54 @@ export function Infografis() {
   const [activeData, setActiveData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchData = (isSilent = false) => {
+    if (!isSilent) setLoading(true);
     api.get('/api/infografis')
       .then(d => d.data || d)
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setInfografisList(data);
-          setActiveData(data[0]);
-        } else if (data && !Array.isArray(data)) {
-          setInfografisList([data]);
-          setActiveData(data);
+        const rawList = Array.isArray(data) ? data : (data?.data ? data.data : [data]);
+        if (Array.isArray(rawList) && rawList.length > 0) {
+          const formatted = rawList.map((d: any) => ({
+            ...d,
+            id: String(d.id),
+            kontak: d.kontak ? (typeof d.kontak === 'string' ? JSON.parse(d.kontak) : d.kontak) : {},
+            stats: d.stats ? (typeof d.stats === 'string' ? JSON.parse(d.stats) : d.stats) : {},
+            dokumentasi: d.dokumentasi ? (typeof d.dokumentasi === 'string' ? JSON.parse(d.dokumentasi) : d.dokumentasi) : [],
+            pelayanan: d.pelayanan ? (typeof d.pelayanan === 'string' ? JSON.parse(d.pelayanan) : d.pelayanan) : [],
+          }));
+          setInfografisList(formatted);
+          setActiveData((prev: any) => {
+            if (!prev) return formatted[0];
+            const currentMatch = formatted.find((item: any) => item.id === String(prev.id));
+            return currentMatch || formatted[0];
+          });
         }
-        setLoading(false);
       })
       .catch(err => {
         console.error("Error fetching infografis:", err);
-        setLoading(false);
+      })
+      .finally(() => {
+        if (!isSilent) setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchData();
+
+    // Auto-update saat tab Beranda dibuka kembali setelah admin menyimpan di tab lain
+    const handleFocus = () => fetchData(true);
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        fetchData(true);
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   if (loading) return <div className="text-center py-12 text-white">Memuat Infografis...</div>;
@@ -45,20 +76,24 @@ export function Infografis() {
             <div className="text-xl font-bold text-white/80 uppercase tracking-widest">
               Laporan Kinerja Bulan:
             </div>
-            <select 
-              value={activeData.id || ""}
-              onChange={(e) => {
-                const selected = infografisList.find(d => d.id === e.target.value);
-                if (selected) setActiveData(selected);
-              }}
-              className="px-8 py-3 bg-white border-2 border-white rounded-2xl text-2xl font-black text-[#C41E3A] shadow-xl focus:ring-4 focus:ring-white/30 outline-none appearance-none cursor-pointer hover:bg-gray-50 transition-all text-center"
-            >
-              {infografisList.map(item => (
-                <option key={item.id} value={item.id}>
-                  {item.bulan} {item.tahun}
-                </option>
-              ))}
-            </select>
+            <div className="relative inline-block">
+              <select 
+                value={String(activeData.id || "")}
+                onChange={(e) => {
+                  const targetId = String(e.target.value);
+                  const selected = infografisList.find(d => String(d.id) === targetId);
+                  if (selected) setActiveData(selected);
+                }}
+                className="pl-8 pr-12 py-3 bg-white border-2 border-white rounded-2xl text-2xl font-black text-[#C41E3A] shadow-xl focus:ring-4 focus:ring-white/30 outline-none appearance-none cursor-pointer hover:bg-gray-50 transition-all text-center"
+              >
+                {infografisList.map(item => (
+                  <option key={item.id} value={String(item.id)} className="text-gray-900 text-base font-bold">
+                    {item.bulan} {item.tahun}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-6 h-6 text-[#C41E3A] absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
         </div>
 
@@ -93,10 +128,10 @@ export function Infografis() {
                   <h3 className="text-xl font-black text-gray-900 uppercase">PELAYANAN TERPADU</h3>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {activeData.pelayanan?.map((item: string, idx: number) => (
-                    <div key={idx} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl font-bold text-gray-700 hover:bg-[#C41E3A] hover:text-white transition-all">
-                      <div className="w-2 h-2 bg-[#C41E3A] rounded-full"></div>
-                      {item}
+                  {activeData.pelayanan?.filter((item: string) => item && item.trim()).map((item: string, idx: number) => (
+                    <div key={idx} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl font-bold uppercase tracking-wide text-xs sm:text-sm text-gray-700 hover:bg-[#C41E3A] hover:text-white transition-all shadow-2xs">
+                      <div className="w-2 h-2 bg-[#C41E3A] rounded-full shrink-0"></div>
+                      <span className="truncate">{item}</span>
                     </div>
                   ))}
                 </div>

@@ -11,20 +11,57 @@ import {
   LogOut,
   Menu,
   X,
+  AlertTriangle,
 } from "lucide-react";
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  isDirty?: boolean;
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function DashboardLayout({ children, isDirty = false }: DashboardLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isUnsavedModalOpen, setIsUnsavedModalOpen] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
+
+  const handleNavClick = (e: React.MouseEvent, targetPath: string) => {
+    if (isDirty && location.pathname !== targetPath) {
+      e.preventDefault();
+      setPendingPath(targetPath);
+      setIsUnsavedModalOpen(true);
+    } else {
+      setSidebarOpen(false);
+    }
+  };
 
   const handleLogout = () => {
-    setIsLogoutModalOpen(true);
+    if (isDirty) {
+      setPendingPath("__logout__");
+      setIsUnsavedModalOpen(true);
+    } else {
+      setIsLogoutModalOpen(true);
+    }
+  };
+
+  const confirmUnsavedLeave = () => {
+    setIsUnsavedModalOpen(false);
+    if (pendingPath === "__logout__") {
+      setPendingPath(null);
+      setIsLogoutModalOpen(true);
+    } else if (pendingPath) {
+      const dest = pendingPath;
+      setPendingPath(null);
+      setSidebarOpen(false);
+      navigate(dest);
+    }
+  };
+
+  const cancelUnsavedLeave = () => {
+    setIsUnsavedModalOpen(false);
+    setPendingPath(null);
   };
 
   const confirmLogout = () => {
@@ -84,7 +121,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={() => setSidebarOpen(false)}
+                onClick={(e) => handleNavClick(e, item.path)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   isActive
                     ? "bg-primary text-white"
@@ -119,6 +156,37 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <main className="lg:ml-64 p-4 lg:p-8">{children}</main>
+
+      {/* Unsaved Changes Modal */}
+      {isUnsavedModalOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform transition-all border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 border border-amber-200">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-1.5">Perubahan Belum Disimpan</h3>
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+              Anda memiliki data yang telah diubah tetapi belum disimpan. Jika Anda meninggalkan halaman ini sekarang, semua perubahan tersebut akan hilang.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={cancelUnsavedLeave}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Tetap di Sini
+              </button>
+              <button
+                type="button"
+                onClick={confirmUnsavedLeave}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 transition-colors shadow-sm"
+              >
+                Ya, Tinggalkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Logout Modal */}
       {isLogoutModalOpen && (
