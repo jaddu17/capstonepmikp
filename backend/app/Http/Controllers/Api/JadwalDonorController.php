@@ -8,9 +8,13 @@ use Illuminate\Http\Request;
 
 class JadwalDonorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return JadwalDonor::orderBy('created_at', 'asc')->paginate(10);
+        if ($request->boolean('all')) {
+            return response()->json(JadwalDonor::orderBy('created_at', 'asc')->get());
+        }
+        $perPage = $request->query('per_page', 10);
+        return JadwalDonor::orderBy('created_at', 'asc')->paginate((int) $perPage);
     }
 
     public function store(Request $request)

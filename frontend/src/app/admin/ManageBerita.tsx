@@ -206,7 +206,7 @@ export function ManageBerita() {
         } else {
           setNewsList([formattedData, ...newsList]);
           if (formattedData.published) {
-            toast.success("Berita berhasil dipublikasikan & disinkronkan ke WhatsApp & Instagram!");
+            toast.success("Berita berhasil dipublikasikan & disinkronkan ke WhatsApp!");
           } else {
             toast.success("Draft berita berhasil disimpan (belum dipublikasikan ke publik)!");
           }
@@ -459,7 +459,7 @@ export function ManageBerita() {
               </div>
               <p className="text-xs text-muted-foreground ml-6 mt-1">
                 {formData.published
-                  ? "Berita akan langsung tampil di portal publik serta disiarkan ke WhatsApp & Instagram PMI."
+                  ? "Berita akan langsung tampil di portal publik serta disiarkan ke WhatsApp PMI."
                   : "Berita disimpan sebagai draft internal (belum ditampilkan di portal publik)."}
               </p>
             </div>

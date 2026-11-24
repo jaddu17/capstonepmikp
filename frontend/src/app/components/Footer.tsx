@@ -154,14 +154,6 @@ export function Footer() {
             <p className="text-sm text-gray-400">
               © 2026 PMI Kulon Progo. All rights reserved.
             </p>
-            <div className="flex gap-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">
-                Kebijakan Privasi
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                Syarat & Ketentuan
-              </a>
-            </div>
           </div>
         </div>
       </div>

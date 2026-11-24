@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "./DashboardLayout";
-import { Plus, Edit, Trash2, Save, X, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, Check, Clock, Users } from "lucide-react";
+import { Plus, Edit, Trash2, Save, X, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, Check, Clock, Users, CalendarCheck, History } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/config/api";
 import { Pagination } from "../components/ui/pagination";
@@ -8,25 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popove
 import { Calendar } from "../components/ui/calendar";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-
-const parseIndoDateToObj = (indoDateStr: string): Date | undefined => {
-  if (!indoDateStr) return undefined;
-  const MONTH_NAMES = [
-    "januari", "februari", "maret", "april", "mei", "juni",
-    "juli", "agustus", "september", "oktober", "november", "desember"
-  ];
-  const parts = indoDateStr.trim().split(/\s+/);
-  if (parts.length >= 3) {
-    const day = parseInt(parts[0], 10);
-    const monthIndex = MONTH_NAMES.indexOf(parts[1].toLowerCase());
-    const year = parseInt(parts[2], 10);
-    if (!isNaN(day) && monthIndex !== -1 && !isNaN(year)) {
-      return new Date(year, monthIndex, day);
-    }
-  }
-  const fallback = new Date(indoDateStr);
-  return isNaN(fallback.getTime()) ? undefined : fallback;
-};
+import { getScheduleStatus, parseJadwalDate } from "@/utils/jadwalHelper";
 
 interface Schedule {
   id: string;
@@ -144,19 +126,16 @@ export function ManageJadwal() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
+  const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
+  const [activePage, setActivePage] = useState(1);
+  const [historyPage, setHistoryPage] = useState(1);
 
-  const fetchSchedules = (page = 1) => {
+  const fetchSchedules = () => {
     setLoading(true);
     setFetchError("");
-    api.get(`/api/jadwal-donors?page=${page}`)
+    api.get('/api/jadwal-donors?all=true')
       .then(res => {
-        const items = res.data || (Array.isArray(res) ? res : []);
-        setTotalPages(res.last_page || 1);
-        setTotalItems(res.total || items.length);
-        setCurrentPage(res.current_page || page);
+        const items = Array.isArray(res) ? res : (res?.data || []);
         setSchedules(items.map((item: any) => ({ ...item, id: item.id.toString() })));
         setLoading(false);
       })
@@ -168,7 +147,7 @@ export function ManageJadwal() {
   };
 
   useEffect(() => {
-    fetchSchedules(1);
+    fetchSchedules();
   }, []);
 
   const [isAdding, setIsAdding] = useState(false);
@@ -188,6 +167,21 @@ export function ManageJadwal() {
     time: "08:00 - 12:00 WIB",
     quota: "100 orang",
   });
+
+  // Pisahkan jadwal menjadi Aktif (Hari ini & Mendatang) vs Riwayat (Selesai)
+  const activeList = schedules.filter(s => getScheduleStatus(s.date) !== 'past');
+  activeList.sort((a, b) => (parseJadwalDate(a.date)?.getTime() || 0) - (parseJadwalDate(b.date)?.getTime() || 0));
+
+  const historyList = schedules.filter(s => getScheduleStatus(s.date) === 'past');
+  historyList.sort((a, b) => (parseJadwalDate(b.date)?.getTime() || 0) - (parseJadwalDate(a.date)?.getTime() || 0));
+
+  const currentList = activeTab === 'active' ? activeList : historyList;
+  const currentPage = activeTab === 'active' ? activePage : historyPage;
+  const setCurrentPage = activeTab === 'active' ? setActivePage : setHistoryPage;
+
+  const PER_PAGE = 8;
+  const totalPages = Math.ceil(currentList.length / PER_PAGE) || 1;
+  const paginatedList = currentList.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
 
   const handleCalendarSelect = (date: Date | undefined) => {
     setSelectedDate(date);
@@ -243,8 +237,8 @@ export function ManageJadwal() {
 
   const handleEdit = (schedule: Schedule) => {
     setEditingId(schedule.id);
-    const parsed = parseIndoDateToObj(schedule.date);
-    setSelectedDate(parsed);
+    const parsed = parseJadwalDate(schedule.date);
+    setSelectedDate(parsed || undefined);
     setCalendarOpen(false);
 
     // Parse waktu jam mulai & jam selesai
@@ -299,8 +293,16 @@ export function ManageJadwal() {
           setEditingId(null);
         } else {
           setSchedules([...schedules, formatted]);
-          toast.success("Jadwal berhasil ditambahkan & disinkronkan ke WhatsApp & Instagram!");
+          toast.success("Jadwal berhasil ditambahkan & disinkronkan ke WhatsApp!");
           setIsAdding(false);
+          // Pindahkan langsung ke tab yang relevan berdasarkan tanggal yang dipilih
+          if (getScheduleStatus(formatted.date) !== 'past') {
+            setActiveTab('active');
+            setActivePage(1);
+          } else {
+            setActiveTab('history');
+            setHistoryPage(1);
+          }
         }
         setSelectedDate(undefined);
         setCalendarOpen(false);
@@ -505,85 +507,160 @@ export function ManageJadwal() {
       )}
 
       {!isAdding && !editingId && (
-        <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-border">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Tanggal</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Hari</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Lokasi</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Waktu</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Kuota</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {loading ? (
+        <>
+          {/* Tab Navigasi: Jadwal Aktif/Mendatang vs Riwayat Selesai */}
+          <div className="flex border-b border-border mb-6 gap-2">
+            <button
+              type="button"
+              onClick={() => { setActiveTab('active'); setActivePage(1); }}
+              className={`inline-flex items-center gap-2.5 px-4 py-3 text-sm font-bold border-b-2 transition-all ${
+                activeTab === 'active'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-gray-900'
+              }`}
+            >
+              <CalendarCheck className="w-4 h-4" />
+              <span>Jadwal Aktif & Mendatang</span>
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                activeTab === 'active' ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-600'
+              }`}>
+                {activeList.length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setActiveTab('history'); setHistoryPage(1); }}
+              className={`inline-flex items-center gap-2.5 px-4 py-3 text-sm font-bold border-b-2 transition-all ${
+                activeTab === 'history'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-gray-900'
+              }`}
+            >
+              <History className="w-4 h-4" />
+              <span>Riwayat Jadwal (Selesai)</span>
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                activeTab === 'history' ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-600'
+              }`}>
+                {historyList.length}
+              </span>
+            </button>
+          </div>
+
+          <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-border">
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-muted-foreground">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                        <span className="text-sm">Memuat data jadwal...</span>
-                      </div>
-                    </td>
+                    <th className="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Tanggal</th>
+                    <th className="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Hari</th>
+                    <th className="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Lokasi</th>
+                    <th className="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Waktu</th>
+                    <th className="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Kuota</th>
+                    <th className="px-6 py-3.5 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Aksi</th>
                   </tr>
-                ) : fetchError ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-red-600">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <AlertCircle className="w-6 h-6" />
-                        <span className="text-sm font-medium">{fetchError}</span>
-                        <button
-                          onClick={() => fetchSchedules(currentPage)}
-                          className="mt-2 text-xs bg-red-100 text-red-800 px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors font-semibold"
-                        >
-                          Coba Lagi
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ) : schedules.length === 0 ? (
-                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground text-sm">Belum ada jadwal donor.</td></tr>
-                ) : (
-                  schedules.map((schedule) => (
-                    <tr key={schedule.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">{schedule.date}</td>
-                      <td className="px-6 py-4">{schedule.day}</td>
-                      <td className="px-6 py-4">{schedule.location}</td>
-                      <td className="px-6 py-4">{schedule.time}</td>
-                      <td className="px-6 py-4">{schedule.quota}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {loading ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-16 text-center text-muted-foreground">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                          <span className="text-sm">Memuat data jadwal...</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : fetchError ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center text-red-600">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <AlertCircle className="w-6 h-6" />
+                          <span className="text-sm font-medium">{fetchError}</span>
                           <button
-                            onClick={() => handleEdit(schedule)}
-                            className="text-blue-600 hover:text-blue-800 p-1"
+                            onClick={fetchSchedules}
+                            className="mt-2 text-xs bg-red-100 text-red-800 px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors font-semibold"
                           >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(schedule.id)}
-                            className="text-red-600 hover:text-red-800 p-1"
-                          >
-                            <Trash2 className="w-4 h-4" />
+                            Coba Lagi
                           </button>
                         </div>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : paginatedList.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground text-sm">
+                        {activeTab === 'active'
+                          ? "Belum ada jadwal donor aktif atau mendatang. Klik 'Tambah Jadwal' untuk membuat baru."
+                          : "Belum ada riwayat jadwal donor yang telah selesai."}
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedList.map((schedule) => {
+                      const status = getScheduleStatus(schedule.date);
+                      return (
+                        <tr key={schedule.id} className="hover:bg-gray-50/80 transition-colors">
+                          <td className="px-6 py-4">
+                            {status === 'today' ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-xs">
+                                <span className="relative flex h-2 w-2">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                </span>
+                                Hari Ini
+                              </span>
+                            ) : status === 'upcoming' ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Mendatang
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                Selesai
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 font-semibold text-gray-900">{schedule.date}</td>
+                          <td className="px-6 py-4 text-gray-700">{schedule.day}</td>
+                          <td className="px-6 py-4 font-medium text-gray-900">{schedule.location}</td>
+                          <td className="px-6 py-4 text-gray-600">{schedule.time}</td>
+                          <td className="px-6 py-4 text-gray-600">{schedule.quota}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleEdit(schedule)}
+                                className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Edit Jadwal"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(schedule.id)}
+                                className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Hapus Jadwal"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
 
-            {/* Pagination Controls */}
-            <Pagination
-              currentPage={currentPage}
-              lastPage={totalPages}
-              total={totalItems}
-              onPageChange={fetchSchedules}
-            />
+              {/* Pagination Controls */}
+              <Pagination
+                currentPage={currentPage}
+                lastPage={totalPages}
+                total={currentList.length}
+                perPage={PER_PAGE}
+                onPageChange={(p) => setCurrentPage(p)}
+              />
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Delete Modal */}
