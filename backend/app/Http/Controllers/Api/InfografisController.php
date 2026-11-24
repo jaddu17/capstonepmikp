@@ -38,7 +38,6 @@ class InfografisController extends Controller
         $infografis = Infografis::create($validated);
 
         \App\Services\FonnteService::notifyNewInfografis($infografis);
-        \App\Services\InstagramService::notifyNewInfografis($infografis);
 
         return response()->json($infografis, 201);
     }
@@ -80,8 +79,8 @@ class InfografisController extends Controller
 
         $infografi->update($validated);
 
-        // Catatan: Notifikasi WA/IG hanya dikirim saat Infografis pertama kali dibuat di store(),
-        // agar proses edit typo / revisi angka tidak membanjiri grup WhatsApp dan feed Instagram.
+        // Catatan: Notifikasi WhatsApp hanya dikirim saat Infografis pertama kali dibuat di store(),
+        // agar proses edit typo / revisi angka tidak membanjiri grup WhatsApp.
 
         return response()->json($infografi);
     }

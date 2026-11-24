@@ -13,7 +13,8 @@ export const SITE_CONFIG = {
   whatsappRaw: "6281328861118",
   whatsappLink: "https://wa.me/6281328861118",
   email: "pmi.kulonprogo@gmail.com",
-  instagram: "@pmikulonprogo",
-  instagramLink: "https://instagram.com/pmikulonprogo",
+  instagram: "@humaspmikulonprogo",
+  instagramLink: "https://www.instagram.com/humaspmikulonprogo/",
+  mapsLink: "https://maps.app.goo.gl/48zFJTeA3xpcceGo9",
   emergencyContact: "(0274) 773456 / 0813-2886-1118",
 };

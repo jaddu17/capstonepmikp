@@ -44,7 +44,6 @@ class BeritaController extends Controller
 
         if ($berita->published) {
             \App\Services\FonnteService::notifyNewBerita($berita);
-            \App\Services\InstagramService::notifyNewBerita($berita);
         }
 
         return response()->json($berita, 201);
@@ -90,7 +89,6 @@ class BeritaController extends Controller
         // Jika sebelumnya berstatus draft lalu sekarang dipublikasikan, kirimkan notifikasi
         if ($wasDraft && $berita->published) {
             \App\Services\FonnteService::notifyNewBerita($berita);
-            \App\Services\InstagramService::notifyNewBerita($berita);
         }
 
         return response()->json($berita);

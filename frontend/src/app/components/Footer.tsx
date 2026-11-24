@@ -1,6 +1,7 @@
-import { Facebook, Instagram, Twitter, Mail } from "lucide-react";
+import { Instagram, MessageCircle, MapPin, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo_pmi.svg";
+import { SITE_CONFIG } from "@/config/site";
 
 export function Footer() {
   const quickLinks = [
@@ -18,11 +19,31 @@ export function Footer() {
     { name: "Pelatihan Relawan", href: "/kontak" },
   ];
 
-  const socialMedia = [
-    { name: "Facebook", icon: Facebook, href: "#" },
-    { name: "Instagram", icon: Instagram, href: "#" },
-    { name: "Twitter", icon: Twitter, href: "#" },
-    { name: "Email", icon: Mail, href: "/kontak" },
+  const quickContacts = [
+    {
+      name: "Instagram Resmi",
+      icon: Instagram,
+      href: SITE_CONFIG.instagramLink,
+      hoverClass: "hover:bg-[#E1306C]",
+    },
+    {
+      name: "WhatsApp Admin",
+      icon: MessageCircle,
+      href: SITE_CONFIG.whatsappLink,
+      hoverClass: "hover:bg-[#25D366]",
+    },
+    {
+      name: "Lokasi Google Maps",
+      icon: MapPin,
+      href: SITE_CONFIG.mapsLink,
+      hoverClass: "hover:bg-[#EA4335]",
+    },
+    {
+      name: "Email PMI",
+      icon: Mail,
+      href: `mailto:${SITE_CONFIG.email}`,
+      hoverClass: "hover:bg-[#C41E3A]",
+    },
   ];
 
   return (
@@ -31,42 +52,32 @@ export function Footer() {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center justify-center h-14 bg-white rounded-xl py-2 px-3">
+              <div className="flex items-center justify-center h-14 bg-white rounded-xl py-2 px-3 shadow-sm">
                 <img src={logo} alt="Logo PMI" className="h-full w-auto object-contain" />
               </div>
               <div className="pl-4 border-l-2 border-gray-700">
                 <div className="text-sm font-black tracking-widest text-white">KAB. KULON PROGO</div>
               </div>
             </div>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-gray-400 mb-5 leading-relaxed">
               Palang Merah Indonesia Cabang Kulon Progo melayani dengan sepenuh hati
               untuk kemanusiaan.
             </p>
-            <div className="flex gap-3">
-              {socialMedia.map((social) => {
-                const isExternal = social.href.startsWith("http") || social.href === "#";
-                return isExternal ? (
-                  <a
-                    key={social.name}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors"
-                    aria-label={social.name}
-                  >
-                    <social.icon className="w-4 h-4" />
-                  </a>
-                ) : (
-                  <Link
-                    key={social.name}
-                    to={social.href}
-                    className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors"
-                    aria-label={social.name}
-                  >
-                    <social.icon className="w-4 h-4" />
-                  </Link>
-                );
-              })}
+            {/* 4 Ikon Akses Cepat Fungsional */}
+            <div className="flex gap-2.5">
+              {quickContacts.map((contact) => (
+                <a
+                  key={contact.name}
+                  href={contact.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center text-gray-300 hover:text-white ${contact.hoverClass} transition-all duration-300 transform hover:scale-110 shadow-sm cursor-pointer`}
+                  title={contact.name}
+                  aria-label={contact.name}
+                >
+                  <contact.icon className="w-4 h-4" />
+                </a>
+              ))}
             </div>
           </div>
 
@@ -105,24 +116,34 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Kontak</h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>Jl. Bhayangkara, Serut, Pengasih</li>
-              <li>Kec. Pengasih, Kabupaten Kulon Progo</li>
-              <li>Daerah Istimewa Yogyakarta 55652</li>
+              <li>
+                <a
+                  href={SITE_CONFIG.mapsLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors block leading-relaxed"
+                  title="Lihat lokasi di Google Maps"
+                >
+                  Jl. Bhayangkara, Serut, Pengasih<br />
+                  Kec. Pengasih, Kabupaten Kulon Progo<br />
+                  Daerah Istimewa Yogyakarta 55652
+                </a>
+              </li>
               <li className="mt-3">
                 <a
-                  href="tel:0274773456"
+                  href={`tel:${SITE_CONFIG.phoneRaw}`}
                   className="hover:text-white transition-colors"
                 >
-                  (0274) 773456
+                  {SITE_CONFIG.phone}
                 </a>
               </li>
               <li>
-                <Link
-                  to="/kontak"
+                <a
+                  href={`mailto:${SITE_CONFIG.email}`}
                   className="hover:text-white transition-colors"
                 >
-                  pmi.kulonprogo@gmail.com
-                </Link>
+                  {SITE_CONFIG.email}
+                </a>
               </li>
             </ul>
           </div>

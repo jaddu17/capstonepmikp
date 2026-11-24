@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { api, getStorageUrl } from "@/config/api";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { compressImage } from "@/utils/imageCompressor";
+import { resetHeroSlidesCache } from "../components/Hero";
 
 const MONTHS = [
   { full: "JANUARI", short: "JAN" },
@@ -199,6 +200,14 @@ export function ManageInfografis() {
         const updatedList = infografisList.map(d => d.id === activeId ? formatted : d);
         setInfografisList(updatedList);
         setSavedSnapshot(JSON.stringify(updatedList));
+
+        // Sinkronisasi realtime ke Hero dan Infografis publik
+        resetHeroSlidesCache();
+        window.dispatchEvent(new CustomEvent('pmi-infografis-updated'));
+        try {
+          localStorage.setItem('pmi_infografis_last_updated', Date.now().toString());
+        } catch {}
+
         const isNewRecord = activeId.startsWith("new-");
         if (isNewRecord) {
           setActiveId(formatted.id);
@@ -253,6 +262,14 @@ export function ManageInfografis() {
             setInfografisList(updated);
             setActiveId(updated[0].id);
             setSavedSnapshot(JSON.stringify(updated));
+
+            // Sinkronisasi realtime ke Hero dan Infografis publik
+            resetHeroSlidesCache();
+            window.dispatchEvent(new CustomEvent('pmi-infografis-updated'));
+            try {
+              localStorage.setItem('pmi_infografis_last_updated', Date.now().toString());
+            } catch {}
+
             toast.success("Data berhasil dihapus dari database!");
           })
           .catch((err: any) => {

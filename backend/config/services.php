@@ -42,15 +42,6 @@ return [
         'verify_ssl' => env('CURL_VERIFY_SSL', env('APP_ENV') === 'production'),
     ],
 
-    'instagram' => [
-        'enabled' => env('INSTAGRAM_ENABLED', true),
-        'mock' => env('INSTAGRAM_MOCK', true),
-        'account_id' => env('INSTAGRAM_ACCOUNT_ID', '17841400000000000'),
-        'access_token' => env('INSTAGRAM_ACCESS_TOKEN'),
-        'verify_ssl' => env('CURL_VERIFY_SSL', env('APP_ENV') === 'production'),
-        'default_image' => env('INSTAGRAM_DEFAULT_IMAGE', 'https://raw.githubusercontent.com/jaddu17/capstonepmikp/main/frontend/public/images/pmi-banner.png'),
-    ],
-
     'admin' => [
         'password' => env('ADMIN_PASSWORD', 'pmi2026'),
     ],

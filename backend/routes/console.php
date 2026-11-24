@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Pengiriman Rekap Stok Darah Harian Otomatis ke WhatsApp & Instagram setiap jam 07:00 WIB
+// Pengiriman Rekap Stok Darah Harian Otomatis ke WhatsApp setiap jam 07:00 WIB
 Schedule::command('notif:stok-harian')->dailyAt('07:00');

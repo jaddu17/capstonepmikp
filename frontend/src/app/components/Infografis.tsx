@@ -2,6 +2,33 @@ import { useState, useEffect } from "react";
 import { Phone, MessageCircle, Activity, Shield, Flame, Wind, Heart, Home, Camera, Info, ChevronDown } from "lucide-react";
 import { api, getStorageUrl } from "@/config/api";
 
+const DEFAULT_INFOGRAFIS = {
+  id: "default",
+  bulan: "NOVEMBER",
+  tahun: "2026",
+  kontak: {
+    markas: "0274 773244",
+    ambulance: "0274 7724533",
+    whatsapp: "0813 2886 1118",
+  },
+  stats: {
+    pertolongan_pertama: 9,
+    kecelakaan: 5,
+    kebakaran: 8,
+    bencana_alam: 0,
+    evakuasi_jenazah: 3,
+    home_emergency: 7,
+  },
+  dokumentasi: [
+    "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=800",
+  ],
+  pelayanan: ["PERTOLONGAN PERTAMA", "PELAYANAN AMBULANCE", "EVAKUASI"],
+  quote: "Menjadi relawan bukan tentang seberapa besar bantuan yang diberi, tetapi seberapa tulus hati yang tergerak.",
+};
+
 export function Infografis() {
   const [infografisList, setInfografisList] = useState<any[]>([]);
   const [activeData, setActiveData] = useState<any>(null);
@@ -28,10 +55,16 @@ export function Infografis() {
             const currentMatch = formatted.find((item: any) => item.id === String(prev.id));
             return currentMatch || formatted[0];
           });
+        } else {
+          // Fallback cerdas saat database teman masih kosong agar tampilan tetap rapi & hidup
+          setInfografisList([DEFAULT_INFOGRAFIS]);
+          setActiveData((prev: any) => prev || DEFAULT_INFOGRAFIS);
         }
       })
       .catch(err => {
-        console.error("Error fetching infografis:", err);
+        console.warn("Gagal memuat infografis, menggunakan fallback default:", err);
+        setInfografisList([DEFAULT_INFOGRAFIS]);
+        setActiveData((prev: any) => prev || DEFAULT_INFOGRAFIS);
       })
       .finally(() => {
         if (!isSilent) setLoading(false);
@@ -41,19 +74,30 @@ export function Infografis() {
   useEffect(() => {
     fetchData();
 
-    // Auto-update saat tab Beranda dibuka kembali setelah admin menyimpan di tab lain
+    // Auto-update saat tab Beranda dibuka kembali atau admin menyimpan perubahan di tab lain
     const handleFocus = () => fetchData(true);
     const handleVisibility = () => {
       if (document.visibilityState === "visible") {
         fetchData(true);
       }
     };
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "pmi_infografis_last_updated") {
+        fetchData(true);
+      }
+    };
+    const handleCustomSync = () => fetchData(true);
 
     window.addEventListener("focus", handleFocus);
     window.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("pmi-infografis-updated", handleCustomSync);
+
     return () => {
       window.removeEventListener("focus", handleFocus);
       window.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("pmi-infografis-updated", handleCustomSync);
     };
   }, []);
 
@@ -109,11 +153,13 @@ export function Infografis() {
               { label: "EVAKUASI JENAZAH", value: activeData.stats?.evakuasi_jenazah || 0, icon: Shield, color: "text-slate-700" },
               { label: "HOME EMERGENCY", value: activeData.stats?.home_emergency || 0, icon: Home, color: "text-emerald-600" },
             ].map((stat, idx) => (
-              <div key={idx} className="text-center group p-4 bg-gray-50 rounded-2xl hover:bg-red-50 transition-colors border border-gray-100">
-                <div className="text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest">{stat.label}</div>
+              <div key={idx} className="flex flex-col justify-between text-center group p-4 bg-gray-50 rounded-2xl hover:bg-red-50 hover:border-red-100 transition-all border border-gray-100 shadow-2xs">
+                <div className="h-8 flex items-center justify-center text-[10px] font-black text-gray-500 uppercase tracking-widest leading-tight mb-2">
+                  <span>{stat.label}</span>
+                </div>
                 <div className={`text-4xl font-black ${stat.color} mb-2`}>{stat.value}</div>
                 <div className="flex justify-center">
-                  <stat.icon className={`w-5 h-5 ${stat.color} opacity-30`} />
+                  <stat.icon className={`w-5 h-5 ${stat.color} opacity-30 group-hover:opacity-60 transition-opacity`} />
                 </div>
               </div>
             ))}
